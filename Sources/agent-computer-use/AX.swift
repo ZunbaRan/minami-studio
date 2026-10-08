@@ -542,7 +542,9 @@ enum AXBridge {
     /// launch_app: NSWorkspace.openApplication with `activates` flag.
     static func launchApp(bundle: String, activates: Bool) throws -> NSRunningApplication {
         guard let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundle) else {
-            throw DaemonError("app_not_found", "No app found for bundle \(bundle)")
+            // [live probe] same unified label as resolveApp.
+            throw DaemonError("app_not_found",
+                "No running app matched \(bundle).")
         }
         let config = NSWorkspace.OpenConfiguration()
         config.activates = activates

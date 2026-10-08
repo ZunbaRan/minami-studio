@@ -30,9 +30,11 @@ extension Daemon {
                 return app
             }
         }
+        // [live probe .164] label is the bare bundle string when bundle
+        // was supplied (even alongside a dead pid); otherwise pid=N.
         let label: String
-        if let pid = pid, pid > 0 { label = "pid=\(pid)" }
-        else if let bundle = a.str("bundle") { label = "bundle \(bundle)" }
+        if let bundle = a.str("bundle") { label = bundle }
+        else if let pid = pid, pid > 0 { label = "pid=\(pid)" }
         else { label = "pid=0" }
         throw DaemonError("app_not_found",
                           "No running app matched \(label).")
@@ -306,8 +308,9 @@ extension Daemon {
         -> NSRunningApplication {
         guard let url = NSWorkspace.shared
                 .urlForApplication(withBundleIdentifier: bundle) else {
+            // [live probe] same unified label as resolveApp.
             throw DaemonError("app_not_found",
-                "No running app matched bundle \(bundle).")
+                "No running app matched \(bundle).")
         }
         let cfg = NSWorkspace.OpenConfiguration()
         cfg.activates = activates
@@ -947,10 +950,12 @@ extension Daemon {
             button: button, pid: pid)
 
         settlePostlude(pid: pid, baseline: baseline, a: a)
+        // [live probe .164] from/to echo the TRANSLATED desktop points,
+        // not the request values.
         return [
             "dragged": [
-                "from": ["x": sx, "y": sy],
-                "to": ["x": ex, "y": ey],
+                "from": ["x": from.x, "y": from.y],
+                "to": ["x": to.x, "y": to.y],
                 "button": button.name,
                 "coord_space": space,
             ]
@@ -1064,12 +1069,9 @@ extension Daemon {
                 return ["typed": true, "method": "ax_ref",
                         "length": text.count]
             }
-            if try EventDispatch.typeTextViaFocusedAXElement(
-                text, pid: pid) {
-                settlePostlude(pid: pid, baseline: baseline, a: a)
-                return ["typed": true, "method": "ax_ref",
-                        "length": text.count]
-            }
+            // [live probe .164] auto without ref NEVER takes the
+            // focused-AX path — it always delivers events and always
+            // reports auto_key_events.
             // physical (try?) → unicode fallback — one label either way
             if let presses = try? KeyboardLayoutTranslator
                     .keyPresses(for: text) {
@@ -1195,8 +1197,10 @@ extension Daemon {
         var resp: JSONDict = [
             "pressed": key,
             "delivered": delivery != .suppressed,
-            "via": delivery.rawValue,
         ]
+        // [live probe .164] `via` is emitted only on delivered routes
+        // (e.g. menu_ax_press); the suppressed response omits it.
+        if delivery != .suppressed { resp["via"] = delivery.rawValue }
         if delivery == .suppressed {
             // verbatim string-table literal (em dashes included)
             resp["delivery_note"] =

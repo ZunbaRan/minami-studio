@@ -145,6 +145,24 @@ Devin 侧已配置：项目根 `.devin/mcp_config.local.json` 的
 - text/scroll 系 AX 写路径挂 EnhancedUI assertion（withEnablement），
   click/drag 不挂（§6.1 证据）；type_text 事件路由包 FocusGuard
 
+## Round-2 E2E（8 场景实测）抓出的真修正
+
+ad-hoc 重签 .164 二进制起 `/tmp/real-cu.sock` 做逐条 live 对照：
+
+- `app_not_found` label = 裸 bundle 字符串（有 bundle 就 echo 它，无论
+  pid 死活）；launch/get_app_state 同一句 `No running app matched X.`
+- `type_text auto` 无 ref 恒 `auto_key_events`——砍掉 focused-AX 多余
+  路径（Alma 该路径不存在）
+- `press_key` suppressed 响应无 `via` 键；`via` 仅 delivered 路由出现
+- `dragged.from/to` 回声的是翻译后桌面点，不是请求值
+- Codex 判错的项：`press_key cmd+f` 在后台 TextEdit 真机同样
+  suppressed（无 ENABLED 菜单项持 chord），E2E 断言不可全信
+
+E2E 亮点：cmd+n 经 menu_ax_press 真在后台开新文档；pip_arm→AXPress
+minimize→自动开 PiP 会话全链路实测；gas AX-only 不还原最小化窗、
+带截图才 unminimize；armed 一次性消费；8MiB 分片行 + 双 peer 并发 +
+码点中段切片全通。
+
 ## 已拒的 Codex 建议（画蛇添足，不收）
 
 - 给 daemon 加请求体大小上限/超时（Alma 无此墙）
