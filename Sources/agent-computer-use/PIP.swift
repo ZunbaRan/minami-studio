@@ -40,23 +40,31 @@ enum LensBus {
     static let hide = Notification.Name("alma.lens.hide")
 
     /// Emitted by action paths; consumed by every PIPSession's panel lens.
-    /// userInfo: {"point": NSValue(CGPoint), "slideMs": Int} — slideMs
-    /// defaults to 180 (disasm literal).
+    /// userInfo: {"screenPoint": NSValue(CGPoint), "slideMs": Int} —
+    /// the key is `screenPoint` [native-cursor-contract §4]; slideMs
+    /// defaults to 180 (disasm literal). Posts are gated by `enabled`
+    /// (daemon --lens flag) — Lens visual work only happens when enabled.
+    static var enabled = true
     static func postMove(_ p: CGPoint, slideMs: Int = 180) {
+        guard enabled else { return }
         NotificationCenter.default.post(name: move, object: nil,
-            userInfo: ["point": NSValue(point: p), "slideMs": slideMs])
+            userInfo: ["screenPoint": NSValue(point: p), "slideMs": slideMs])
     }
     static func postClick() {
+        guard enabled else { return }
         NotificationCenter.default.post(name: click, object: nil)
     }
     static func postScroll(direction: String) {
+        guard enabled else { return }
         NotificationCenter.default.post(name: scrollBadge, object: nil,
                                         userInfo: ["direction": direction])
     }
     static func postType() {
+        guard enabled else { return }
         NotificationCenter.default.post(name: typeBadge, object: nil)
     }
     static func postHide() {
+        guard enabled else { return }
         NotificationCenter.default.post(name: hide, object: nil)
     }
 }
@@ -183,7 +191,9 @@ final class PIPFloaterWindow: NSPanel {
         backgroundColor = .windowBackgroundColor
         hasShadow = true
         minSize = CGSize(width: 200, height: 150)
-        self.title = " — \(title ?? "")"
+        // [DISASM] window chrome label: "Alma PIP" or "Alma PIP — <title>".
+        self.title = (title?.isEmpty == false)
+            ? "Alma PIP — \(title!)" : "Alma PIP"
         contentAspectRatio = NSSize(width: 1, height: 1)
         if sourceAspect > 0 {
             contentAspectRatio = NSSize(width: sourceAspect, height: 1)
@@ -228,7 +238,15 @@ final class PIPSession: NSObject, SCStreamOutput, SCStreamDelegate {
         self.windowId = windowId; self.pid = pid; self.title = title
         self.scWindow = scWindow; self.onClose = onClose
         let src = scWindow.frame
-        let size = preferredSize ?? CGSize(width: 334, height: 220) // live-probe default
+        // [DISASM 0x10004ad14–ada4] default size is aspect-derived:
+        //   sourceW=max(sw,1) sourceH=max(sh,1) aspect=W/H
+        //   width=min(max(sourceW/3,240),960) height=width/aspect
+        let size = preferredSize ?? {
+            let sw = max(src.width, 1), sh = max(src.height, 1)
+            let aspect = sw / sh
+            let w = min(max(sw / 3, 240), 960)
+            return CGSize(width: w, height: w / aspect)
+        }()
         floater = PIPFloaterWindow(mirrorOf: windowId, title: title,
                                    size: size,
                                    sourceAspect: src.width / max(src.height, 1))
@@ -274,7 +292,7 @@ final class PIPSession: NSObject, SCStreamOutput, SCStreamDelegate {
         // Prefer the resolved window element; on this macOS AXWindows can
         // return degenerate app proxies, so fall back to observing the app
         // element and filtering delivered elements by wid.
-        let winEl = AXBridge.windows(of: pid).first(where: {
+        let winEl = ((try? AXBridge.windows(of: pid)) ?? []).first(where: {
             AXBridge.windowIDNumber(of: $0) == windowId
         }) ?? PIPMinimizeArmer.shared.axWindowElement(of: appEl, cgWindowId: windowId)
         let target = winEl ?? appEl
@@ -284,13 +302,9 @@ final class PIPSession: NSObject, SCStreamOutput, SCStreamDelegate {
             guard let ctx else { return }
             let me = Unmanaged<PIPSession>.fromOpaque(ctx)
                 .takeUnretainedValue()
-            var hit = AXBridge.windowIDNumber(of: el) == me.windowId
-            if AXBridge.windowIDNumber(of: el) == nil {
-                var ep = pid_t(0)
-                AXUIElementGetPid(el, &ep)
-                if let mp = me.pid, ep == mp { hit = true }
-            }
-            guard hit else { return }
+            // Per-window filtering: destruction targets the MIRRORED
+            // session only — never every session sharing a PID [contract].
+            guard AXBridge.windowIDNumber(of: el) == me.windowId else { return }
             let wid = me.windowId, cb = me.onClose
             DispatchQueue.main.async { cb(wid) }
         }, &obs) == .success, let obs else { return }
@@ -302,39 +316,57 @@ final class PIPSession: NSObject, SCStreamOutput, SCStreamDelegate {
         axObserver = obs
     }
 
+    /// NotificationCenter observer tokens — removed on shutdown so closed
+    /// sessions stop reacting to lens broadcasts [contract: observer cleanup].
+    private var lensTokens: [NSObjectProtocol] = []
+
     /// PIPLens consumes the same "alma.lens.*" broadcast family the action
     /// layer posts — one post drives every open panel's virtual cursor.
     private func subscribeToLensBroadcasts() {
         let nc = NotificationCenter.default
-        nc.addObserver(forName: LensBus.move, object: nil,
+        lensTokens.append(nc.addObserver(forName: LensBus.move, object: nil,
                        queue: .main) { [weak self] n in
-            guard let p = (n.userInfo?["point"] as? NSValue)?.pointValue,
-                  let view = self?.floater.contentView as? PIPContentView
+            guard let self,
+                  let p = (n.userInfo?["screenPoint"] as? NSValue)?.pointValue,
+                  let view = self.floater.contentView as? PIPContentView
             else { return }
-            // Convert screen point → panel video space (letterboxed).
-            let local = view.convert(view.window?.convertPoint(fromScreen: p) ?? p,
-                                     from: nil)
+            // [native-cursor-contract §6] live source-window points map into
+            // a centered aspect-fit video rect; points outside the source
+            // are rejected; native y is inverted (1 − v).
+            let src = self.scWindow.frame
+            guard src.width > 0, src.height > 0, src.contains(p) else { return }
+            let u = (p.x - src.minX) / src.width
+            let v = 1.0 - (p.y - src.minY) / src.height
+            let videoBounds = view.videoLayer.bounds
+            let scale = min(videoBounds.width / src.width,
+                            videoBounds.height / src.height)
+            let fitW = src.width * scale, fitH = src.height * scale
+            let fit = CGRect(x: videoBounds.midX - fitW / 2,
+                             y: videoBounds.midY - fitH / 2,
+                             width: fitW, height: fitH)
+            let local = CGPoint(x: fit.minX + u * fit.width,
+                                y: fit.minY + v * fit.height)
             view.lens.moveTo(local,
                 slideMs: n.userInfo?["slideMs"] as? Int ?? 180)
-        }
-        nc.addObserver(forName: LensBus.click, object: nil,
+        })
+        lensTokens.append(nc.addObserver(forName: LensBus.click, object: nil,
                        queue: .main) { [weak self] _ in
             (self?.floater.contentView as? PIPContentView)?.lens.triggerClick()
-        }
-        nc.addObserver(forName: LensBus.scrollBadge, object: nil,
+        })
+        lensTokens.append(nc.addObserver(forName: LensBus.scrollBadge, object: nil,
                        queue: .main) { [weak self] _ in
             (self?.floater.contentView as? PIPContentView)?.lens
                 .showBadge(symbol: "arrow.up.and.down")
-        }
-        nc.addObserver(forName: LensBus.typeBadge, object: nil,
+        })
+        lensTokens.append(nc.addObserver(forName: LensBus.typeBadge, object: nil,
                        queue: .main) { [weak self] _ in
             (self?.floater.contentView as? PIPContentView)?.lens
                 .showBadge(symbol: "keyboard")
-        }
-        nc.addObserver(forName: LensBus.hide, object: nil,
+        })
+        lensTokens.append(nc.addObserver(forName: LensBus.hide, object: nil,
                        queue: .main) { [weak self] _ in
             (self?.floater.contentView as? PIPContentView)?.lens.hide()
-        }
+        })
     }
 
     private func handleStreamError(_ e: Error) {
@@ -344,6 +376,9 @@ final class PIPSession: NSObject, SCStreamOutput, SCStreamDelegate {
     }
 
     func shutdown() {
+        let nc = NotificationCenter.default
+        for t in lensTokens { nc.removeObserver(t) }
+        lensTokens.removeAll()
         if let obs = axObserver {
             CFRunLoopRemoveSource(CFRunLoopGetMain(),
                 AXObserverGetRunLoopSource(obs), .defaultMode)
@@ -380,22 +415,23 @@ final class PIPSession: NSObject, SCStreamOutput, SCStreamDelegate {
 
     /// Live-probe session dict: {window_id, pid, title,
     /// floater_frame:{x,y,w,h}, has_first_frame, last_frame_age_ms}.
+    /// pid is retained as JSON null when absent — never omitted
+    /// [PIP_EXTRA_CONTRACTS §3 SessionStatus].
     func statusSnapshot() -> JSONDict {
         let f = floater.frame
-        var d: JSONDict = [
-            "window_id": windowId,
+        return [
+            "window_id": Int(windowId),
+            "pid": pid.map { Int($0) } ?? NSNull() as Any,
             "title": title,
             "floater_frame": [
                 "x": Double(f.origin.x), "y": Double(f.origin.y),
                 "w": Double(f.size.width), "h": Double(f.size.height),
             ],
             "has_first_frame": frameCount > 0,
-            "last_frame_age_ms": frameCount > 0
+            "last_frame_age_ms": lastFrameAt > 0
                 ? Int((CACurrentMediaTime() - lastFrameAt) * 1000.0)
                 : NSNull(),
         ]
-        if let pid { d["pid"] = pid }
-        return d
     }
 }
 
@@ -423,8 +459,9 @@ final class PIPManager {
         }
         if let failure { throw DaemonError.wrap(failure) }
         guard let w = result else {
+            // [STRINGS 0x100049534–618]
             throw DaemonError("internal",
-                "No SCWindow with id \(wid) (was the window closed?)")
+                "No SCWindow with id \(wid) (window closed or off-screen?)")
         }
         return w
     }
@@ -432,6 +469,7 @@ final class PIPManager {
     /// pip_open {window_id, title?, width?, height?, pid?}
     /// [DISASM] existing sessions are checked BEFORE fresh SC lookup and
     /// brought to front; optional pid is preserved (may stay null).
+    /// New-session title: provided nonempty ?? SCWindow.title ?? "".
     func open(windowId: CGWindowID, pid: pid_t?, title: String?,
               preferredSize: CGSize?) throws -> JSONDict {
         if let existing = onMainThread({ () -> JSONDict? in
@@ -442,7 +480,7 @@ final class PIPManager {
         // SCShareableContent delivery needs a spinning main runloop — resolve
         // it BEFORE hopping to main, otherwise main.sync deadlocks.
         let scw = try scWindow(for: windowId)
-        let title = title ?? scw.title ?? ""
+        let resolvedTitle = (title?.isEmpty == false) ? title! : (scw.title ?? "")
         return try onMain {
             if let s = sessions[windowId] {
                 s.floater.orderFrontRegardless()
@@ -450,7 +488,7 @@ final class PIPManager {
             }
             let s = try PIPSession(
                 windowId: windowId, pid: pid,
-                title: title,
+                title: resolvedTitle,
                 scWindow: scw, preferredSize: preferredSize
             ) { [weak self] wid in self?.noteClosed(wid) }
             sessions[windowId] = s
@@ -458,15 +496,6 @@ final class PIPManager {
             catch { sessions[windowId] = nil; throw error }
             return ["opened": true, "session": s.statusSnapshot()]
         }
-    }
-
-    private func scOwnerPid(_ wid: CGWindowID) -> pid_t? {
-        let opts = CGWindowListOption(arrayLiteral: .optionAll)
-        guard let list = CGWindowListCopyWindowInfo(opts, kCGNullWindowID) as? [[String: Any]]
-        else { return nil }
-        return list.first(where: {
-            ($0[kCGWindowNumber as String] as? NSNumber)?.uint32Value == wid
-        })?[kCGWindowOwnerPID as String] as? pid_t
     }
 
     /// pip_close {window_id} | {all:true}
@@ -504,6 +533,11 @@ final class PIPManager {
         guard let s = sessions.removeValue(forKey: wid) else { return }
         s.shutdown()
     }
+
+    /// Used by the minimize disposition's session-exists check.
+    func hasSession(_ wid: CGWindowID) -> Bool {
+        onMainThread { sessions[wid] != nil }
+    }
 }
 
 // MARK: - PIPMinimizeArmer — "re-open as PiP when the user minimizes".
@@ -517,131 +551,142 @@ final class PIPMinimizeArmer {
     private struct Arm {
         let windowId: CGWindowID
         let pid: pid_t
-        let title: String?
+        let title: String            // stored nonoptional; empty stays ""
+        let element: AXUIElement     // the AX window element observed
         var observer: AXObserver?
     }
     private var arms: [CGWindowID: Arm] = [:]
+    private let lock = NSLock()
 
-    /// arm — direct-ID path validates the window belongs to `pid`
-    /// (a valid id owned by another pid must NOT arm [DISASM]). Returns the
-    /// stored arm tuple — duplicate arms report the stored entry.
-    func arm(windowId: CGWindowID, pid: pid_t, title: String?) throws
-        -> JSONDict {
+    /// arm — [0x10004e480]. A duplicate ID is a no-op success; the call's
+    /// own resolved tuple is echoed (status keeps the original entry).
+    /// Fresh entry: find the first AXWindows element whose
+    /// _AXUIElementGetWindow equals window_id → else internal
+    /// `No AX window element for windowId=N pid=P`; AXObserverCreate
+    /// failure → internal `AXObserverCreate failed: <int>`; both
+    /// AddNotification return codes are IGNORED.
+    func arm(windowId: CGWindowID, pid: pid_t, title: String?) throws {
         try onMain {
-            if let existing = arms[windowId] {
-                var d: JSONDict = ["window_id": Int(existing.windowId),
-                                   "pid": Int(existing.pid)]
-                if let t = existing.title { d["title"] = t }
-                return d
-            }
-            // ownership gate: the CG id must resolve in this PID's window
-            // set (AX match preferred; CG owner fallback for degraded AX).
-            var owned = false
-            for w in AXBridge.windows(of: pid) {
-                if AXBridge.windowIDNumber(of: w) == windowId {
-                    owned = true; break
-                }
-            }
-            if !owned {
-                let opts = CGWindowListOption(arrayLiteral: .optionAll)
-                let list = CGWindowListCopyWindowInfo(opts, kCGNullWindowID)
-                    as? [[String: Any]] ?? []
-                owned = list.contains(where: {
-                    ($0[kCGWindowNumber as String] as? NSNumber)?
-                        .uint32Value == windowId
-                        && ($0[kCGWindowOwnerPID as String] as? Int32) == pid
-                })
-            }
-            guard owned else {
-                throw DaemonError("invalid_arg",
-                    "No AX window element for windowId=\(windowId) "
-                    + "(pid \(pid))")
-            }
-            // Observe at the APP element: on this macOS AXWindows returns
-            // degenerate AXApplication proxies (no wid, no bounds), so the
-            // per-window element Alma's disasm resolves does not exist to
-            // subscribe to. The notification callback delivers the real
-            // window element — _AXUIElementGetWindow on it filters by wid;
-            // a single armed window for the pid falls through unfiltered.
+            lock.lock()
+            let dup = arms[windowId] != nil
+            lock.unlock()
+            if dup { return } // no-op; response echoes this call's tuple
+
             let appEl = AXUIElementCreateApplication(pid)
+            // (try? ...) — AX enumeration errors are swallowed per contract.
+            let wins = (try? AXBridge.windows(of: pid)) ?? []
+            guard let el = wins.first(where: {
+                AXBridge.windowIDNumber(of: $0) == windowId
+            }) ?? axWindowElement(of: appEl, cgWindowId: windowId) else {
+                throw DaemonError("internal",
+                    "No AX window element for windowId=\(windowId) pid=\(pid)")
+            }
             var ob: AXObserver?
-            guard AXObserverCreate(pid, { _, el, notif, ctx in
+            let createErr = AXObserverCreate(pid, { _, el, notif, ctx in
                 let me = Unmanaged<PIPMinimizeArmer>.fromOpaque(ctx!)
                     .takeUnretainedValue()
-                var eid = AXBridge.windowIDNumber(of: el)
-                if eid == nil {
-                    // delivered element didn't resolve — fall back to the
-                    // sole armed window for that pid
-                    var ep = pid_t(0)
-                    AXUIElementGetPid(el, &ep)
-                    let pidsArms = me.arms.values.filter { $0.pid == ep }
-                    if pidsArms.count == 1 { eid = pidsArms[0].windowId }
-                }
-                guard let wid = eid else { return }
+                guard let wid = AXBridge.windowIDNumber(of: el) else { return }
                 if (notif as String) == kAXUIElementDestroyedNotification {
                     DispatchQueue.main.async { _ = me.disarm(windowId: wid) }
-                } else {
+                } else if (notif as String) == kAXWindowMiniaturizedNotification {
                     DispatchQueue.main.async { me.didMinimize(windowId: wid) }
                 }
-            }, &ob) == .success, let ob else {
+            }, &ob)
+            guard createErr == .success, let ob else {
                 throw DaemonError("internal",
-                    "AXObserverCreate failed: \(ob == nil ? -1 : 0)")
+                    "AXObserverCreate failed: \(createErr.rawValue)")
             }
-            AXObserverAddNotification(ob, appEl,
+            // Both AddNotification return codes ignored per disasm.
+            AXObserverAddNotification(ob, el,
                 kAXWindowMiniaturizedNotification as CFString,
                 Unmanaged.passUnretained(self).toOpaque())
-            AXObserverAddNotification(ob, appEl,
+            AXObserverAddNotification(ob, el,
                 kAXUIElementDestroyedNotification as CFString,
                 Unmanaged.passUnretained(self).toOpaque())
             CFRunLoopAddSource(CFRunLoopGetMain(),
                                AXObserverGetRunLoopSource(ob), .defaultMode)
+            lock.lock()
             arms[windowId] = Arm(windowId: windowId, pid: pid,
-                                 title: title, observer: ob)
-            var d: JSONDict = ["window_id": Int(windowId), "pid": Int(pid)]
-            if let t = title { d["title"] = t }
-            return d
+                                 title: title ?? "",
+                                 element: el, observer: ob)
+            lock.unlock()
         }
     }
 
+    /// Queued minimize disposition [0x100052cd8+]:
+    ///   1. session already open for wid → disarm + return
+    ///   2. arm entry gone → return
+    ///   3. open(id, pid, nonempty title, nil size) — off-main so the
+    ///      SCShareableContent semaphore never blocks the runloop
+    ///   4. success → disarm   5. failure → stderr log, retain arm
     private func didMinimize(windowId: CGWindowID) {
-        guard let a = arms[windowId] else { return }
-        do {
-            _ = try PIPManager.shared.open(windowId: windowId, pid: a.pid,
-                                           title: a.title, preferredSize: nil)
-        } catch {
-            pipLog("PIP auto-open on minimise failed for wid=\(windowId): " +
-                   "\(error.localizedDescription)") // verbatim string
+        DispatchQueue.global(qos: .userInitiated).async {
+            self.lock.lock()
+            let a = self.arms[windowId]
+            self.lock.unlock()
+            guard let a else { return }
+            if PIPManager.shared.hasSession(windowId) {
+                DispatchQueue.main.async { _ = self.disarm(windowId: windowId) }
+                return
+            }
+            do {
+                _ = try PIPManager.shared.open(
+                    windowId: windowId, pid: a.pid,
+                    title: a.title.isEmpty ? nil : a.title,
+                    preferredSize: nil)
+                DispatchQueue.main.async {
+                    _ = self.disarm(windowId: windowId)
+                }
+            } catch {
+                FileHandle.standardError.write(
+                    ("PIP auto-open on minimise failed for wid=\(windowId): "
+                     + "\(error.localizedDescription)\n")
+                    .data(using: .utf8)!)
+            }
         }
     }
 
+    /// disarm [0x10004eabc]: remove entry, remove run-loop source AND both
+    /// AX notifications (return codes ignored); returns whether it existed.
     @discardableResult
     func disarm(windowId: CGWindowID) -> Bool {
-        guard let a = arms.removeValue(forKey: windowId) else { return false }
+        lock.lock()
+        guard let a = arms.removeValue(forKey: windowId) else {
+            lock.unlock(); return false
+        }
+        lock.unlock()
         if let ob = a.observer {
             CFRunLoopRemoveSource(CFRunLoopGetMain(),
                 AXObserverGetRunLoopSource(ob), .defaultMode)
+            AXObserverRemoveNotification(ob, a.element,
+                kAXWindowMiniaturizedNotification as CFString)
+            AXObserverRemoveNotification(ob, a.element,
+                kAXUIElementDestroyedNotification as CFString)
         }
         return true
     }
 
     func disarmAll() {
-        for k in arms.keys { _ = disarm(windowId: k) }
+        lock.lock()
+        let keys = Array(arms.keys)
+        lock.unlock()
+        for k in keys { _ = disarm(windowId: k) }
     }
 
-    /// [LIVE] armed entries in pip_status / pip_arm responses.
+    /// ArmedStatus {window_id, pid, title} — title always present ("" stored).
     func statusList() -> [JSONDict] {
-        arms.values.map {
-            var d: JSONDict = ["window_id": $0.windowId, "pid": $0.pid]
-            if let t = $0.title { d["title"] = t }
-            return d
+        lock.lock(); defer { lock.unlock() }
+        return arms.values.map {
+            ["window_id": Int($0.windowId), "pid": Int($0.pid),
+             "title": $0.title]
         }
     }
 
     /// CGWindowID → AX window element.
     /// Primary path is verbatim: app AXWindows + _AXUIElementGetWindow.
     /// Fallback [INFER]: Apple apps (Notes/Calculator) can return the app
-    /// element itself from AXWindows; in that case BFS AXChildren (depth 2,
-    /// CFEqual self-loop guard, 64-node cap) for real AXWindow elements.
+    /// element itself from AXWindows; in that case BFS AXChildren (CFEqual
+    /// self-loop guard, 64-node cap) for real AXWindow elements.
     func axWindowElement(of app: AXUIElement,
                          cgWindowId: CGWindowID) -> AXUIElement? {
         var rv: CFTypeRef?
@@ -674,11 +719,15 @@ final class PIPMinimizeArmer {
 
 extension Daemon {
 
-    /// Shared window picker: title exact → contains → focused → first.
-    /// AX first, CG metadata fallback for degraded AXWindows hosts.
+    /// Shared window picker [0x1000890dc–298]: title exact → title
+    /// contains → focused (CFEqual vs AXFocusedWindow) → first.
+    /// An unmatched title is a preference, not an error. AX enumeration
+    /// errors are swallowed to an empty list.
     private func pickWindow(pid: pid_t, title: String?)
-        -> (el: AXUIElement?, wid: CGWindowID, title: String?)? {
-        let wins = AXBridge.windows(of: pid)
+        -> (wid: CGWindowID, title: String?)? {
+        let app = AXUIElementCreateApplication(pid)
+        let wins = (try? AXBridge.windows(of: pid)) ?? []
+        guard !wins.isEmpty else { return nil }
         var target: AXUIElement?
         if let t = title, !t.isEmpty {
             target = wins.first {
@@ -688,37 +737,22 @@ extension Daemon {
                     == true
             }
         }
-        if target == nil {
-            target = wins.first {
-                AXBridge.copyBool($0, kAXFocusedAttribute) == true
-                    || AXBridge.copyBool($0, kAXMainAttribute) == true
-            }
+        if target == nil,
+           let focused = AXBridge.copyAttr(app,
+                    kAXFocusedWindowAttribute) as! AXUIElement? {
+            target = wins.first { CFEqual($0, focused) }
         }
         target = target ?? wins.first
-        if let el = target, let wid = AXBridge.windowIDNumber(of: el) {
-            return (el, wid, AXBridge.copyString(el, kAXTitleAttribute))
-        }
-        // CG fallback — same selection order over CGWindowList rows.
-        let rows = WindowList.windows(pid: pid)
-        var row: [String: Any]?
-        if let t = title, !t.isEmpty {
-            row = rows.first {
-                ($0[kCGWindowName as String] as? String) == t
-            } ?? rows.first {
-                ($0[kCGWindowName as String] as? String)?.contains(t)
-                    == true
-            }
-        }
-        row = row ?? rows.first
-        guard let r = row,
-              let wid = (r[kCGWindowNumber as String] as? NSNumber)?
-                  .uint32Value
+        guard let el = target,
+              let wid = AXBridge.windowIDNumber(of: el)
         else { return nil }
-        return (nil, wid, r[kCGWindowName as String] as? String)
+        return (wid, AXBridge.copyString(el, kAXTitleAttribute))
     }
 
-    /// pip_open — direct window_id, else app/title/focused/first resolution.
-    /// Partial/invalid width/height collapse to nil preferred size.
+    /// pip_open — direct window_id path takes no ownership/bundle
+    /// resolution; app path: resolveApp → selectWindow rules. Partial or
+    /// nonpositive width/height collapses to nil preferred size. Empty
+    /// resolved title becomes nil before manager.open [0x10007c6a8–c7c0].
     func cmdPipOpen(_ a: JSONDict) throws -> JSONDict {
         var size: CGSize?
         if let w = a.double("width"), let h = a.double("height"),
@@ -734,59 +768,61 @@ extension Daemon {
         let app = try resolveApp(a)
         guard let picked = pickWindow(pid: app.processIdentifier,
                                       title: a.str("title")) else {
-            throw DaemonError("invalid_arg",
-                "App has no windows to mirror.")
+            throw DaemonError("internal", "App has no windows to mirror.")
         }
         return try PIPManager.shared.open(
             windowId: picked.wid, pid: app.processIdentifier,
-            title: a.str("title") ?? picked.title, preferredSize: size)
+            title: picked.title, preferredSize: size)
     }
 
-    /// pip_close — all:true wins; window_id is never parsed on the all path.
+    /// pip_close — `all` is read FIRST; window_id is never parsed on the
+    /// all path (invalid/out-of-range input included) [0x10007c70c–c7b4].
     func cmdPipClose(_ a: JSONDict) throws -> JSONDict {
-        try PIPManager.shared.close(
-            windowId: a.int("window_id").map(CGWindowID.init),
-            all: a.bool("all") ?? false)
+        if a.bool("all") ?? false {
+            return try PIPManager.shared.close(windowId: nil, all: true)
+        }
+        guard let wid = a.int("window_id") else {
+            throw DaemonError("invalid_arg",
+                "missing \"window_id\" (or pass \"all\": true)")
+        }
+        return try PIPManager.shared.close(
+            windowId: CGWindowID(wid), all: false)
     }
 
     func cmdPipStatus(_ a: JSONDict) throws -> JSONDict {
         try PIPManager.shared.status()
     }
 
-    /// pip_arm — id+pid direct (ownership enforced); otherwise app/title/
-    /// focused/first reselection. Returns the resolved arm tuple.
+    /// pip_arm — direct path requires BOTH window_id AND pid (no CG
+    /// derivation for id-only); otherwise resolveApp → selectWindow.
+    /// Response: {"armed":{window_id,pid,title:<resolved, may be "">}}.
     func cmdPipArm(_ a: JSONDict) throws -> JSONDict {
-        if let wid = a.int("window_id") {
-            var pid = a.int("pid").map(pid_t.init)
-            if pid == nil {
-                // derive owner from CGWindowList for an id-only request
-                let list = CGWindowListCopyWindowInfo(
-                    .optionAll, kCGNullWindowID) as? [[String: Any]] ?? []
-                pid = list.first(where: {
-                    ($0[kCGWindowNumber as String] as? NSNumber)?
-                        .uint32Value == CGWindowID(wid)
-                })?[kCGWindowOwnerPID as String] as? pid_t
+        var wid: CGWindowID
+        var pid: pid_t
+        var title: String
+        if let w = a.int("window_id"), let p = a.int("pid") {
+            wid = CGWindowID(w)
+            pid = pid_t(p)
+            title = a.str("title") ?? ""
+        } else {
+            let app = try resolveApp(a)
+            guard let picked = pickWindow(pid: app.processIdentifier,
+                                          title: a.str("title")) else {
+                throw DaemonError("internal", "App has no windows to arm.")
             }
-            guard let p = pid else {
-                throw DaemonError("invalid_arg",
-                    "No AX window element for windowId=\(wid) (pid 0)")
-            }
-            return try PIPMinimizeArmer.shared.arm(
-                windowId: CGWindowID(wid), pid: p, title: a.str("title"))
+            wid = picked.wid
+            pid = app.processIdentifier
+            title = picked.title ?? ""
         }
-        let app = try resolveApp(a)
-        guard let picked = pickWindow(pid: app.processIdentifier,
-                                      title: a.str("title")) else {
-            throw DaemonError("invalid_arg",
-                "App has no windows to arm.")
-        }
-        return try PIPMinimizeArmer.shared.arm(
-            windowId: picked.wid, pid: app.processIdentifier,
-            title: a.str("title") ?? picked.title)
+        try PIPMinimizeArmer.shared.arm(
+            windowId: wid, pid: pid,
+            title: title.isEmpty ? nil : title)
+        return ["armed": ["window_id": Int(wid), "pid": Int(pid),
+                          "title": title]]
     }
 
-    /// pip_disarm — {"disarmed":"all"} | {"disarmed":Bool,"window_id":N};
-    /// missing id is rejected, never silently accepted.
+    /// pip_disarm — `all` first, same contract as pip_close:
+    /// {"disarmed":"all"} | {"disarmed":Bool,"window_id":N}.
     func cmdPipDisarm(_ a: JSONDict) throws -> JSONDict {
         if a.bool("all") ?? false {
             try onMainThread { PIPMinimizeArmer.shared.disarmAll() }

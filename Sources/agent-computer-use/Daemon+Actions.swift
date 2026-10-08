@@ -10,24 +10,25 @@ import Foundation
 
 extension Daemon {
 
-    /// resolveApp — PID → live NSRunningApplication; falls back to bundle,
-    /// then exact localizedName. Total failure → app_not_found with the
-    /// label `pid=<n>` / `bundle <b>` (pid=0 when neither was supplied).
+    /// resolveApp [DISASM]: pid → live NSRunningApplication; bundle →
+    /// bundleID match first, then localizedName == bundle. There is no
+    /// `name` argument. Failure → app_not_found `pid=<n>` / `bundle <b>`
+    /// / `pid=0` when nothing was supplied.
     func resolveApp(_ a: JSONDict) throws -> NSRunningApplication {
         let pid = a.int("pid")
         if let pid = pid, pid > 0,
            let app = NSRunningApplication(processIdentifier: pid_t(pid)) {
             return app
         }
-        if let bundle = a.str("bundle"),
-           let app = NSRunningApplication
-               .runningApplications(withBundleIdentifier: bundle).first {
-            return app
-        }
-        if let name = a.str("name"),
-           let app = NSWorkspace.shared.runningApplications
-               .first(where: { $0.localizedName == name }) {
-            return app
+        if let bundle = a.str("bundle") {
+            if let app = NSRunningApplication
+                .runningApplications(withBundleIdentifier: bundle).first {
+                return app
+            }
+            if let app = NSWorkspace.shared.runningApplications
+                .first(where: { $0.localizedName == bundle }) {
+                return app
+            }
         }
         let label: String
         if let pid = pid, pid > 0 { label = "pid=\(pid)" }
@@ -37,12 +38,17 @@ extension Daemon {
                           "No running app matched \(label).")
     }
 
-    /// resolveApp for state/snapshot commands — a bundle that is not running
-    /// is cold-launched with focus preserved, then waited on.
+    /// get_app_state's auto-launch predicate [DISASM]: only when
+    /// `auto_launch` is enabled (default), `bundle` is present, `pid` is
+    /// absent, and the bundle is not already running. Ordinary resolution
+    /// proceeds first; a missing bundle target launches in the background.
     func resolveAppForState(_ a: JSONDict) throws -> NSRunningApplication {
         do { return try resolveApp(a) }
         catch let e as DaemonError where e.code == "app_not_found" {
-            guard let bundle = a.str("bundle") else { throw e }
+            let autoLaunch = a.bool("auto_launch") ?? true
+            guard autoLaunch,
+                  a.int("pid") == nil,
+                  let bundle = a.str("bundle") else { throw e }
             let launched = try launchWithFrontmostPreserved(bundle: bundle)
             EventDispatch.waitUntilReady(pid: launched.processIdentifier)
             return launched
@@ -100,24 +106,26 @@ extension Daemon {
         return (AXUIElementCopyActionNames(el, &names) == .success
                 ? (names as? [String]) : nil) ?? []
     }
-    /// Live bounds first (elements move); snapshot descriptor fallback.
+    /// Action points use CURRENT AXPosition/AXSize only — a stale
+    /// descriptor bound is never consulted [DISASM: live-only].
     func bounds(of e: ElementStore.Entry) -> CGRect? {
-        AXBridge.axBounds(e.element) ?? e.descriptor.bounds
+        AXBridge.axBounds(e.element)
     }
     /// Live window id for pointer-event window-local metadata.
     func windowID(of e: ElementStore.Entry) -> CGWindowID? {
         AXBridge.windowIDNumber(of: e.element)
     }
 
-    /// Common settle prelude/postlude driver. settle_ms arg, default 600ms.
+    /// Common settle prelude/postlude driver. settle_ms arg, default 600ms;
+    /// parsed with the native int() accessor (Int/trunc-Double/String).
     func settlePrelude(pid: pid_t) -> UInt32 {
         Settle.hash(pid: pid)
     }
     func settlePostlude(pid: pid_t, baseline: UInt32, a: JSONDict) {
+        // 0x10008616c: baseline == 0 exits before the loop is entered.
         guard baseline != 0 else { return }
-        let budget = (a["settle_ms"] as? Int)
-            ?? (a["settle_ms"] as? Double).map(Int.init) ?? 600
-        Settle.wait(pid: pid, baseline: baseline, budgetMs: budget)
+        Settle.wait(pid: pid, baseline: baseline,
+                    budgetMs: a.int("settle_ms") ?? 600)
     }
 }
 
@@ -125,8 +133,9 @@ extension Daemon {
 
 /// UInt32 sampled-byte hash over the cached mapping's window image:
 /// seed 0xdeadbeef, per byte h = (h &* 0x01000193) ^ b, stride
-/// max(1, byteCount/64). Postlude polls every 40ms until the hash returns
-/// to baseline or the per-command budget (default 600ms) expires.
+/// max(1, byteCount/64). Postlude polls every 40ms until the window
+/// pixels DIFFER from baseline (the action visibly settled) or the
+/// per-command budget (default 600ms) expires.
 enum Settle {
     static func hash(pid: pid_t) -> UInt32 {
         guard let wid = Capture.mapping(for: pid)?.wid
@@ -147,7 +156,9 @@ enum Settle {
         let deadline = Date().addingTimeInterval(Double(budgetMs) / 1000.0)
         while Date() < deadline {
             usleep(40_000)
-            if hash(pid: pid) == baseline { return }
+            // 0x100086568: exit iff hash != 0 && hash != baseline.
+            let h = hash(pid: pid)
+            if h != 0 && h != baseline { return }
         }
     }
 }
@@ -167,11 +178,10 @@ extension Daemon {
         [
             "accessibility": AXIsProcessTrusted(),
             "screen_recording": Capture.screenRecordingCached(),
+            // [live probe] focus_guard carries exactly two keys.
             "focus_guard": [
                 "armed": FocusStealPreventer.shared.armed,
                 "arm_failures": FocusStealPreventer.shared.armFailures,
-                "tap_disables_recovered": FocusStealPreventer.shared
-                    .tapDisablesRecovered,
             ],
         ]
     }
@@ -261,13 +271,22 @@ extension Daemon {
         ]
     }
 
-    /// launch_app — launchWithFrontmostPreserved; response echoes request.
+    /// launch_app [DISASM]: an already-running bundle match returns
+    /// immediately — no openApplication, no waitUntilReady. A cold launch
+    /// is followed by the native ~0.2s delay before the response.
     func cmdLaunchApp(_ a: JSONDict) throws -> JSONDict {
         let bundle = try requireStr(a, "bundle")
         let activates = a.bool("activates") ?? false
-        let app = try launchWithFrontmostPreserved(bundle: bundle,
-                                                   activates: activates)
-        EventDispatch.waitUntilReady(pid: app.processIdentifier)
+        let app: NSRunningApplication
+        if let running = NSRunningApplication
+            .runningApplications(withBundleIdentifier: bundle).first {
+            app = running
+        } else {
+            app = try launchWithFrontmostPreserved(
+                bundle: bundle, activates: activates)
+            EventDispatch.waitUntilReady(pid: app.processIdentifier)
+            usleep(200_000) // native 0.2s launch delay
+        }
         return [
             "launched": true,
             "activates": activates,
@@ -319,153 +338,290 @@ extension Daemon {
     }
 }
 
+/// AppUsage [APP_USAGE_CONTRACT]: running seed dict + unbundled array →
+/// NSMetadataQuery (main-queue lifecycle, observers signal only, 2s → [])
+/// → bundle-keyed merge (running fields preserved; path keeps non-nil —
+/// "" counts; count/date overwritten unconditionally incl. nil) →
+/// dict.values + unbundled → stable 4-stage sort → nine-key rows.
 enum AppUsage {
-    /// Nine-key rows: bundle, name, pid, path, running, active, use_count,
-    /// last_used_at, intents.
+
+    struct AppInfo {
+        var bundle: String?; var name: String; var pid: Int?
+        var active = false; var running = false
+        var path: String?; var useCount: Int?; var lastUsedAt: Date?
+    }
+    private struct MDEntry {
+        var bundle: String?; var name: String; var path: String
+        var useCount: Int?; var lastUsedAt: Date?
+    }
+
     static func list(days: Int) -> [JSONDict] {
-        struct Row {
-            var bundle: String?; var name: String; var pid: Int?
-            var path: String?; var running = false; var active = false
-            var useCount: Int?; var lastUsed: Date?
-        }
-        var rows: [Row] = []
-        let frontPID = NSWorkspace.shared.frontmostApplication?
-            .processIdentifier ?? 0
+        // §3 running seed — activationPolicy==.regular only; later
+        // instances of a bundle replace earlier ones; nil bundles append
+        // to the separate unbundled array.
+        var dict: [String: AppInfo] = [:]
+        var unbundled: [AppInfo] = []
+        let front = NSWorkspace.shared.frontmostApplication
+        let frontPID = front?.processIdentifier
         for app in NSWorkspace.shared.runningApplications
         where app.activationPolicy == .regular {
-            rows.append(Row(
+            let info = AppInfo(
                 bundle: app.bundleIdentifier,
                 name: app.localizedName ?? "(unknown)",
                 pid: Int(app.processIdentifier),
-                path: app.bundleURL?.path,
+                active: frontPID != nil
+                    && app.processIdentifier == frontPID,
                 running: true,
-                active: app.processIdentifier == frontPID,
-                useCount: nil, lastUsed: nil))
+                path: app.bundleURL?.path)
+            if let b = info.bundle { dict[b] = info }
+            else { unbundled.append(info) }
         }
-        // NSMetadataQuery — application bundles used within `days`.
-        let cutoff = Date().addingTimeInterval(-86400 * Double(days))
-        let q = NSMetadataQuery()
-        q.searchScopes = [NSMetadataQueryLocalComputerScope]
-        q.predicate = NSPredicate(format:
-            "kMDItemContentType == 'com.apple.application-bundle' "
-            + "AND kMDItemLastUsedDate >= %@", cutoff as NSDate)
-        q.valueListAttributes = [
-            NSMetadataItemDisplayNameKey,
-            NSMetadataItemCFBundleIdentifierKey,
-            NSMetadataItemLastUsedDateKey,
-            "kMDItemUseCount",
-            NSMetadataItemPathKey,
-        ]
-        let sem = DispatchSemaphore(value: 0)
-        var metaRows: [Row] = []
-        let obs = NotificationCenter.default.addObserver(
-            forName: .NSMetadataQueryDidFinishGathering,
-            object: q, queue: nil) { _ in
-            q.disableUpdates()
-            for i in 0..<q.resultCount {
-                guard let it = q.result(at: i) as? NSMetadataItem
-                else { continue }
-                metaRows.append(Row(
-                    bundle: it.value(
-                        forAttribute: NSMetadataItemCFBundleIdentifierKey)
-                        as? String,
-                    name: (it.value(
-                        forAttribute: NSMetadataItemDisplayNameKey)
-                        as? String) ?? "(unknown)",
-                    pid: nil,
-                    path: it.value(
-                        forAttribute: NSMetadataItemPathKey) as? String,
-                    running: false, active: false,
-                    useCount: it.value(
-                        forAttribute: "kMDItemUseCount") as? Int,
-                    lastUsed: it.value(
-                        forAttribute: NSMetadataItemLastUsedDateKey)
-                        as? Date))
-            }
-            sem.signal()
-        }
-        q.start()
-        _ = sem.wait(timeout: .now() + 2.0)
-        q.stop()
-        NotificationCenter.default.removeObserver(obs)
-        // Merge: bundle rows dedupe by exact bundle id (later wins);
-        // running row keeps name/pid/flags, metadata fills path/count/date.
-        for m in metaRows.sorted(by: {
-            ($0.lastUsed ?? .distantPast) > ($1.lastUsed ?? .distantPast)
-        }) {
-            if let b = m.bundle,
-               let idx = rows.firstIndex(where: { $0.bundle == b }) {
-                if rows[idx].path == nil { rows[idx].path = m.path }
-                if let uc = m.useCount { rows[idx].useCount = uc }
-                if let lu = m.lastUsed { rows[idx].lastUsed = lu }
+        // §5 merge — metadata rows in returned query order; a duplicate
+        // bundle row OVERWRITES count/date unconditionally.
+        for m in recentMetadata(days: days) {
+            if let b = m.bundle {
+                if var row = dict[b] {
+                    if row.path == nil { row.path = m.path }
+                    row.useCount = m.useCount
+                    row.lastUsedAt = m.lastUsedAt
+                    dict[b] = row
+                } else {
+                    dict[b] = AppInfo(
+                        bundle: b, name: m.name, pid: nil,
+                        path: m.path, useCount: m.useCount,
+                        lastUsedAt: m.lastUsedAt)
+                }
             } else {
-                rows.append(m)
+                unbundled.append(AppInfo(
+                    bundle: nil, name: m.name, pid: nil,
+                    path: m.path, useCount: m.useCount,
+                    lastUsedAt: m.lastUsedAt))
             }
         }
-        let fmt = ISO8601DateFormatter()
-        return rows.sorted { lhs, rhs in
-            if lhs.active != rhs.active { return lhs.active }
-            if lhs.running != rhs.running { return lhs.running }
-            if (lhs.useCount ?? -1) != (rhs.useCount ?? -1) {
-                return (lhs.useCount ?? -1) > (rhs.useCount ?? -1)
+        var rows = Array(dict.values)
+        rows.append(contentsOf: unbundled)
+        // §6 stable 4-stage comparator (decorate-sort to keep ties stable)
+        let decorated = rows.enumerated().sorted { a, b in
+            let (l, r) = (a.element, b.element)
+            if l.active != r.active { return l.active }
+            if l.running != r.running { return l.running }
+            if (l.useCount ?? -1) != (r.useCount ?? -1) {
+                return (l.useCount ?? -1) > (r.useCount ?? -1)
             }
-            return lhs.name.lowercased() < rhs.name.lowercased()
-        }.map { r in
+            if l.name.lowercased() != r.name.lowercased() {
+                return l.name.lowercased() < r.name.lowercased()
+            }
+            return a.offset < b.offset
+        }.map { $0.element }
+        let fmt = ISO8601DateFormatter() // NSISO8601 default, no options
+        return decorated.map { r in
             [
                 "bundle": r.bundle as Any? ?? NSNull(),
                 "name": r.name,
                 "pid": r.pid as Any? ?? NSNull(),
-                "path": r.path as Any? ?? NSNull(),
-                "running": r.running,
                 "active": r.active,
+                "running": r.running,
+                "path": r.path as Any? ?? NSNull(),
                 "use_count": r.useCount as Any? ?? NSNull(),
-                "last_used_at": r.lastUsed.map { fmt.string(from: $0) }
-                    as Any? ?? NSNull(),
-                "intents": IntentRegistry.intents(for: r.bundle ?? ""),
+                "last_used_at": r.lastUsedAt
+                    .map { fmt.string(from: $0) } as Any? ?? NSNull(),
+                "intents": IntentRegistry.intents(for: r.bundle),
             ]
         }
     }
+
+    /// §4 NSMetadataQuery — start/stop on the MAIN queue; the gathering
+    /// observer only collects+signals; 2s timeout discards partial rows.
+    private static func recentMetadata(days: Int) -> [MDEntry] {
+        let q = NSMetadataQuery()
+        q.searchScopes = [NSMetadataQueryLocalComputerScope]
+        q.predicate = NSPredicate(format:
+            "kMDItemContentType == 'com.apple.application-bundle' "
+            + "AND kMDItemLastUsedDate >= %@",
+            Date().addingTimeInterval(-86400.0 * Double(days)) as NSDate)
+        q.valueListAttributes = [
+            "kMDItemDisplayName", "kMDItemCFBundleIdentifier",
+            "kMDItemLastUsedDate", "kMDItemUseCount", "kMDItemPath",
+            "kMDItemFSName",
+        ]
+        let sem = DispatchSemaphore(value: 0)
+        var rows: [MDEntry] = []
+        var obs: NSObjectProtocol?
+        DispatchQueue.main.sync {
+            obs = NotificationCenter.default.addObserver(
+                forName: .NSMetadataQueryDidFinishGathering,
+                object: q, queue: nil) { _ in
+                q.disableUpdates()
+                for i in 0..<q.resultCount {
+                    guard let it = q.result(at: i) as? NSMetadataItem
+                    else { continue }
+                    rows.append(MDEntry(
+                        bundle: it.value(
+                            forAttribute: "kMDItemCFBundleIdentifier")
+                            as? String,
+                        name: (it.value(
+                                forAttribute: "kMDItemDisplayName")
+                               as? String)
+                            ?? (it.value(forAttribute: "kMDItemFSName")
+                                as? String)
+                            ?? "(unknown)",
+                        path: (it.value(forAttribute: "kMDItemPath")
+                               as? String) ?? "",
+                        useCount: it.value(
+                            forAttribute: "kMDItemUseCount") as? Int,
+                        lastUsedAt: it.value(
+                            forAttribute: "kMDItemLastUsedDate") as? Date))
+                }
+                sem.signal()
+            }
+            q.start()
+        }
+        let timedOut = sem.wait(timeout: .now() + 2.0) == .timedOut
+        DispatchQueue.main.sync {
+            q.stop()
+            if let o = obs {
+                NotificationCenter.default.removeObserver(o)
+            }
+        }
+        return timedOut ? [] : rows // timeout discards partial results
+    }
 }
 
-/// Registered app-native intents (Layer-1 registry; currently none).
+/// IntentRegistry [APP_INTENTS_METADATA]: lazy dictionary keyed by exact
+/// bundle id — 7 keys, 15 intents; per-app order preserved. Emitted as
+/// {name, description, required_params, optional_params} objects; nil
+/// bundle or unregistered → [].
 enum IntentRegistry {
-    static func intents(for bundle: String) -> [String] { [] }
+    struct Intent {
+        let name: String; let desc: String
+        let required: [String]; let optional: [String]
+        func wire() -> JSONDict {
+            ["name": name, "description": desc,
+             "required_params": required, "optional_params": optional]
+        }
+    }
+    private static let table: [String: [Intent]] = [
+        "com.netease.163music": [
+            Intent(name: "launch",
+                desc: "Open NetEase Music without changing frontmost app.",
+                required: [], optional: []),
+            Intent(name: "play_song",
+                desc: "Play a specific NetEase song by its numeric "
+                    + "song_id.",
+                required: ["song_id"], optional: []),
+            Intent(name: "open_playlist",
+                desc: "Open a NetEase playlist by its numeric "
+                    + "playlist_id.",
+                required: ["playlist_id"], optional: []),
+            Intent(name: "play_daily_recommendation",
+                desc: "Open NetEase's '每日推荐' (daily recommendation) "
+                    + "page. Discovered via webfiles/hybrid route "
+                    + "'/dailyRecommend'.",
+                required: [], optional: []),
+            Intent(name: "open_history_recommend",
+                desc: "Open the historical recommendations page. "
+                    + "Route '/historyRecommend'.",
+                required: [], optional: []),
+            Intent(name: "open_route",
+                desc: "Generic NetEase route dispatcher. `route` param "
+                    + "is one of: dailyRecommend, historyRecommend, "
+                    + "historyPlaylist, styleRecommend, similarArtist, "
+                    + "ranking, playlist, album, artist, albumlist, "
+                    + "musicDesktop, localMusic, login. Other values "
+                    + "may also work — this is the raw "
+                    + "`orpheus://route/<name>` bridge.",
+                required: ["route"], optional: []),
+        ],
+        "com.apple.Music": [
+            Intent(name: "launch",
+                desc: "Open Music.app in the background.",
+                required: [], optional: []),
+            Intent(name: "open_url",
+                desc: "Open an Apple Music URL (music.apple.com/… "
+                    + "or music://…).",
+                required: ["url"], optional: []),
+        ],
+        "com.spotify.client": [
+            Intent(name: "launch",
+                desc: "Open Spotify in the background.",
+                required: [], optional: []),
+            Intent(name: "play_uri",
+                desc: "Play a Spotify URI, e.g. "
+                    + "spotify:track:4iV5W9uYEdYUVa79Axb7Rh or "
+                    + "spotify:playlist:37i9dQZF1DXcBWIGoYBM5M.",
+                required: ["uri"], optional: []),
+        ],
+        "com.apple.mail": [
+            Intent(name: "compose",
+                desc: "Open a new message. All params optional: to, "
+                    + "subject, body, cc, bcc.",
+                required: [],
+                optional: ["to", "subject", "body", "cc", "bcc"]),
+        ],
+        "com.apple.Safari": [
+            Intent(name: "open_url",
+                desc: "Open a URL in Safari. Pass a full http/https URL.",
+                required: ["url"], optional: []),
+        ],
+        // [live] WeChat launch description is verbatim "Open WeChat."
+        "com.tencent.xinWeChat": [
+            Intent(name: "launch", desc: "Open WeChat.",
+                required: [], optional: []),
+        ],
+        // Slack launch description: inline small-string, unverifiable —
+        // pattern "Open Slack." follows the WeChat sibling.
+        "com.tinyspeck.slackmacgap": [
+            Intent(name: "launch", desc: "Open Slack.",
+                required: [], optional: []),
+            Intent(name: "open_channel",
+                desc: "Open a Slack channel or DM. team_id like "
+                    + "T02ABCDEF, channel_id like C02ABCDEF.",
+                required: ["team_id", "channel_id"], optional: []),
+        ],
+    ]
+    static func intents(for bundle: String?) -> [JSONDict] {
+        guard let bundle = bundle else { return [] }
+        return (table[bundle] ?? []).map { $0.wire() }
+    }
 }
 
 // MARK: - Snapshot commands (snap / get_app_state)
 
 extension Daemon {
 
-    /// snap — plain AX projection: no diff, no capture, wakeup default 0.
+    /// snap — plain AX projection: ordinary app resolution (NO auto
+    /// launch), no diff, no capture, no menu_shortcuts, wakeup default 0.
     func cmdSnap(_ a: JSONDict) throws -> JSONDict {
-        let app = try resolveAppForState(a)
+        let app = try resolveApp(a)
         let store = elementStore
-        let snap = AXBridge.snapshot(
+        let snap = try AXBridge.snapshot(
             pid: app.processIdentifier,
             windowId: a.int("window_id").map(CGWindowID.init),
             depth: a.int("depth") ?? 6,
             interactiveOnly: a.bool("interactive_only") ?? true,
             wakeupSeconds: a.double("wakeup_seconds") ?? 0,
             snapshotId: appState.nextSnapshotId(), store: store)
-        return snapToDict(snap, app: app)
+        return snapToDict(snap, app: app, includeMenu: false)
     }
 
-    /// get_app_state — snapshot(1.5s wakeup) → unminimize+re-snapshot →
-    /// AppStateDiff → optional capture (skipped without snapshot.windowId)
-    /// → OCR fallback when the AX tree was empty.
+    /// get_app_state — snapshot(1.5s wakeup) → unminimize+re-snapshot ONLY
+    /// when include_screenshot is requested → AppStateDiff → optional
+    /// capture (skipped without snapshot.windowId) → OCR fallback when the
+    /// AX tree was empty.
     func cmdGetAppState(_ a: JSONDict) throws -> JSONDict {
         let app = try resolveAppForState(a)
+        let includeShot = a.bool("include_screenshot") ?? true
         let store = elementStore
-        var snap = AXBridge.snapshot(
+        var snap = try AXBridge.snapshot(
             pid: app.processIdentifier,
             windowId: a.int("window_id").map(CGWindowID.init),
             depth: a.int("depth") ?? 6,
             interactiveOnly: a.bool("interactive_only") ?? true,
             wakeupSeconds: a.double("wakeup_seconds") ?? 1.5,
             snapshotId: appState.nextSnapshotId(), store: store)
-        if let el = snap.windowElement,
+        if includeShot, let el = snap.windowElement,
            AXBridge.unminimizeIfNeeded(el) {
-            snap = AXBridge.snapshot(
+            snap = try AXBridge.snapshot(
                 pid: app.processIdentifier,
                 windowId: a.int("window_id").map(CGWindowID.init),
                 depth: a.int("depth") ?? 6,
@@ -478,14 +634,15 @@ extension Daemon {
             appState.diff(
                 pid: snap.pid, wid: snap.windowId,
                 elements: snap.elements, disableDiff: disableDiff)
-        var resp = snapToDict(snap, app: app, elements: emitted)
+        var resp = snapToDict(snap, app: app, elements: emitted,
+                              includeMenu: true)
         if diffComputed {
             resp["elements_are_diff"] = true
             resp["unchanged_element_count"] = unchanged
             if !removed.isEmpty { resp["removed_refs"] = removed }
         }
         // screenshot — only when the snapshot produced a window id.
-        if (a["include_screenshot"] as? Bool ?? true),
+        if includeShot,
            let wid = snap.windowId, wid != 0 {
             do {
                 let maxW = a.int("screenshot_max_width") ?? 1600
@@ -501,12 +658,12 @@ extension Daemon {
                     Capture.registerMapping(pid: snap.pid, wid: wid,
                         windowRect: b, imageW: w, imageH: h, path: out)
                 }
-                // OCR fallback: empty AX tree → Vision visual regions
+                // OCR fallback: empty AX tree → Vision visual refs
                 if snap.elements.count <= 1,
                    let regions = Capture.ocrRegions(
                        imagePath: out, pid: snap.pid),
                    !regions.isEmpty {
-                    resp["visual_regions"] = regions
+                    resp["visual_refs"] = regions
                 }
             } catch let e as DaemonError {
                 resp["screenshot_error"] = e.message
@@ -519,7 +676,8 @@ extension Daemon {
 
     private func snapToDict(_ snap: SnapshotResult,
                             app: NSRunningApplication,
-                            elements: [SerializedElement]? = nil) -> JSONDict {
+                            elements: [SerializedElement]? = nil,
+                            includeMenu: Bool) -> JSONDict {
         var d: JSONDict = [
             "snapshot_id": snap.snapshotId,
             "ax_status": snap.axStatus,
@@ -531,9 +689,11 @@ extension Daemon {
                 "pid": Int(app.processIdentifier),
             ],
             "elements": (elements ?? snap.elements).map { $0.toDict() },
-            "menu_shortcuts": MenuShortcuts.wireEntries(
-                pid: app.processIdentifier),
         ]
+        if includeMenu {
+            d["menu_shortcuts"] = MenuShortcuts.wireEntries(
+                pid: app.processIdentifier)
+        }
         if let wid = snap.windowId {
             d["window"] = [
                 "id": Int(wid),
@@ -558,50 +718,57 @@ extension Daemon {
 
     func cmdClick(_ a: JSONDict) throws -> JSONDict {
         try actionPreflight(a)
-        if a["x"] != nil { return try clickPixel(a) }
+        // Pixel routing keys on successful double() parsing, not key
+        // presence [DISASM numeric routing].
+        if a.double("x") != nil { return try clickPixel(a) }
         return try clickRef(a)
+    }
+
+    /// coord_space is echoed verbatim; only the exact lowercase "screen"
+    /// bypasses screenshot→desktop mapping. Everything else (including a
+    /// missing arg and odd casing) translates when a mapping exists.
+    private func mapPoint(_ a: JSONDict, pid: pid_t,
+                          _ x: Double, _ y: Double)
+        -> (pt: CGPoint, space: String) {
+        let space = a.str("coord_space") ?? "screenshot"
+        if space != "screen",
+           let m = Capture.mapping(for: pid) {
+            return (m.point(forX: x, y: y), space)
+        }
+        return (CGPoint(x: x, y: y), space)
     }
 
     private func clickPixel(_ a: JSONDict) throws -> JSONDict {
         guard let pid = resolveActionPid(a) else {
             throw DaemonError("invalid_arg",
                 "click by pixel requires either `pid` or `bundle` of a "
-                + "running app "
-                + " without a target we'd have to post globally and move "
-                + "the real cursor.")
+                + "running app — without a target we'd have to post "
+                + "globally and move the real cursor.")
         }
-        let x = a.double("x") ?? Double(a["x"] as? Int ?? 0)
+        let x = a.double("x")!
         guard let y = a.double("y") else {
             throw DaemonError("invalid_arg",
                 "click --pixel requires both x and y")
         }
         let button = MouseButtonTag.parse(a.str("button"))
         let clicks = a.int("click_count") ?? 1
-        let space = a.str("coord_space") ?? "screenshot"
-        // screenshot coords translate through the cached mapping; when no
-        // mapping exists Alma falls back to the supplied coordinates.
-        let pt: CGPoint
-        if space == "screenshot",
-           let m = Capture.mapping(for: pid) {
-            pt = m.point(forX: x, y: y)
-        } else {
-            pt = CGPoint(x: x, y: y)
-        }
+        let (pt, space) = mapPoint(a, pid: pid, x, y)
         // wait→snapshot→select window→unminimize→re-snapshot→settle→click
         EventDispatch.waitUntilReady(pid: pid)
         let store = elementStore
-        var snap = AXBridge.snapshot(pid: pid, depth: 1,
+        var snap = try AXBridge.snapshot(pid: pid, depth: 1,
             interactiveOnly: false, wakeupSeconds: 0,
             snapshotId: appState.nextSnapshotId(), store: store)
         if let el = snap.windowElement,
            AXBridge.unminimizeIfNeeded(el) {
-            snap = AXBridge.snapshot(pid: pid, depth: 1,
+            snap = try AXBridge.snapshot(pid: pid, depth: 1,
                 interactiveOnly: false, wakeupSeconds: 0,
                 snapshotId: appState.nextSnapshotId(), store: store)
         }
         let baseline = settlePrelude(pid: pid)
         try EventDispatch.click(at: pt, button: button,
-            clickCount: clicks, pid: pid)
+            clickCount: clicks, pid: pid,
+            showCursor: a.bool("show_cursor") ?? true)
 
         settlePostlude(pid: pid, baseline: baseline, a: a)
         return [
@@ -614,18 +781,20 @@ extension Daemon {
 
     private func clickRef(_ a: JSONDict) throws -> JSONDict {
         let ref = try requireStr(a, "ref")
-        // visual refs (v*) — pixel center through the target's mapping
+        // visual refs (v*) — screenshot-pixel CENTER through the target's
+        // current mapping; missing mapping → internal, missing ref →
+        // element_not_found. Response echoes clicked_at, no strategy.
         if ref.hasPrefix("v") {
             guard let pid = resolveActionPid(a) else {
                 throw DaemonError("invalid_arg",
                     "visual refs (v*) require `pid` or `bundle`")
             }
-            guard Capture.mapping(for: pid) != nil else {
-                throw DaemonError("element_not_found",
-                    "no screenshot mapping for pid \(pid)"
-                    + "; run get_app_state first")
-            }
-            guard let pt = Capture.visualRef(pid: pid, ref: ref) else {
+            guard let pt = Capture.visualRefPoint(pid: pid, ref: ref) else {
+                if Capture.mapping(for: pid) == nil {
+                    throw DaemonError("internal",
+                        "no screenshot mapping for pid \(pid)"
+                        + "; run get_app_state first")
+                }
                 throw DaemonError("element_not_found",
                     "No element known for ref \(ref). Run `snap` first.")
             }
@@ -633,10 +802,11 @@ extension Daemon {
             let clicks = a.int("click_count") ?? 1
             let baseline = settlePrelude(pid: pid)
             try EventDispatch.click(at: pt, button: button,
-                clickCount: clicks, pid: pid)
+                clickCount: clicks, pid: pid,
+                showCursor: a.bool("show_cursor") ?? true)
             settlePostlude(pid: pid, baseline: baseline, a: a)
             return [
-                "clicked": ref, "strategy": "physical",
+                "clicked_at": ["x": Double(pt.x), "y": Double(pt.y)],
                 "button": button.name, "clicks": clicks,
             ]
         }
@@ -646,11 +816,14 @@ extension Daemon {
             rawValue: a.str("strategy") ?? "auto") ?? .auto
         let button = MouseButtonTag.parse(a.str("button"))
         let clicks = a.int("click_count") ?? 1
-        let forceSynth = ProcessInfo.processInfo
-            .environment["ALMA_CU_FORCE_SYNTH"] != nil
-        let axEligible = strategy == .ax
-            || (strategy == .auto && button == .left
-                && clicks == 1 && !forceSynth)
+        // ALMA_CU_FORCE_SYNTH true values: 1/true/yes/on (anything else off)
+        let forceSynth = ["1", "true", "yes", "on"].contains(
+            (ProcessInfo.processInfo.environment["ALMA_CU_FORCE_SYNTH"] ?? "")
+                .lowercased())
+        // [DISASM] eligibility = !forceSynth && strategy!=physical
+        //          && button==left && clicks<=1
+        let axEligible = !forceSynth && strategy != .physical
+            && button == .left && clicks <= 1
         if axEligible {
             let action = ["AXPress", "AXPick", "AXConfirm"]
                 .first { actions(of: entry.element).contains($0) }
@@ -689,7 +862,8 @@ extension Daemon {
         let pt = CGPoint(x: b.midX, y: b.midY)
         let baseline = settlePrelude(pid: entry.pid)
         try EventDispatch.click(at: pt, button: button,
-            clickCount: clicks, pid: entry.pid)
+            clickCount: clicks, pid: entry.pid,
+            showCursor: a.bool("show_cursor") ?? true)
         settlePostlude(pid: entry.pid, baseline: baseline, a: a)
         return [
             "clicked": ref,
@@ -716,17 +890,11 @@ extension Daemon {
                     + "both x and y")
             }
             let x = a.double("x")!
-            let space = a.str("coord_space") ?? "screenshot"
-            let pt: CGPoint
-            if space == "screenshot",
-               let m = Capture.mapping(for: pid) {
-                pt = m.point(forX: x, y: y)
-            } else {
-                pt = CGPoint(x: x, y: y)
-            }
+            let (pt, _) = mapPoint(a, pid: pid, x, y)
             let baseline = settlePrelude(pid: pid)
             try EventDispatch.click(at: pt, button: .right,
-                clickCount: 1, pid: pid)
+                clickCount: 1, pid: pid,
+                showCursor: a.bool("show_cursor") ?? true)
             settlePostlude(pid: pid, baseline: baseline, a: a)
             return [
                 "opened_menu_at": ["x": Double(pt.x), "y": Double(pt.y)]
@@ -772,15 +940,8 @@ extension Daemon {
         let ex = try requireNumD(a, "end_x")
         let ey = try requireNumD(a, "end_y")
         let button = MouseButtonTag.parse(a.str("button"))
-        let space = a.str("coord_space") ?? "screenshot"
-        let m = Capture.mapping(for: pid)
-        func tr(_ x: Double, _ y: Double) -> CGPoint {
-            if space == "screenshot", let m = m {
-                return m.point(forX: x, y: y)
-            }
-            return CGPoint(x: x, y: y)
-        }
-        let from = tr(sx, sy), to = tr(ex, ey)
+        let (from, space) = mapPoint(a, pid: pid, sx, sy)
+        let (to, _) = mapPoint(a, pid: pid, ex, ey)
         let baseline = settlePrelude(pid: pid)
         try EventDispatch.drag(from: from, to: to,
             button: button, pid: pid)
@@ -842,8 +1003,11 @@ extension Daemon {
         let store = elementStore
         let entry = try resolveEntry(ref, store: store)
         let baseline = settlePrelude(pid: entry.pid)
-        try axInsert(element: entry.element, ref: ref, text: text,
-                     replace: a.bool("replace") ?? false)
+        // text-route AX write runs under the enablement assertion
+        try AXBridge.withEnablement(pid: entry.pid) {
+            try axInsert(element: entry.element, ref: ref, text: text,
+                         replace: a.bool("replace") ?? false)
+        }
         settlePostlude(pid: entry.pid, baseline: baseline, a: a)
         return ["typed": ref, "length": text.count]
     }
@@ -879,48 +1043,74 @@ extension Daemon {
         let baseline = settlePrelude(pid: pid)
         switch method {
         case "ax":
-            try axInsert(element: refEntry!.element, ref: ref!,
-                         text: text, replace: false)
+            try AXBridge.withEnablement(pid: pid) {
+                try axInsert(element: refEntry!.element, ref: ref!,
+                             text: text, replace: false)
+            }
             settlePostlude(pid: pid, baseline: baseline, a: a)
             return ["typed": true, "method": "ax_ref",
                     "length": text.count]
         case "auto":
+            // auto+ref → ax_ref label; auto without ref always reports
+            // auto_key_events regardless of the internal physical/unicode
+            // fallback [live probe: AUTO+ref → ax_ref, AUTO →
+            // auto_key_events].
+            if let e = refEntry,
+               ((try? AXBridge.withEnablement(pid: pid) {
+                   try axInsert(element: e.element, ref: ref!,
+                                text: text, replace: false)
+               }) != nil) {
+                settlePostlude(pid: pid, baseline: baseline, a: a)
+                return ["typed": true, "method": "ax_ref",
+                        "length": text.count]
+            }
             if try EventDispatch.typeTextViaFocusedAXElement(
                 text, pid: pid) {
                 settlePostlude(pid: pid, baseline: baseline, a: a)
-                return ["typed": true, "method": "ax",
+                return ["typed": true, "method": "ax_ref",
                         "length": text.count]
             }
-            // physical (try?) → unicode fallback
+            // physical (try?) → unicode fallback — one label either way
             if let presses = try? KeyboardLayoutTranslator
                     .keyPresses(for: text) {
                 return try finishTypeEvents(a: a, pid: pid,
                     baseline: baseline, text: text,
-                    method: "physical_key_events") {
-                    try EventDispatch.typeKeyPresses(presses, pid: pid)
+                    method: "auto_key_events") {
+                    try EventDispatch.withFocusPreserved(pid: pid) {
+                        try EventDispatch.typeKeyPresses(presses, pid: pid)
+                    }
                 }
             }
             return try finishTypeEvents(a: a, pid: pid,
                 baseline: baseline, text: text,
-                method: "unicode_events") {
-                try EventDispatch.typeUnicodeText(text, pid: pid)
+                method: "auto_key_events") {
+                try EventDispatch.withFocusPreserved(pid: pid) {
+                    try EventDispatch.typeUnicodeText(text, pid: pid)
+                }
             }
         case "physical":
             let presses = try KeyboardLayoutTranslator.keyPresses(for: text)
             return try finishTypeEvents(a: a, pid: pid,
                 baseline: baseline, text: text,
                 method: "physical_key_events") {
-                try EventDispatch.typeKeyPresses(presses, pid: pid)
+                try EventDispatch.withFocusPreserved(pid: pid) {
+                    try EventDispatch.typeKeyPresses(presses, pid: pid)
+                }
             }
         default: // unicode
             return try finishTypeEvents(a: a, pid: pid,
                 baseline: baseline, text: text,
                 method: "unicode_events") {
-                try EventDispatch.typeUnicodeText(text, pid: pid)
+                try EventDispatch.withFocusPreserved(pid: pid) {
+                    try EventDispatch.typeUnicodeText(text, pid: pid)
+                }
             }
         }
     }
 
+    /// Event-route type: deliver → settle → verify [DISASM order]. The
+    /// verification note and the no-text error are verbatim string-table
+    /// literals (em dashes).
     private func finishTypeEvents(a: JSONDict, pid: pid_t,
                                   baseline: UInt32, text: String,
                                   method: String,
@@ -928,7 +1118,9 @@ extension Daemon {
         -> JSONDict {
         let tb = TypeVerification.baseline(pid: pid)
         try deliver()
-        let outcome = TypeVerification.check(baseline: tb, typed: text, pid: pid)
+        settlePostlude(pid: pid, baseline: baseline, a: a)
+        let outcome = TypeVerification.check(baseline: tb, typed: text,
+                                             pid: pid)
         var resp: JSONDict = [
             "typed": true, "method": method, "length": text.count,
         ]
@@ -936,22 +1128,20 @@ extension Daemon {
         case .verified:
             resp["verified"] = true
         case .unchanged:
-            // the long "keystrokes were discarded" advisory
             throw DaemonError("internal",
                 "type_text delivered no text: the target app has no "
                 + "key window, so the keystrokes were discarded (its "
-                + "AX element still reports focused=true "
-                + " that only means it is the app's first responder). "
-                + "Use set_value with the element's ref to write the "
-                + "field directly. Do NOT bring the app forward to "
-                + "make typing land "
-                + " Alma never takes the user's foreground.")
+                + "AX element still reports focused=true — that only "
+                + "means it is the app's first responder). Use "
+                + "set_value with the element's ref to write the field "
+                + "directly. Do NOT bring the app forward to make "
+                + "typing land — Alma never takes the user's "
+                + "foreground.")
         case .unverifiable(let reason):
             resp["verified"] = false
             resp["verification_note"] =
-                "sent, but could not confirm it landed \(reason)"
+                "sent, but could not confirm it landed — \(reason)"
         }
-        settlePostlude(pid: pid, baseline: baseline, a: a)
         return resp
     }
 
@@ -1008,18 +1198,19 @@ extension Daemon {
             "via": delivery.rawValue,
         ]
         if delivery == .suppressed {
+            // verbatim string-table literal (em dashes included)
             resp["delivery_note"] =
                 "the target app is in the background and no ENABLED "
                 + "menu item owns this chord, so nothing was posted "
-                + " a background app is not listening to the keyboard "
+                + "— a background app is not listening to the keyboard "
                 + "and macOS would have answered with the system alert "
                 + "beep. Often the command is simply unavailable right "
                 + "now (macOS greys out window-scoped commands when the "
                 + "app has no usable window). Act on the element "
                 + "directly (click or set_value with a ref) or report "
                 + "this to the user. NEVER bring the app to the "
-                + "foreground to force a keypress through "
-                + " Alma absolutely must not steal the user's focus."
+                + "foreground to force a keypress through — Alma "
+                + "absolutely must not steal the user's focus."
         }
         settlePostlude(pid: pid, baseline: baseline, a: a)
         return resp
@@ -1043,14 +1234,19 @@ extension Daemon {
                 "Element does not support action set_value (AXValue "
                 + "not settable on this element).")
         }
+        // [DISASM] conversion order: String → NSNumber → Bool → describe.
+        // NSNumber must be tried before Bool so numeric JSON values land
+        // as numbers, not 0/1 booleans.
         let cf: CFTypeRef
         if let s = raw as? String { cf = s as NSString }
-        else if let b = raw as? Bool { cf = b as NSNumber }
         else if let n = raw as? NSNumber { cf = n }
+        else if let b = raw as? Bool { cf = b as NSNumber }
         else { cf = String(describing: raw) as NSString }
         let baseline = settlePrelude(pid: entry.pid)
-        let err = AXUIElementSetAttributeValue(entry.element,
-            kAXValueAttribute as CFString, cf)
+        let err = try AXBridge.withEnablement(pid: entry.pid) {
+            AXUIElementSetAttributeValue(entry.element,
+                kAXValueAttribute as CFString, cf)
+        }
         try mapAXError(err, context: "setting AXValue")
         settlePostlude(pid: entry.pid, baseline: baseline, a: a)
         return ["set": ref]
@@ -1106,8 +1302,10 @@ extension Daemon {
                 "select_text: could not build an AX range")
         }
         let baseline = settlePrelude(pid: entry.pid)
-        let err = AXUIElementSetAttributeValue(entry.element,
-            "AXSelectedTextRange" as CFString, axv)
+        let err = try AXBridge.withEnablement(pid: entry.pid) {
+            AXUIElementSetAttributeValue(entry.element,
+                "AXSelectedTextRange" as CFString, axv)
+        }
         try mapAXError(err, context: "setting AXSelectedTextRange")
         settlePostlude(pid: entry.pid, baseline: baseline, a: a)
         return ["selected": text, "selection_type": selType]
@@ -1119,6 +1317,13 @@ extension Daemon {
         try actionPreflight(a)
         let ref = try requireStr(a, "ref")
         let dir = try requireStr(a, "direction")
+        let pages = a.int("pages") ?? 1
+        let store = elementStore
+        // [live probe] ref resolution precedes the direction enum check:
+        // {bad ref, bad dir} → element_not_found; {good ref, missing
+        // dir} → missing "direction"; {good ref, bad dir} → the enum
+        // error.
+        let entry = try resolveEntry(ref, store: store)
         let action: String
         switch dir {
         case "up": action = "AXScrollUpByPage"
@@ -1129,21 +1334,24 @@ extension Daemon {
             throw DaemonError("invalid_arg",
                 "direction must be up|down|left|right")
         }
-        let pages = a.int("pages") ?? 1
-        let store = elementStore
-        let entry = try resolveEntry(ref, store: store)
         guard actions(of: entry.element).contains(action) else {
+            // verbatim: "Element does not support action \(action) not
+            // available on element (ref points at an unscrollable
+            // element — snap the parent ScrollArea)" — no direction in
+            // the message.
             throw DaemonError("action_unsupported",
-                "Element does not support action scroll \(dir) "
-                + "\(action) not available on element (ref points at "
-                + "an unscrollable element — snap the parent "
-                + "ScrollArea).")
+                "Element does not support action \(action) not "
+                + "available on element (ref points at an unscrollable "
+                + "element — snap the parent ScrollArea)")
         }
         let baseline = settlePrelude(pid: entry.pid)
-        for _ in 0..<pages {
-            let err = AXUIElementPerformAction(entry.element,
-                action as CFString)
-            try mapAXError(err, context: "performing \(action)")
+        // scroll-route AX performs carry the enablement assertion
+        try AXBridge.withEnablement(pid: entry.pid) {
+            for _ in 0..<pages {
+                let err = AXUIElementPerformAction(entry.element,
+                    action as CFString)
+                try mapAXError(err, context: "performing \(action)")
+            }
         }
         LensBus.postScroll(direction: dir)
         settlePostlude(pid: entry.pid, baseline: baseline, a: a)
@@ -1173,7 +1381,7 @@ extension Daemon {
             wid = CGWindowID(w)
         } else {
             let app = try resolveApp(a)
-            let wins = AXBridge.windows(of: app.processIdentifier)
+            let wins = try AXBridge.windows(of: app.processIdentifier)
             guard let first = wins.first,
                   let w = AXBridge.windowIDNumber(of: first)
             else {
@@ -1191,16 +1399,23 @@ extension Daemon {
         return resp
     }
 
-    /// shot_display — optional `display_id`; default `out` when absent is
-    /// the /tmp pattern (spec'd). quality 0.6.
+    /// shot_display [DISASM]: `out` is REQUIRED (missing "<out>"-style
+    /// requireStr error); quality arg parsed with default 0.6; cursor
+    /// metadata is read from the MAIN display independently of which
+    /// display was captured.
     func cmdShotDisplay(_ a: JSONDict) throws -> JSONDict {
-        let out = a.str("out") ?? Capture.defaultOutPath()
+        let out = try requireStr(a, "out")
         let maxW = a.int("max_width") ?? 0
-        let (w, h, displayID) = try Capture.displayShotToFile(
+        let quality = a.double("quality") ?? 0.6
+        let (w, h, _) = try Capture.displayShotToFile(
             displayID: a.int("display_id").map(CGDirectDisplayID.init),
-            out: out, maxWidth: maxW, quality: 0.6)
+            out: out, maxWidth: maxW, quality: quality)
         var resp: JSONDict = ["path": out, "width": w, "height": h]
-        if let c = Capture.cursorForDisplay(displayID) {
+        // [UTILITY_COMMANDS] cursor uses the supplied display id when
+        // present, else CGMainDisplayID.
+        let cursorDisplay = a.int("display_id")
+            .map(CGDirectDisplayID.init) ?? CGMainDisplayID()
+        if let c = Capture.cursorForDisplay(cursorDisplay) {
             resp["cursor"] = c
         }
         return resp

@@ -1,13 +1,14 @@
 import Foundation
 
-// CLI surface — semantics per computer-use/chapters/12 ("native CLI 与前置 gate"):
-//   no args            → daemon (default)
-//   version/-v/--version → prints helper version 0.1.0 (independent of host version)
-//   help/-h/--help     → usage
-//   daemon             → --socket PATH --idle-seconds N --lens --no-lens
-//                        unknown flags ignored; last --lens/--no-lens wins;
-//                        idle default 900s (actual; help text may still say 600)
-//   unknown subcommand → exit 2
+// CLI surface — verbatim live probe of AlmaComputerUse.bin 0.1.0:
+//   version            → "alma-computer-use 0.1.0" (stdout, exit 0)
+//   --help/-h/help and `daemon --help` → usage text (stdout, exit 0)
+//   unknown subcommand → "unknown subcommand: X" on STDERR + usage on
+//                        STDOUT, exit 2
+//   daemon             → --socket PATH --idle-seconds N --lens/--no-lens;
+//                        unknown flags & extra positionals ignored;
+//                        idle default 900s actual (help text still says
+//                        600 — kept verbatim)
 
 let HELPER_VERSION = "0.1.0"
 let DEFAULT_IDLE_SECONDS: Double = 900
@@ -19,13 +20,21 @@ func defaultSocketPath() -> String {
     return base.appendingPathComponent("computer-use.sock").path
 }
 
+/// Usage text — byte-for-byte from `alma-computer-use --help`.
 func printUsage() {
     let text = """
-    agent-computer-use \(HELPER_VERSION)
-    Usage:
-      agent-computer-use daemon --socket <path> [--idle-seconds <n>] [--lens|--no-lens]
-      agent-computer-use version
-      agent-computer-use help
+    AlmaComputerUse — macOS desktop automation helper (AX + ScreenCaptureKit)
+
+    Subcommands:
+      daemon [--socket PATH] [--idle-seconds N]
+          Start the long-running daemon. Opens a Unix domain socket and serves
+          NDJSON requests. Exits after N seconds of inactivity (default 600).
+
+      version
+          Print version and exit.
+
+    The daemon is normally launched automatically by the Alma app. Users do
+    not need to run it directly.
     """
     FileHandle.standardOutput.write((text + "\n").data(using: .utf8)!)
 }
@@ -35,7 +44,8 @@ let sub = argv.count > 1 ? argv[1] : "daemon"
 
 switch sub {
 case "version", "--version", "-v":
-    FileHandle.standardOutput.write("\(HELPER_VERSION)\n".data(using: .utf8)!)
+    FileHandle.standardOutput.write(
+        "alma-computer-use \(HELPER_VERSION)\n".data(using: .utf8)!)
     exit(0)
 case "help", "--help", "-h":
     printUsage()
@@ -56,13 +66,18 @@ case "daemon":
             lens = true
         case "--no-lens":
             lens = false
+        case "--help", "-h":
+            printUsage()
+            exit(0)
         default:
-            break // unknown daemon flags are ignored
+            break // unknown daemon flags & positionals are ignored
         }
         i += 1
     }
     Daemon(socketPath: socketPath, idleSeconds: idleSeconds, lensEnabled: lens).run()
 default:
-    FileHandle.standardError.write("unknown subcommand: \(sub)\n".data(using: .utf8)!)
+    FileHandle.standardError.write(
+        "unknown subcommand: \(sub)\n".data(using: .utf8)!)
+    printUsage()
     exit(2)
 }

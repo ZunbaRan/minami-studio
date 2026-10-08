@@ -215,48 +215,59 @@ final class ElementStore {
         for ref in dead { table.removeValue(forKey: ref) }
     }
 
-    /// CFEqual dedupe: same AXUIElement re-registered under its existing ref.
+    /// CFEqual dedupe: same AXUIElement re-registered under its existing ref
+    /// — UNLESS that ref was already handed out in this snapshot generation
+    /// (an AX object traversed twice in one snapshot earns a second ref,
+    /// [ALGORITHMS §2.2]). Reuse also refreshes snapshotId/element and
+    /// clears invalidated; a nil new descriptor preserves the old one.
     func register(_ el: AXUIElement, snapshotId: String, pid: pid_t,
-                  descriptor: ElementDescriptor) -> String {
+                  descriptor: ElementDescriptor?) -> String {
         lock.lock(); defer { lock.unlock() }
-        for (ref, e) in table where e.pid == pid {
-            if CFEqual(e.element, el) {
-                var updated = e
-                updated.snapshotId = snapshotId
-                updated.descriptor = descriptor
-                updated.invalidated = false
-                updated.element = el
-                table[ref] = updated
-                currentSnapshotRefs.insert(ref)
-                return ref
-            }
+        for (ref, e) in table where e.pid == pid
+                && CFEqual(e.element, el)
+                && !currentSnapshotRefs.contains(ref) {
+            var updated = e
+            updated.snapshotId = snapshotId
+            if let descriptor { updated.descriptor = descriptor }
+            updated.invalidated = false
+            updated.element = el
+            table[ref] = updated
+            currentSnapshotRefs.insert(ref)
+            return ref
         }
         counter += 1
         let ref = "e\(counter)"
         table[ref] = Entry(element: el, snapshotId: snapshotId, pid: pid,
-                           descriptor: descriptor, invalidated: false)
+                           descriptor: descriptor ?? ElementDescriptor(),
+                           invalidated: false)
         currentSnapshotRefs.insert(ref)
         ensureDestroyedObserver(pid: pid)
+        subscribeDestroyed(el, pid: pid)
         return ref
     }
 
-    /// Per-pid app-level observer for AXUIElementDestroyed; the destroyed
-    /// element arrives in the callback and its entry is flagged invalidated.
+    /// One AXObserver per pid on the app element; every newly REGISTERED
+    /// element is subscribed to AXUIElementDestroyed on that observer
+    /// (destroyed notification identifies the element by refcon-free
+    /// delivery: the callback receives the element itself).
     private func ensureDestroyedObserver(pid: pid_t) {
         if observers[pid] != nil { return }
-        let app = AXUIElementCreateApplication(pid)
         var obs: AXObserver?
         guard AXObserverCreate(pid, { _, el, _, ctx in
             guard let ctx else { return }
             let me = Unmanaged<ElementStore>.fromOpaque(ctx).takeUnretainedValue()
             me.markInvalidated(element: el)
         }, &obs) == .success, let obs else { return }
-        AXObserverAddNotification(obs, app,
-            kAXUIElementDestroyedNotification as CFString,
-            Unmanaged.passUnretained(self).toOpaque())
         CFRunLoopAddSource(CFRunLoopGetMain(),
                            AXObserverGetRunLoopSource(obs), .defaultMode)
         observers[pid] = obs
+    }
+
+    private func subscribeDestroyed(_ el: AXUIElement, pid: pid_t) {
+        guard let obs = observers[pid] else { return }
+        AXObserverAddNotification(obs, el,
+            kAXUIElementDestroyedNotification as CFString,
+            Unmanaged.passUnretained(self).toOpaque())
     }
 
     private func markInvalidated(element: AXUIElement) {
@@ -296,43 +307,62 @@ final class ElementStore {
             lock.unlock()
             return u
         }
+        // [STRINGS] "<ref> is no longer valid (UI changed). Re-run `snap`."
         throw DaemonError("ref_stale",
-            "ref \(ref) is stale — element no longer exists")
+            "\(ref) is no longer valid (UI changed). Re-run `snap`.")
     }
 
-    /// Descriptor-based re-acquisition: bounded DFS from the app root
-    /// (≤200 nodes, ≤12 deep — the 200 cap belongs HERE, not in snapshots).
-    /// Match on role+subrole+title+identifier+roleDescription + last-3
-    /// parentRoles; exactly one match required.
+    /// Descriptor-based re-acquisition [ALGORITHMS §2.3]: bounded LIFO DFS
+    /// from the app root, ≤200 nodes visited. Stack pops the last-pushed
+    /// child first, so top-level windows are searched in reverse order.
+    /// Candidates must be unique.
     private func refetchByDescriptor(_ d: ElementDescriptor,
                                      pid: pid_t) -> AXUIElement? {
         let app = AXUIElementCreateApplication(pid)
-        var visited = 0
-        var found: [AXUIElement] = []
-        func matches(_ el: AXUIElement, parents: [String]) -> Bool {
-            if AXBridge.copyString(el, kAXRoleAttribute) != d.role { return false }
-            if AXBridge.copyString(el, kAXSubroleAttribute) != d.subrole { return false }
-            if AXBridge.copyString(el, kAXTitleAttribute) != d.title { return false }
-            if AXBridge.copyString(el, kAXIdentifierAttribute) != d.identifier { return false }
-            if AXBridge.copyString(el, kAXRoleDescriptionAttribute) != d.roleDescription { return false }
-            let tail = Array(parents.suffix(3))
-            let want = Array(d.parentRoles.suffix(3))
-            if tail != want { return false }
-            return true
+        var budget = 200
+        var stack: [AXUIElement] = [app]
+        var candidates: [AXUIElement] = []
+        while let top = stack.popLast(), budget > 0 {
+            budget -= 1
+            if Self.descMatch(top, d) { candidates.append(top) }
+            stack.append(contentsOf: AXBridge.copyElements(top, kAXChildrenAttribute))
         }
-        func dfs(_ el: AXUIElement, parents: [String], depth: Int) {
-            if visited >= 200 || found.count > 1 { return }
-            visited += 1
-            let role = AXBridge.copyString(el, kAXRoleAttribute)
-            if matches(el, parents: parents) { found.append(el) }
-            guard depth < 12 else { return }
-            for c in AXBridge.copyElements(el, kAXChildrenAttribute) {
-                dfs(c, parents: parents + (role.map { [$0] } ?? []),
-                    depth: depth + 1)
-            }
+        return candidates.count == 1 ? candidates[0] : nil
+    }
+
+    /// Leaf match predicates: title/subrole/identifier/role-description are
+    /// hard equality; role is soft (an AXGroup element with nil descriptor
+    /// role, or a title match, excuses a role mismatch). Elements with any
+    /// AXChildren never match — recovery is leaf-only. When a live AX
+    /// parent exists it must recursively match the descriptor chain.
+    private static func descMatch(_ el: AXUIElement,
+                                  _ d: ElementDescriptor) -> Bool {
+        let elTitle = AXBridge.copyString(el, kAXTitleAttribute)
+        guard elTitle == d.title,
+              AXBridge.copyString(el, kAXSubroleAttribute) == d.subrole,
+              AXBridge.copyString(el, kAXIdentifierAttribute) == d.identifier,
+              AXBridge.copyString(el, kAXRoleDescriptionAttribute) == d.roleDescription
+        else { return false }
+        let elRole = AXBridge.copyString(el, kAXRoleAttribute)
+        if elRole != d.role {
+            let groupEx = elRole == "AXGroup" && d.role == nil
+            if !groupEx && elTitle != d.title { return false }
         }
-        dfs(app, parents: [], depth: 0)
-        return found.count == 1 ? found[0] : nil
+        if !AXBridge.copyElements(el, kAXChildrenAttribute).isEmpty { return false }
+        // Parent-chain check: parentRoles is root→parent order truncated
+        // to the last ≤8, so the IMMEDIATE parent is the array END — walk
+        // the live AXParent chain comparing backward; a missing live
+        // parent while roles remain fails the match.
+        var parent = AXBridge.copyAttr(el, kAXParentAttribute) as! AXUIElement?
+        var i = d.parentRoles.count - 1
+        while i >= 0 {
+            guard let p = parent else { return false }
+            guard AXBridge.copyString(p, kAXRoleAttribute) == d.parentRoles[i]
+            else { return false }
+            parent = AXBridge.copyAttr(p, kAXParentAttribute) as! AXUIElement?
+            i -= 1
+        }
+        return true
     }
 }
 
@@ -350,11 +380,35 @@ func mapAXError(_ err: AXError, context: String) throws {
         throw DaemonError("action_unsupported",
             "Element does not support action \(context).")
     case .apiDisabled:
+        // [STRINGS] axDenied literal + Settings hint.
         throw DaemonError("ax_not_granted",
-            "Accessibility permission not granted")
+            "Accessibility permission not granted to Alma Computer Use.",
+            hint: "Open System Settings → Privacy & Security → Accessibility and enable \"Alma Computer Use\".")
     default:
+        // [ALGORITHMS §4] ax_failure = "<AXError case name> while <context>"
         throw DaemonError("ax_failure",
-            "AX error \(err.rawValue) during \(context)")
+            "\(axErrorName(err)) while \(context)")
+    }
+}
+
+/// AXError name as printed by String(describing:) on known cases.
+func axErrorName(_ err: AXError) -> String {
+    switch err {
+    case .cannotComplete: return "cannotComplete"
+    case .attributeUnsupported: return "attributeUnsupported"
+    case .actionUnsupported: return "actionUnsupported"
+    case .notificationUnsupported: return "notificationUnsupported"
+    case .notImplemented: return "notImplemented"
+    case .notificationAlreadyRegistered: return "notificationAlreadyRegistered"
+    case .notificationNotRegistered: return "notificationNotRegistered"
+    case .apiDisabled: return "apiDisabled"
+    case .noValue: return "noValue"
+    case .parameterizedAttributeUnsupported: return "parameterizedAttributeUnsupported"
+    case .invalidUIElement: return "invalidUIElement"
+    case .invalidUIElementObserver: return "invalidUIElementObserver"
+    case .illegalArgument: return "illegalArgument"
+    case .notEnoughPrecision: return "notEnoughPrecision"
+    default: return "AXError(\(err.rawValue))"
     }
 }
 
@@ -367,11 +421,16 @@ enum AXBridge {
         guard AXUIElementCopyAttributeValue(el, name as CFString, &v) == .success else { return nil }
         return v
     }
+    /// Single `as? String` cast — used for every serialized string field.
+    /// [SNAP §11] no NSNumber/NSAttributedString coercion except `value`.
     static func copyString(_ el: AXUIElement, _ name: String) -> String? {
+        copyAttr(el, name) as? String
+    }
+    /// AXValue field only: String cast, else NSNumber.stringValue.
+    static func copyValueText(_ el: AXUIElement, _ name: String) -> String? {
         let v = copyAttr(el, name)
         if let s = v as? String { return s }
         if let n = v as? NSNumber { return n.stringValue }
-        if let a = v as? NSAttributedString { return a.string }
         return nil
     }
     static func copyBool(_ el: AXUIElement, _ name: String) -> Bool? {
@@ -421,7 +480,7 @@ enum AXBridge {
             }
         }
         el.title = title
-        el.value = copyString(ax, kAXValueAttribute)
+        el.value = copyValueText(ax, kAXValueAttribute)
         // description: AXDescription String (even empty); AXHelp only when
         // AXDescription is not a String at all.
         if let d = copyAttr(ax, kAXDescriptionAttribute) as? String {
@@ -534,8 +593,15 @@ enum AXBridge {
         return (attempts, Date().timeIntervalSince(t0) * 1000, false)
     }
 
-    static func windows(of pid: pid_t) -> [AXUIElement] {
-        copyElements(AXUIElementCreateApplication(pid), kAXWindowsAttribute)
+    /// AXWindows enumeration [UTILITY_COMMANDS]: copyAttr errors PROPAGATE
+    /// (mapped via mapAXError); a non-array/nil result yields empty.
+    static func windows(of pid: pid_t) throws -> [AXUIElement] {
+        var v: CFTypeRef?
+        let err = AXUIElementCopyAttributeValue(
+            AXUIElementCreateApplication(pid),
+            kAXWindowsAttribute as CFString, &v)
+        try mapAXError(err, context: "reading AXWindows")
+        return (v as? [AXUIElement]) ?? []
     }
 
     /// Read AXMinimized; if true write false, sleep ~0.2s for the Dock
@@ -552,47 +618,81 @@ enum AXBridge {
     // MARK: snapshot
 
     /// Enhanced-UI assertion [SNAP §12.1]: save AXEnhancedUserInterface +
-    /// AXManualAccessibility, set both true, restore on exit. Write failures
-    /// are not errors.
+    /// AXManualAccessibility (unreadable → saved as false), set both true,
+    /// restore the saved values on exit AND at daemon shutdown via the
+    /// global registry. Write failures are not errors.
     private final class EnhancedUIAssertion {
         let app: AXUIElement
-        var savedEnhanced: Bool?
-        var savedManual: Bool?
+        let pid: pid_t
+        let savedEnhanced: Bool
+        let savedManual: Bool
         init(pid: pid_t) {
+            self.pid = pid
             app = AXUIElementCreateApplication(pid)
-            savedEnhanced = AXBridge.copyBool(app, "AXEnhancedUserInterface")
-            savedManual = AXBridge.copyBool(app, "AXManualAccessibility")
+            savedEnhanced = AXBridge.copyBool(app, "AXEnhancedUserInterface") ?? false
+            savedManual = AXBridge.copyBool(app, "AXManualAccessibility") ?? false
+            AXBridge.enhancedUILock.lock()
+            AXBridge.enhancedUISaved[pid] = (savedEnhanced, savedManual)
+            AXBridge.enhancedUILock.unlock()
             AXUIElementSetAttributeValue(app,
                 "AXEnhancedUserInterface" as CFString, true as CFTypeRef)
             AXUIElementSetAttributeValue(app,
                 "AXManualAccessibility" as CFString, true as CFTypeRef)
         }
         func restore() {
-            if let v = savedEnhanced {
-                AXUIElementSetAttributeValue(app,
-                    "AXEnhancedUserInterface" as CFString, v as CFTypeRef)
-            }
-            if let v = savedManual {
-                AXUIElementSetAttributeValue(app,
-                    "AXManualAccessibility" as CFString, v as CFTypeRef)
-            }
+            AXUIElementSetAttributeValue(app,
+                "AXEnhancedUserInterface" as CFString,
+                savedEnhanced as CFTypeRef)
+            AXUIElementSetAttributeValue(app,
+                "AXManualAccessibility" as CFString,
+                savedManual as CFTypeRef)
+            AXBridge.enhancedUILock.lock()
+            AXBridge.enhancedUISaved.removeValue(forKey: pid)
+            AXBridge.enhancedUILock.unlock()
         }
     }
 
-    /// Snapshot window selection [SNAP §3]: explicit window_id match → first
-    /// focused (AXFocusedWindow / AXMain) → windows[0]. No match is NOT an
-    /// error — falls through to focused/first.
-    private static func chooseWindow(_ wins: [AXUIElement],
+    /// AXEnablementAssertion(targetPid) on the action paths that carry it
+    /// — text/scroll-family AX writes (manual §6.1: click/drag do NOT
+    /// take this assertion). Same save→set-true→restore lifecycle as the
+    /// snapshot assertion, registered in the shutdown map until restored.
+    static func withEnablement<T>(pid: pid_t,
+                                  _ body: () throws -> T) throws -> T {
+        let assertion = EnhancedUIAssertion(pid: pid)
+        defer { assertion.restore() }
+        return try body()
+    }
+
+    /// Per-pid saved EnhancedUI/ManualAccessibility states; shutdown
+    /// restores every still-registered original.
+    static let enhancedUILock = NSLock()
+    static var enhancedUISaved: [pid_t: (Bool, Bool)] = [:]
+    static func restoreAllEnhancedUI() {
+        enhancedUILock.lock()
+        let saved = enhancedUISaved
+        enhancedUISaved.removeAll()
+        enhancedUILock.unlock()
+        for (pid, v) in saved {
+            let app = AXUIElementCreateApplication(pid)
+            AXUIElementSetAttributeValue(app,
+                "AXEnhancedUserInterface" as CFString, v.0 as CFTypeRef)
+            AXUIElementSetAttributeValue(app,
+                "AXManualAccessibility" as CFString, v.1 as CFTypeRef)
+        }
+    }
+
+    /// Snapshot window selection [SNAP §3]: explicit window_id match →
+    /// first CFEqual match against AXFocusedWindow → windows[0]. No match
+    /// is NOT an error — falls through to focused/first.
+    private static func chooseWindow(_ wins: [AXUIElement], pid: pid_t,
                                      requested: CGWindowID?) -> AXUIElement? {
         if let requested {
             for w in wins where windowIDNumber(of: w) == requested { return w }
         }
-        let app = wins.first
-        for w in wins {
-            if copyBool(w, kAXFocusedAttribute) == true
-                || copyBool(w, kAXMainAttribute) == true { return w }
+        if let focused = copyAttr(AXUIElementCreateApplication(pid),
+                                  kAXFocusedWindowAttribute) as! AXUIElement? {
+            for w in wins where CFEqual(w, focused) { return w }
         }
-        _ = app
         return wins.first
     }
 
@@ -614,7 +714,12 @@ enum AXBridge {
         wakeupSeconds: TimeInterval,
         snapshotId: String,
         store: ElementStore
-    ) -> SnapshotResult {
+    ) throws -> SnapshotResult {
+        // [DISASM] axDenied precheck before any window work.
+        guard AXIsProcessTrusted() else {
+            try mapAXError(.apiDisabled, context: "snapshot")
+            throw DaemonError("ax_not_granted", "unreachable")
+        }
         store.beginSnapshot(snapshotId)
         let assertion = EnhancedUIAssertion(pid: pid)
         defer { assertion.restore() }
@@ -628,8 +733,8 @@ enum AXBridge {
 
         while true {
             attempts += 1
-            wins = windows(of: pid)
-            windowEl = chooseWindow(wins, requested: windowId)
+            wins = try windows(of: pid)
+            windowEl = chooseWindow(wins, pid: pid, requested: windowId)
             elements.removeAll()
             if let root = windowEl {
                 walk(el: root, depthLeft: depth, parentRoles: [],

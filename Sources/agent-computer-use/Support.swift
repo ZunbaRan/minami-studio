@@ -121,18 +121,44 @@ struct DaemonError: Error {
 
 // MARK: - Wire frames
 
+/// Minimal AnyCodable matching Alma's decoder order [WIRE_SCHEMA]:
+/// null → Bool → Int → Double → String → [AnyCodable] → [String:AnyCodable].
+/// Stored value unwraps to `Any?`; nested nulls survive as NSNull.
+struct AnyCodable: Decodable {
+    let value: Any?
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.singleValueContainer()
+        if c.decodeNil() { value = nil; return }
+        if let b = try? c.decode(Bool.self) { value = b; return }
+        if let i = try? c.decode(Int.self) { value = i; return }
+        if let d = try? c.decode(Double.self) { value = d; return }
+        if let s = try? c.decode(String.self) { value = s; return }
+        if let a = try? c.decode([AnyCodable].self) {
+            value = a.map { $0.value ?? NSNull() }; return
+        }
+        if let o = try? c.decode([String: AnyCodable].self) {
+            value = o.mapValues { $0.value ?? NSNull() as Any }; return
+        }
+        value = nil
+    }
+}
+
 struct WireRequest {
     let id: String
     let cmd: String
     let args: JSONDict
 
-    /// Alma decodes the frame with JSONDecoder against a {id:String,
-    /// cmd:String, args:Dictionary?} Codable. Failures reply with id "?" and
-    /// `malformed JSON: <DecodingError.localizedDescription>` — so we decode
-    /// through the real JSONDecoder to inherit Foundation's exact wording.
-    private struct RequestHead: Decodable {
+    /// Alma decodes the whole frame through one Codable Request:
+    /// {id:String, cmd:String, args:[String:AnyCodable]?}. Any decode failure
+    /// replies with id "?" + `malformed JSON: <localizedDescription>` —
+    /// keyNotFound produces "…because it is missing."; every other failure
+    /// produces "…isn't in the correct format." — both are Foundation's own
+    /// DecodingError wording, inherited for free here.
+    private struct Request: Decodable {
         let id: String
         let cmd: String
+        let args: [String: AnyCodable]?
     }
 
     /// Failure carries only the Foundation wording — the handler adds the
@@ -143,35 +169,12 @@ struct WireRequest {
         guard let data = line.data(using: .utf8) else {
             return .failure(Malformed(message: "The data couldn't be read because it isn't in the correct format."))
         }
-        let head: RequestHead
         do {
-            head = try JSONDecoder().decode(RequestHead.self, from: data)
+            let r = try JSONDecoder().decode(Request.self, from: data)
+            let args = (r.args ?? [:]).mapValues { $0.value ?? NSNull() as Any }
+            return .success(WireRequest(id: r.id, cmd: r.cmd, args: args))
         } catch {
             return .failure(Malformed(message: error.localizedDescription))
-        }
-        // args: optional dictionary. A present non-dict produces the same
-        // typeMismatch wording Foundation emits for [String: Any] fields.
-        var args: JSONDict = [:]
-        if let raw = try? JSONSerialization.jsonObject(with: data) as? JSONDict,
-           let a = raw["args"], !(a is NSNull) {
-            guard let d = a as? JSONDict else {
-                return .failure(Malformed(message: "Expected to decode Dictionary<String, Any> but found \(jsonTypeWord(a)) instead."))
-            }
-            args = d
-        }
-        return .success(WireRequest(id: head.id, cmd: head.cmd, args: args))
-    }
-
-    /// Foundation JSONDecoder typeMismatch wording: "found a <word> instead".
-    private static func jsonTypeWord(_ v: Any) -> String {
-        switch v {
-        case is String: return "a string"
-        case is [Any]: return "an array"
-        case is [String: Any]: return "a dictionary"
-        case let n as NSNumber where CFGetTypeID(n) == CFBooleanGetTypeID(): return "a boolean"
-        case is NSNumber: return "a number"
-        case is NSNull: return "null"
-        default: return "a value"
         }
     }
 }

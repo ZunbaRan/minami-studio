@@ -93,12 +93,21 @@ async function logAction(entry) {
 // ---------- daemon client (verbatim) ----------
 
 function resolveHelperBinary() {
-  const override = process.env.AGENT_CU_HELPER;
+  const override = process.env.ALMA_CU_HELPER ?? process.env.AGENT_CU_HELPER;
   if (override && existsSync(override)) return override;
   const candidates = [];
+  const almaRel = path.join("Alma Computer Use.app", "Contents", "MacOS", "AlmaComputerUse");
+  const resources = process.env.ALMA_RESOURCES_PATH;
+  if (resources) {
+    candidates.push(path.join(resources, almaRel));
+  }
   const self = process.argv[1] || "";
   if (self) {
     const dir = path.dirname(path.resolve(self));
+    candidates.push(path.join(dir, "..", "computer-use", almaRel));
+    candidates.push(path.join(dir, "..", "..", "computer-use", almaRel));
+    candidates.push(path.join(dir, "..", "..", "..", "computer-use", almaRel));
+    // our own repo layout
     candidates.push(path.join(dir, "..", "bin", "agent-computer-use"));
     candidates.push(path.join(dir, "..", ".build", "release", "agent-computer-use"));
     candidates.push(path.join(dir, "..", ".build", "debug", "agent-computer-use"));
@@ -111,7 +120,7 @@ function resolveHelperBinary() {
 }
 
 function defaultSocketPath() {
-  const base = path.join(os.homedir(), "Library", "Application Support", "agent-computer-use");
+  const base = path.join(os.homedir(), "Library", "Application Support", "Alma");
   mkdirSync(base, { recursive: true });
   const helper = resolveHelperBinary();
   if (!helper) return path.join(base, "computer-use.sock");
@@ -157,7 +166,7 @@ class DaemonClient {
       } catch {}
       const helper = resolveHelperBinary();
       if (!helper) {
-        throw new Error("agent-computer-use helper not found. Run scripts/build.sh first.");
+        throw new Error("Alma Computer Use helper not found. Run `pnpm build:computer-use` or reinstall Alma.");
       }
       this.spawnDaemon(helper);
       const deadline = Date.now() + 4e3;
@@ -467,9 +476,704 @@ function defTool(name, description, properties, required, handler) {
   tools.push({
     name, description,
     inputSchema: { type: "object", properties, required },
+    _listSchema: null,
     handler
   });
 }
+
+
+// [ALMA] tools/list emits the SDK-serialized draft-07 schemas
+// verbatim (safe-int bounds, $schema key, required omitted when empty)
+// plus execution:{taskSupport:"forbidden"} on every tool.
+const REAL_SCHEMAS = {
+  "launch_app": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+      "bundle": {
+        "type": "string",
+        "description": "Bundle id, e.g. com.netease.163music."
+      },
+      "activates": {
+        "description": "macOS's own cold-launch activation flag, and only that. Default false. It has no effect on a running app, and nothing here can move the foreground away from the user \u2014 do not reach for it to make an action work.",
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "bundle"
+    ]
+  },
+  "list_apps": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+      "days": {
+        "description": "Lookback window for recency (days). Default 14.",
+        "type": "integer",
+        "minimum": -9007199254740991,
+        "maximum": 90
+      }
+    }
+  },
+  "get_app_state": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+      "bundle": {
+        "description": "Bundle id (com.apple.Music). Either bundle or pid is required.",
+        "type": "string"
+      },
+      "pid": {
+        "description": "Process id. Either bundle or pid is required.",
+        "type": "integer",
+        "minimum": -9007199254740991,
+        "maximum": 9007199254740991
+      },
+      "window_id": {
+        "description": "Specific CGWindowID (optional).",
+        "type": "integer",
+        "minimum": -9007199254740991,
+        "maximum": 9007199254740991
+      },
+      "depth": {
+        "description": "AX tree depth. Default 6.",
+        "type": "integer",
+        "minimum": -9007199254740991,
+        "maximum": 20
+      },
+      "interactive_only": {
+        "description": "Limit to interactive elements. Default true.",
+        "type": "boolean"
+      },
+      "screenshot_max_width": {
+        "description": "Downsample width for the screenshot (default 1280).",
+        "type": "integer",
+        "minimum": -9007199254740991,
+        "maximum": 9007199254740991
+      },
+      "auto_launch": {
+        "description": "Auto-launch the app in the background if not running. Default true.",
+        "type": "boolean"
+      }
+    }
+  },
+  "click": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+      "ref": {
+        "description": "Element ref from get_app_state (e.g. \"e7\"). Either ref or {x, y} is required.",
+        "type": "string"
+      },
+      "x": {
+        "description": "X coordinate (screenshot pixel by default; see coord_space).",
+        "type": "number"
+      },
+      "y": {
+        "description": "Y coordinate (screenshot pixel by default; see coord_space).",
+        "type": "number"
+      },
+      "coord_space": {
+        "description": "\"screenshot\" (default) \u2014 coords are pixels in the last get_app_state screenshot. \"screen\" \u2014 raw screen points.",
+        "type": "string",
+        "enum": [
+          "screenshot",
+          "screen"
+        ]
+      },
+      "button": {
+        "description": "Mouse button. Default left.",
+        "type": "string",
+        "enum": [
+          "left",
+          "right",
+          "middle"
+        ]
+      },
+      "click_count": {
+        "description": "1=single, 2=double, 3=triple. Default 1.",
+        "type": "integer",
+        "minimum": -9007199254740991,
+        "maximum": 3
+      },
+      "strategy": {
+        "description": "auto (default) prefers CGEvent if bounds known.",
+        "type": "string",
+        "enum": [
+          "auto",
+          "physical",
+          "ax"
+        ]
+      },
+      "bundle": {
+        "description": "Bundle id (com.apple.Music). Either bundle or pid is required.",
+        "type": "string"
+      },
+      "pid": {
+        "description": "Process id. Either bundle or pid is required.",
+        "type": "integer",
+        "minimum": -9007199254740991,
+        "maximum": 9007199254740991
+      },
+      "window_id": {
+        "description": "Specific CGWindowID (optional).",
+        "type": "integer",
+        "minimum": -9007199254740991,
+        "maximum": 9007199254740991
+      }
+    }
+  },
+  "perform_secondary_action": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+      "ref": {
+        "type": "string"
+      },
+      "x": {
+        "description": "X coordinate (screenshot pixel by default).",
+        "type": "number"
+      },
+      "y": {
+        "description": "Y coordinate (screenshot pixel by default).",
+        "type": "number"
+      },
+      "coord_space": {
+        "type": "string",
+        "enum": [
+          "screenshot",
+          "screen"
+        ]
+      },
+      "bundle": {
+        "description": "Bundle id (com.apple.Music). Either bundle or pid is required.",
+        "type": "string"
+      },
+      "pid": {
+        "description": "Process id. Either bundle or pid is required.",
+        "type": "integer",
+        "minimum": -9007199254740991,
+        "maximum": 9007199254740991
+      },
+      "window_id": {
+        "description": "Specific CGWindowID (optional).",
+        "type": "integer",
+        "minimum": -9007199254740991,
+        "maximum": 9007199254740991
+      }
+    }
+  },
+  "drag": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+      "start_x": {
+        "type": "number"
+      },
+      "start_y": {
+        "type": "number"
+      },
+      "end_x": {
+        "type": "number"
+      },
+      "end_y": {
+        "type": "number"
+      },
+      "coord_space": {
+        "type": "string",
+        "enum": [
+          "screenshot",
+          "screen"
+        ]
+      },
+      "button": {
+        "type": "string",
+        "enum": [
+          "left",
+          "right",
+          "middle"
+        ]
+      },
+      "bundle": {
+        "description": "Bundle id (com.apple.Music). Either bundle or pid is required.",
+        "type": "string"
+      },
+      "pid": {
+        "description": "Process id. Either bundle or pid is required.",
+        "type": "integer",
+        "minimum": -9007199254740991,
+        "maximum": 9007199254740991
+      },
+      "window_id": {
+        "description": "Specific CGWindowID (optional).",
+        "type": "integer",
+        "minimum": -9007199254740991,
+        "maximum": 9007199254740991
+      }
+    },
+    "required": [
+      "start_x",
+      "start_y",
+      "end_x",
+      "end_y"
+    ]
+  },
+  "type_text": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+      "text": {
+        "type": "string"
+      },
+      "ref": {
+        "description": "Optional text-field ref from get_app_state. When present, auto mode inserts via AX instead of keystrokes.",
+        "type": "string"
+      },
+      "input_method": {
+        "description": "auto (default), physical key events, unicode CGEvents, or AX insertion when ref is provided.",
+        "type": "string",
+        "enum": [
+          "auto",
+          "physical",
+          "unicode",
+          "ax"
+        ]
+      },
+      "bundle": {
+        "description": "Bundle id (com.apple.Music). Either bundle or pid is required.",
+        "type": "string"
+      },
+      "pid": {
+        "description": "Process id. Either bundle or pid is required.",
+        "type": "integer",
+        "minimum": -9007199254740991,
+        "maximum": 9007199254740991
+      },
+      "window_id": {
+        "description": "Specific CGWindowID (optional).",
+        "type": "integer",
+        "minimum": -9007199254740991,
+        "maximum": 9007199254740991
+      }
+    },
+    "required": [
+      "text"
+    ]
+  },
+  "press_key": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+      "key": {
+        "type": "string",
+        "description": "xdotool-style key combo, e.g. \"cmd+s\" or \"Return\""
+      },
+      "bundle": {
+        "description": "Bundle id (com.apple.Music). Either bundle or pid is required.",
+        "type": "string"
+      },
+      "pid": {
+        "description": "Process id. Either bundle or pid is required.",
+        "type": "integer",
+        "minimum": -9007199254740991,
+        "maximum": 9007199254740991
+      },
+      "window_id": {
+        "description": "Specific CGWindowID (optional).",
+        "type": "integer",
+        "minimum": -9007199254740991,
+        "maximum": 9007199254740991
+      }
+    },
+    "required": [
+      "key"
+    ]
+  },
+  "scroll": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+      "ref": {
+        "type": "string"
+      },
+      "direction": {
+        "type": "string",
+        "enum": [
+          "up",
+          "down",
+          "left",
+          "right"
+        ]
+      },
+      "pages": {
+        "type": "integer",
+        "minimum": -9007199254740991,
+        "maximum": 20
+      },
+      "bundle": {
+        "description": "Bundle id (com.apple.Music). Either bundle or pid is required.",
+        "type": "string"
+      },
+      "pid": {
+        "description": "Process id. Either bundle or pid is required.",
+        "type": "integer",
+        "minimum": -9007199254740991,
+        "maximum": 9007199254740991
+      },
+      "window_id": {
+        "description": "Specific CGWindowID (optional).",
+        "type": "integer",
+        "minimum": -9007199254740991,
+        "maximum": 9007199254740991
+      }
+    },
+    "required": [
+      "ref",
+      "direction"
+    ]
+  },
+  "set_value": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+      "ref": {
+        "type": "string"
+      },
+      "value": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "number"
+          },
+          {
+            "type": "boolean"
+          }
+        ]
+      },
+      "bundle": {
+        "description": "Bundle id (com.apple.Music). Either bundle or pid is required.",
+        "type": "string"
+      },
+      "pid": {
+        "description": "Process id. Either bundle or pid is required.",
+        "type": "integer",
+        "minimum": -9007199254740991,
+        "maximum": 9007199254740991
+      },
+      "window_id": {
+        "description": "Specific CGWindowID (optional).",
+        "type": "integer",
+        "minimum": -9007199254740991,
+        "maximum": 9007199254740991
+      }
+    },
+    "required": [
+      "ref",
+      "value"
+    ]
+  },
+  "select_text": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+      "ref": {
+        "type": "string",
+        "description": "Element index/ref from the latest get_app_state."
+      },
+      "text": {
+        "type": "string",
+        "description": "Text to locate within the editable element."
+      },
+      "prefix": {
+        "description": "Text immediately before the target, to disambiguate repeats.",
+        "type": "string"
+      },
+      "suffix": {
+        "description": "Text immediately after the target, to disambiguate repeats.",
+        "type": "string"
+      },
+      "selection_type": {
+        "description": "Select the text itself (default), or collapse the cursor before/after it.",
+        "type": "string",
+        "enum": [
+          "text",
+          "cursor_before",
+          "cursor_after"
+        ]
+      },
+      "bundle": {
+        "description": "Bundle id (com.apple.Music). Either bundle or pid is required.",
+        "type": "string"
+      },
+      "pid": {
+        "description": "Process id. Either bundle or pid is required.",
+        "type": "integer",
+        "minimum": -9007199254740991,
+        "maximum": 9007199254740991
+      },
+      "window_id": {
+        "description": "Specific CGWindowID (optional).",
+        "type": "integer",
+        "minimum": -9007199254740991,
+        "maximum": 9007199254740991
+      }
+    },
+    "required": [
+      "ref",
+      "text"
+    ]
+  },
+  "sky_list_apps": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {}
+  },
+  "sky_get_app_state": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+      "app": {
+        "type": "string",
+        "description": "App id, display name or process name from sky_list_apps."
+      },
+      "disableDiff": {
+        "description": "Return the full accessibility tree instead of a diff from the previous tree.",
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "app"
+    ]
+  },
+  "sky_click": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+      "app": {
+        "type": "string"
+      },
+      "element_index": {
+        "type": "integer",
+        "minimum": -9007199254740991,
+        "maximum": 9007199254740991
+      },
+      "x": {
+        "description": "X coordinate in the app-window screenshot.",
+        "type": "number"
+      },
+      "y": {
+        "description": "Y coordinate in the app-window screenshot.",
+        "type": "number"
+      },
+      "click_count": {
+        "type": "integer",
+        "minimum": -9007199254740991,
+        "maximum": 9007199254740991
+      },
+      "mouse_button": {
+        "type": "string",
+        "enum": [
+          "left",
+          "right",
+          "middle",
+          "l",
+          "r",
+          "m"
+        ]
+      }
+    },
+    "required": [
+      "app"
+    ]
+  },
+  "sky_press_key": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+      "app": {
+        "type": "string"
+      },
+      "key": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "app",
+      "key"
+    ]
+  },
+  "sky_type_text": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+      "app": {
+        "type": "string"
+      },
+      "text": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "app",
+      "text"
+    ]
+  },
+  "sky_scroll": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+      "app": {
+        "type": "string"
+      },
+      "element_index": {
+        "type": "integer",
+        "minimum": -9007199254740991,
+        "maximum": 9007199254740991
+      },
+      "direction": {
+        "type": "string",
+        "enum": [
+          "up",
+          "down",
+          "left",
+          "right",
+          "u",
+          "d",
+          "l",
+          "r"
+        ]
+      },
+      "pages": {
+        "type": "number"
+      }
+    },
+    "required": [
+      "app",
+      "element_index",
+      "direction"
+    ]
+  },
+  "sky_set_value": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+      "app": {
+        "type": "string"
+      },
+      "element_index": {
+        "type": "integer",
+        "minimum": -9007199254740991,
+        "maximum": 9007199254740991
+      },
+      "value": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "app",
+      "element_index",
+      "value"
+    ]
+  },
+  "sky_drag": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+      "app": {
+        "type": "string"
+      },
+      "from_x": {
+        "type": "number"
+      },
+      "from_y": {
+        "type": "number"
+      },
+      "to_x": {
+        "type": "number"
+      },
+      "to_y": {
+        "type": "number"
+      }
+    },
+    "required": [
+      "app",
+      "from_x",
+      "from_y",
+      "to_x",
+      "to_y"
+    ]
+  },
+  "sky_perform_secondary_action": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+      "app": {
+        "type": "string"
+      },
+      "element_index": {
+        "type": "integer",
+        "minimum": -9007199254740991,
+        "maximum": 9007199254740991
+      },
+      "action": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "app",
+      "element_index",
+      "action"
+    ]
+  },
+  "sky_select_text": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+      "app": {
+        "type": "string"
+      },
+      "element_index": {
+        "type": "integer",
+        "minimum": -9007199254740991,
+        "maximum": 9007199254740991
+      },
+      "text": {
+        "type": "string"
+      },
+      "prefix": {
+        "type": "string"
+      },
+      "suffix": {
+        "type": "string"
+      },
+      "selection_type": {
+        "type": "string",
+        "enum": [
+          "text",
+          "cursor_before",
+          "cursor_after"
+        ]
+      }
+    },
+    "required": [
+      "app",
+      "element_index",
+      "text"
+    ]
+  },
+  "permissions": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {}
+  },
+  "grant": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {}
+  }
+};
 
 defTool(
   "launch_app",
@@ -972,7 +1676,7 @@ defTool(
 // Content-Length headers and bare newline-delimited JSON (what codex sends),
 // and replies in the framing the client used.
 
-const SERVER_INFO = { name: "agent-computer-use", version: "1.0.0" };
+const SERVER_INFO = { name: "alma-computer-use", version: "1.0.0" };
 const INSTRUCTIONS = [
   "Drive native macOS apps via the Accessibility API and CGEvent.",
   "Start every turn with `get_app_state <bundle|pid>` — it returns a",
@@ -999,12 +1703,123 @@ function writeMessage(msg) {
   }
 }
 
-function rpcResult(id, result) { writeMessage({ jsonrpc: "2.0", id, result }); }
+function rpcResult(id, result) { writeMessage({ result, jsonrpc: "2.0", id }); }
 function rpcError(id, code, message) { writeMessage({ jsonrpc: "2.0", id, error: { code, message } }); }
 
 // [ALMA] notifications/cancelled suppresses the eventual response — the
 // aborted request never emits a late result frame.
 const cancelledRequests = new Set();
+
+// [ALMA] zod-equivalent argument validation. The real wrapper bundles the
+// MCP SDK + zod; tool args are validated BEFORE the handler runs and a
+// failure returns `{isError:true, content:[{text:"MCP error -32602: Input
+// validation error: Invalid arguments for tool <name>: <issues JSON>"}]}`.
+// Issue shapes below were live-probed against the shipped Alma wrapper
+// (Resources/cli/alma-computer-use-mcp.mjs) — keep them byte-identical.
+function zodReceived(v) {
+  if (v === null) return "null";
+  if (Array.isArray(v)) return "array";
+  if (typeof v === "number" && Number.isNaN(v)) return "nan";
+  return typeof v;
+}
+function invalidType(expected, path, v, extra = {}) {
+  return {
+    expected,
+    ...extra,
+    code: "invalid_type",
+    path,
+    message: `Invalid input: expected ${expected}, received ${zodReceived(v)}`
+  };
+}
+function validateField(spec, v, key) {
+  if (spec.anyOf) {
+    const errors = [];
+    for (const member of spec.anyOf) {
+      const issues = validateField(member, v, key);
+      if (issues.length === 0) return [];
+      errors.push(issues.map((i) => ({ ...i, path: [] })));
+    }
+    return [{ code: "invalid_union", errors, path: [key], message: "Invalid input" }];
+  }
+  // [ALMA] z.enum fields: ANY non-member — wrong type or undefined — reports
+  // invalid_value, never invalid_type (live-probed: button:42, direction
+  // missing).
+  if (spec.enum) {
+    if (!spec.enum.includes(v)) {
+      return [{
+        code: "invalid_value",
+        values: spec.enum,
+        path: [key],
+        message: `Invalid option: expected one of ${spec.enum.map((e) => JSON.stringify(e)).join("|")}`
+      }];
+    }
+    return [];
+  }
+  switch (spec.type) {
+    case "string":
+      if (typeof v !== "string") return [invalidType("string", [key], v)];
+      break;
+    case "boolean":
+      if (typeof v !== "boolean") return [invalidType("boolean", [key], v)];
+      break;
+    case "number":
+      if (typeof v !== "number") return [invalidType("number", [key], v)];
+      break;
+    case "integer":
+      if (typeof v !== "number") return [invalidType("number", [key], v)];
+      if (Math.abs(v) > 9007199254740991) {
+        return [{
+          code: "too_big",
+          maximum: 9007199254740991,
+          note: "Integers must be within the safe integer range.",
+          origin: "int",
+          inclusive: true,
+          path: [key],
+          message: "Too big: expected int to be <=9007199254740991"
+        }];
+      }
+      if (!Number.isInteger(v)) return [invalidType("int", [key], v, { format: "safeint" })];
+      break;
+    default:
+      break;
+  }
+  if (spec.maximum !== void 0 && typeof v === "number" && v > spec.maximum) {
+    return [{
+      origin: "number",
+      code: "too_big",
+      maximum: spec.maximum,
+      inclusive: true,
+      path: [key],
+      message: `Too big: expected number to be <=${spec.maximum}`
+    }];
+  }
+  return [];
+}
+function validateArgs(tool, args) {
+  if (args === void 0) {
+    return [invalidType("object", [], args)];
+  }
+  const issues = [];
+  const required = new Set(tool.inputSchema?.required ?? []);
+  for (const [key, spec] of Object.entries(tool.inputSchema?.properties ?? {})) {
+    const v = args[key];
+    if (v === void 0) {
+      if (required.has(key)) issues.push(...validateField(spec, v, key));
+      continue;
+    }
+    issues.push(...validateField(spec, v, key));
+  }
+  return issues;
+}
+
+// [ALMA] zod's getParsedType naming for "received X" issue messages.
+function zodType(v) {
+  if (v === void 0) return "undefined";
+  if (v === null) return "null";
+  if (Array.isArray(v)) return "array";
+  if (typeof v === "number" && Number.isNaN(v)) return "nan";
+  return typeof v;
+}
 
 async function handleMessage(msg) {
   const { id, method, params } = msg;
@@ -1016,14 +1831,40 @@ async function handleMessage(msg) {
   }
   try {
     switch (method) {
-      case "initialize":
+      case "initialize": {
+        // [ALMA] InitializeRequestSchema: params{protocolVersion:string,
+        // capabilities:object, clientInfo:object} — each required; missing
+        // params → single path ["params"] issue; failures are -32603 with
+        // the zod issue array.
+        const issues = [];
+        if (params === void 0 || params === null || typeof params !== "object" || Array.isArray(params)) {
+          issues.push({ expected: "object", code: "invalid_type",
+            path: ["params"],
+            message: `Invalid input: expected object, received ${zodType(params)}` });
+        } else {
+          for (const [f, exp] of [["protocolVersion","string"],["capabilities","object"],["clientInfo","object"]]) {
+            const v = params[f];
+            const ok = exp === "string" ? typeof v === "string"
+              : (v !== null && typeof v === "object" && !Array.isArray(v));
+            if (!ok) issues.push({ expected: exp, code: "invalid_type",
+              path: ["params", f],
+              message: `Invalid input: expected ${exp}, received ${zodType(v)}` });
+          }
+        }
+        if (issues.length) { rpcError(id, -32603, JSON.stringify(issues, null, 2)); return; }
+        // [ALMA] negotiation: a supported version echoes back; anything
+        // else falls to the server's max.
+        const SUPPORTED = ["2024-10-07","2024-11-05","2025-03-26","2025-06-18","2025-11-25"];
+        const pv = SUPPORTED.includes(params.protocolVersion)
+          ? params.protocolVersion : SUPPORTED[SUPPORTED.length - 1];
         rpcResult(id, {
-          protocolVersion: params?.protocolVersion ?? "2024-11-05",
-          capabilities: { tools: {} },
+          protocolVersion: pv,
+          capabilities: { tools: { listChanged: true } },
           serverInfo: SERVER_INFO,
           instructions: INSTRUCTIONS
         });
         return;
+      }
       case "ping":
         rpcResult(id, {});
         return;
@@ -1032,16 +1873,55 @@ async function handleMessage(msg) {
           tools: tools.map((t) => ({
             name: t.name,
             description: t.description,
-            inputSchema: t.inputSchema
+            execution: { taskSupport: "forbidden" },
+            inputSchema: REAL_SCHEMAS[t.name] ?? t.inputSchema
           }))
         });
         return;
       }
       case "tools/call": {
-        const name = params?.name;
+        if (params === void 0 || params === null || typeof params !== "object" || Array.isArray(params)) {
+          rpcError(id, -32603, JSON.stringify([{ expected: "object",
+            code: "invalid_type", path: ["params"],
+            message: `Invalid input: expected object, received ${zodType(params)}` }], null, 2));
+          return;
+        }
+        const name = params.name;
+        if (typeof name !== "string") {
+          rpcError(id, -32603, JSON.stringify([{ expected: "string",
+            code: "invalid_type", path: ["params", "name"],
+            message: `Invalid input: expected string, received ${zodType(name)}` }], null, 2));
+          return;
+        }
         const tool = toolsByName.get(name);
         if (!tool) {
-          rpcResult(id, { isError: true, content: [textBlock(`Unknown tool: ${name}`)] });
+          rpcResult(id, { content: [textBlock(`MCP error -32602: Tool ${name} not found`)], isError: true });
+          return;
+        }
+        if (params.arguments !== void 0
+            && (typeof params.arguments !== "object"
+                || params.arguments === null
+                || Array.isArray(params.arguments))) {
+          // [ALMA] request-schema rejection happens before tool validation —
+          // it surfaces as a JSON-RPC error, not an isError tool result.
+          rpcError(id, -32602, JSON.stringify([{
+            expected: "record", code: "invalid_type",
+            path: ["params", "arguments"],
+            message: `Invalid input: expected record, received ${zodType(params.arguments)}`
+          }], null, 2));
+          return;
+        }
+        const issues = params.arguments === void 0
+          ? [{ expected: "object", code: "invalid_type", path: [],
+               message: "Invalid input: expected object, received undefined" }]
+          : validateArgs(tool, params.arguments);
+        if (issues.length > 0) {
+          rpcResult(id, {
+            content: [textBlock(
+              `MCP error -32602: Input validation error: Invalid arguments for tool ${name}: ${JSON.stringify(issues, null, 2)}`
+            )],
+            isError: true
+          });
           return;
         }
         try {
@@ -1049,22 +1929,13 @@ async function handleMessage(msg) {
           if (!cancelledRequests.delete(id)) rpcResult(id, result);
         } catch (e) {
           if (!cancelledRequests.delete(id)) {
-            rpcResult(id, { isError: true, content: [textBlock(e instanceof Error ? e.message : String(e))] });
+            rpcResult(id, { content: [textBlock(e instanceof Error ? e.message : String(e))], isError: true });
           }
         }
         return;
       }
-      case "resources/list":
-        rpcResult(id, { resources: [] });
-        return;
-      case "prompts/list":
-        rpcResult(id, { prompts: [] });
-        return;
-      case "logging/setLevel":
-        rpcResult(id, {});
-        return;
       default:
-        rpcError(id, -32601, `Method not found: ${method}`);
+        rpcError(id, -32601, "Method not found");
     }
   } catch (e) {
     rpcError(id, -32603, e instanceof Error ? e.message : String(e));

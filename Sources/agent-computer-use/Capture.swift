@@ -15,34 +15,117 @@ import Vision
 
 enum Capture {
 
-    // MARK: - SCShareableContent bridge (worker-thread safe; main runloop
-    // spins so the async delivery lands)
+    // MARK: - ShareableContentCache [FINDINGS §8]
+    //
+    // windowTTL 2s / displayTTL 30s, strict `< maxAge` freshness, one
+    // in-flight fetch coalesced across callers. Fetch failure invalidates
+    // content+fetchedAt (NOT inFlight bookkeeping of a joiner) and
+    // normalizes the creator's error to sc_denied. window(id) miss →
+    // invalidate → one fresh() retry → nil.
 
-    private static func shareableContent() throws -> SCShareableContent {
-        var result: SCShareableContent?
-        var failure: Error?
-        let sem = DispatchSemaphore(value: 0)
-        SCShareableContent.getWithCompletionHandler { content, err in
-            result = content; failure = err; sem.signal()
-        }
-        if sem.wait(timeout: .now() + 5) == .timedOut {
-            throw DaemonError("internal", "SCShareableContent timed out")
-        }
-        if let failure { throw DaemonError.wrap(failure) }
-        guard let c = result else {
-            throw DaemonError("internal", "no shareable content")
-        }
-        return c
+    private static var content: SCShareableContent?
+    private static var fetchedAt = Date.distantPast
+    private static var inFlight = false
+    private static var inFlightSem: DispatchSemaphore?
+    private static var inFlightResult: SCShareableContent?
+    private static var inFlightError: DaemonError?
+    private static var lastSuccess = Date.distantPast
+    private static let cacheLock = NSLock()
+    private static let windowTTL = 2.0, displayTTL = 30.0
+
+    private static func invalidate() {
+        content = nil; fetchedAt = .distantPast
     }
 
+    /// actor fresh(maxAge:) — called under no lock; synchronizes the
+    //  in-flight join via a semaphore stored at task creation.
+    private static func fresh(maxAge: TimeInterval) throws
+        -> SCShareableContent {
+        cacheLock.lock()
+        if let c = content,
+           Date().timeIntervalSince(fetchedAt) < maxAge {
+            cacheLock.unlock(); return c
+        }
+        if inFlight, let sem = inFlightSem {
+            cacheLock.unlock()
+            sem.wait()
+            cacheLock.lock()
+            defer { cacheLock.unlock() }
+            if let r = inFlightResult { return r }
+            throw inFlightError
+                ?? DaemonError("sc_not_granted",
+                    "Screen Recording permission not granted to "
+                    + "agent-computer-use.")
+        }
+        inFlight = true
+        let mySem = DispatchSemaphore(value: 0)
+        inFlightSem = mySem
+        cacheLock.unlock()
+
+        var result: SCShareableContent?
+        var failure: Error?
+        SCShareableContent.getWithCompletionHandler { c, e in
+            result = c; failure = e; mySem.signal()
+        }
+        mySem.wait() // no artificial timeout — Alma awaits unbounded
+
+        cacheLock.lock()
+        if let result, failure == nil {
+            content = result
+            fetchedAt = Date()
+            lastSuccess = fetchedAt
+            inFlightResult = result; inFlightError = nil
+        } else {
+            invalidate()
+            inFlightResult = nil
+            // creator failure normalizes to sc_not_granted
+            inFlightError = DaemonError("sc_not_granted",
+                "Screen Recording permission not granted to "
+                + "agent-computer-use.")
+        }
+        inFlight = false
+        let r = inFlightResult, e = inFlightError
+        cacheLock.unlock()
+        // wake joiners — they read the shared slot under the lock
+        mySem.signal()
+        if let r { return r }
+        throw e ?? DaemonError("sc_not_granted",
+            "Screen Recording permission not granted to "
+            + "agent-computer-use.")
+    }
+
+    /// cache window(id): fresh(2s) → search → miss → invalidate →
+    /// fresh(2s) retry → search → nil.
     static func scWindow(for wid: CGWindowID) throws -> SCWindow {
-        let content = try shareableContent()
+        var content = try fresh(maxAge: windowTTL)
+        if let w = content.windows.first(where: { $0.windowID == wid }) {
+            return w
+        }
+        cacheLock.lock(); invalidate(); cacheLock.unlock()
+        content = try fresh(maxAge: windowTTL)
         guard let w = content.windows.first(where: { $0.windowID == wid })
         else {
             throw DaemonError("internal",
                 "No SCWindow with id \(wid) (was the window closed?)")
         }
         return w
+    }
+
+    /// Display content uses the 30s TTL. Unknown/absent display_id falls
+    /// back to the FIRST display [live probe: bogus display_id still
+    /// captures].
+    private static func scDisplay(for displayID: CGDirectDisplayID?)
+        throws -> SCDisplay {
+        let content = try fresh(maxAge: displayTTL)
+        if let displayID,
+           let d = content.displays.first(where: {
+               $0.displayID == displayID }) {
+            return d
+        }
+        guard let d = content.displays.first else {
+            throw DaemonError("internal", "No shareable display available")
+        }
+        return d
     }
 
     /// Screen Recording permission probe — cached once by the daemon boot
@@ -87,9 +170,7 @@ enum Capture {
             contentFilter: filter, configuration: cfg) { img, err in
             result = img; failure = err; sem.signal()
         }
-        if sem.wait(timeout: .now() + 10) == .timedOut {
-            throw DaemonError("internal", "SCScreenshotManager timed out")
-        }
+        sem.wait() // awaited unbounded — no artificial timeout
         if let failure { throw DaemonError.wrap(failure) }
         guard let img = result else {
             throw DaemonError("internal", "capture returned no image")
@@ -97,66 +178,50 @@ enum Capture {
         return img
     }
 
-    /// Window JPEG: point dimensions = SCWindow.frame × main-screen scale,
-    /// then downsampled to maxWidth when positive.
+    /// The width limit is applied BEFORE capture: the requested pixel
+    /// size is clamped to maxWidth (proportionally), so the returned
+    /// image is already within budget.
+    private static func limitedSize(frame: CGRect, scale: CGFloat,
+                                    maxWidth: Int) -> CGSize {
+        var w = frame.width * scale, h = frame.height * scale
+        if maxWidth > 0, Int(w) > maxWidth {
+            let ratio = Double(maxWidth) / Double(w)
+            w = CGFloat(maxWidth)
+            h = CGFloat(max(1, Int(Double(h) * ratio)))
+        }
+        return CGSize(width: max(1, w), height: max(1, h))
+    }
+
+    /// Window JPEG: capture size = SCWindow.frame × main-screen scale,
+    /// clamped to maxWidth before the filter is configured.
     static func windowShotToFile(wid: CGWindowID, out: String,
                                  maxWidth: Int, quality: Double)
         throws -> (Int, Int) {
         let scw = try scWindow(for: wid)
         let scale = NSScreen.main?.backingScaleFactor ?? 2
-        let px = CGSize(width: scw.frame.width * scale,
-                        height: scw.frame.height * scale)
+        let px = limitedSize(frame: scw.frame, scale: scale,
+                             maxWidth: maxWidth)
         let filter = SCContentFilter(desktopIndependentWindow: scw)
-        var img = try captureImage(filter: filter, pixelSize: px)
-        if maxWidth > 0, img.width > maxWidth {
-            img = downscale(img, toWidth: maxWidth)
-        }
+        let img = try captureImage(filter: filter, pixelSize: px)
         try writeJPEG(img, to: out, quality: quality)
         return (img.width, img.height)
     }
 
-    /// Display JPEG: `displayID` nil → the FIRST SCDisplay (not an
-    /// infinite composite of every screen).
+    /// Display JPEG: `displayID` nil OR unmatched → the FIRST SCDisplay
+    /// (never an infinite composite of every screen, never an error).
     static func displayShotToFile(displayID: CGDirectDisplayID?,
                                   out: String, maxWidth: Int,
                                   quality: Double)
         throws -> (Int, Int, CGDirectDisplayID) {
-        let content = try shareableContent()
-        let scd: SCDisplay?
-        if let displayID {
-            scd = content.displays.first { $0.displayID == displayID }
-        } else {
-            scd = content.displays.first
-        }
-        guard let d = scd else {
-            throw DaemonError("internal", "No shareable display available")
-        }
+        let d = try scDisplay(for: displayID)
         let scale = NSScreen.main?.backingScaleFactor ?? 2
-        let px = CGSize(width: d.frame.width * scale,
-                        height: d.frame.height * scale)
+        let px = limitedSize(frame: d.frame, scale: scale,
+                             maxWidth: maxWidth)
         let filter = SCContentFilter(display: d,
             excludingApplications: [], exceptingWindows: [])
-        var img = try captureImage(filter: filter, pixelSize: px)
-        if maxWidth > 0, img.width > maxWidth {
-            img = downscale(img, toWidth: maxWidth)
-        }
+        let img = try captureImage(filter: filter, pixelSize: px)
         try writeJPEG(img, to: out, quality: quality)
         return (img.width, img.height, d.displayID)
-    }
-
-    private static func downscale(_ image: CGImage,
-                                  toWidth maxWidth: Int) -> CGImage {
-        let scale = Double(maxWidth) / Double(image.width)
-        let w = maxWidth, h = max(1, Int(Double(image.height) * scale))
-        guard let ctx = CGContext(
-            data: nil, width: w, height: h,
-            bitsPerComponent: 8, bytesPerRow: 0,
-            space: CGColorSpaceCreateDeviceRGB(),
-            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)
-        else { return image }
-        ctx.interpolationQuality = .high
-        ctx.draw(image, in: CGRect(x: 0, y: 0, width: w, height: h))
-        return ctx.makeImage() ?? image
     }
 
     private static func writeJPEG(_ image: CGImage, to path: String,
@@ -226,21 +291,38 @@ enum Capture {
         return mappings[pid]
     }
 
-    // MARK: - visual refs (OCR fallback regions → clickable vN points)
+    // MARK: - visual refs [FINDINGS §6/VisualIndex]
+    //
+    // visualRefs[pid] = ref → SCREENSHOT-PIXEL CGRect (replaced only when
+    // a nonempty region set is produced — a skipped/empty/failed OCR call
+    // leaves the stale table in place). Click on vN takes the rect's
+    // center and translates it through the pid's CURRENT mapping.
 
-    private static var visualRefTable: [pid_t: [String: CGPoint]] = [:]
+    private static var visualRefTable: [pid_t: [String: CGRect]] = [:]
 
-    static func visualRef(pid: pid_t, ref: String) -> CGPoint? {
-        mapLock.lock(); defer { mapLock.unlock() }
-        return visualRefTable[pid]?[ref]
+    /// v-ref → desktop point: stored pixel-rect center through the
+    /// pid's current mapping. nil when the ref is unknown.
+    static func visualRefPoint(pid: pid_t, ref: String) -> CGPoint? {
+        mapLock.lock()
+        let rect = visualRefTable[pid]?[ref]
+        mapLock.unlock()
+        guard let rect = rect else { return nil }
+        let cx = rect.origin.x + rect.size.width / 2
+        let cy = rect.origin.y + rect.size.height / 2
+        mapLock.lock()
+        let m = mappings[pid]
+        mapLock.unlock()
+        return m?.point(forX: cx, y: cy)
     }
 
-    /// Vision fast OCR over the last gas screenshot; publishes vN refs as
-    /// SCREEN points (translated through the pid's mapping). Returns wire
-    /// region dicts or nil when OCR can't run / produced nothing.
+    /// Vision fast OCR over the last gas screenshot. Refs restart at v1
+    /// per call; accepted refs cap at maxResults 80; NO confidence
+    /// threshold/sort (only nonempty-text filter). Emits
+    /// {ref,text,bounds{x,y,w,h},confidence} where bounds are screenshot
+    /// pixel coordinates. On nonempty output the pid's visualRefs table
+    /// is replaced; empty/error leaves the previous table untouched.
     static func ocrRegions(imagePath: String, pid: pid_t) -> [JSONDict]? {
-        guard let m = mapping(for: pid),
-              let img = NSImage(contentsOfFile: imagePath)?.cgImage(
+        guard let img = NSImage(contentsOfFile: imagePath)?.cgImage(
                   forProposedRect: nil, context: nil, hints: nil)
         else { return nil }
         let req = VNRecognizeTextRequest()
@@ -249,33 +331,32 @@ enum Capture {
         req.usesLanguageCorrection = false
         let handler = VNImageRequestHandler(cgImage: img, options: [:])
         try? handler.perform([req])
-        guard let observations = req.results,
-              !observations.isEmpty else { return nil }
-        var refs: [String: CGPoint] = [:]
+        guard let observations = req.results else { return nil }
+        var refs: [String: CGRect] = [:]
         var out: [JSONDict] = []
-        for (i, obs) in observations.prefix(80).enumerated() {
-            guard let text = obs.topCandidates(1).first?.string,
-                  !text.isEmpty else { continue }
-            // VN boxes are normalized, bottom-left origin → image px
-            // top-left origin.
+        var accepted = 0
+        for obs in observations {
+            if accepted >= 80 { break } // maxResults
+            guard let cand = obs.topCandidates(1).first,
+                  !cand.string.isEmpty else { continue }
+            accepted += 1
+            let ref = "v\(accepted)"
+            // VN normalized lower-left → screenshot-pixel top-left
             let b = obs.boundingBox
             let px = b.origin.x * Double(img.width)
             let py = (1 - b.origin.y - b.height) * Double(img.height)
             let pw = b.width * Double(img.width)
             let ph = b.height * Double(img.height)
-            let center = m.point(forX: px + pw / 2, y: py + ph / 2)
-            let ref = "v\(i + 1)"
-            refs[ref] = center
-            let tl = m.point(forX: px, y: py)
-            let br = m.point(forX: px + pw, y: py + ph)
+            refs[ref] = CGRect(x: px, y: py, width: pw, height: ph)
             out.append([
-                "ref": ref, "text": text,
+                "ref": ref, "text": cand.string,
+                "confidence": Double(cand.confidence),
                 "bounds": [
-                    "x": tl.x, "y": tl.y,
-                    "w": br.x - tl.x, "h": br.y - tl.y,
+                    "x": px, "y": py, "w": pw, "h": ph,
                 ],
             ])
         }
+        guard !out.isEmpty else { return nil }
         mapLock.lock()
         visualRefTable[pid] = refs
         mapLock.unlock()

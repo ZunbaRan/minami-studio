@@ -53,10 +53,10 @@ final class Daemon {
     /// refreshed before EVERY frame decode — including malformed requests.
     private var lastActivity = Date()
     private var idleTimer: DispatchSourceTimer?
+    /// [DISASM] handleQueue .concurrent — different peers run requests
+    /// concurrently; each peer's own lines dispatch synchronously in its
+    /// read loop (processLine is called inline, not queued).
     private let connQueue = DispatchQueue(label: "agent-cu.conn", attributes: .concurrent)
-    /// [DISASM] self.workQueue.async — serial: requests serialize so that
-    /// concurrent get_app_state/click frames can't interleave mid-snapshot.
-    private let workQueue = DispatchQueue(label: "agent-cu.work")
 
     let elementStore = ElementStore()
     let appState = AppStateStore()
@@ -133,15 +133,17 @@ final class Daemon {
         NSApp.run()
     }
 
+    /// Idle timer [0x1000749f8]: main queue, starts now+30s, repeats 30s,
+    /// armed unconditionally — nonpositive timeouts simply make the strict
+    /// `elapsed > timeout` comparison fire at the first tick.
     private func armIdleTimer() {
-        guard idleSeconds > 0, idleTimer == nil else { return }
-        let t = DispatchSource.makeTimerSource(queue: DispatchQueue.global())
+        guard idleTimer == nil else { return }
+        let t = DispatchSource.makeTimerSource(queue: DispatchQueue.main)
         t.schedule(deadline: .now() + 30, repeating: 30)
         t.setEventHandler { [weak self] in
             guard let self else { return }
-            if Date().timeIntervalSince(self.lastActivity) >= self.idleSeconds {
-                FileHandle.standardError.write(
-                    "idle timeout reached; exiting\n".data(using: .utf8)!)
+            guard !self.shutdownRequested else { return }
+            if Date().timeIntervalSince(self.lastActivity) > self.idleSeconds {
                 self.initiateShutdown()
             }
         }
@@ -153,6 +155,7 @@ final class Daemon {
     /// unlink the socket, exit. Also used by the idle path.
     func initiateShutdown() {
         shutdownRequested = true
+        AXBridge.restoreAllEnhancedUI()
         if listenFD >= 0 { Darwin.close(listenFD); listenFD = -1 }
         unlink(socketPath)
         exit(0)
@@ -190,10 +193,10 @@ final class Daemon {
                 ctx.readBuffer.removeSubrange(0...nl)
                 guard !lineData.isEmpty,
                       let line = String(data: lineData, encoding: .utf8) else { continue }
-                workQueue.async { self.handleLine(line, on: ctx) }
-            }
-            if ctx.readBuffer.count > 8 * 1024 * 1024 {
-                ctx.readBuffer.removeAll() // oversized garbage frame; drop
+                // [DISASM] processLine runs synchronously inside this peer's
+                // read loop — a peer disconnecting mid-dispatch does NOT
+                // cancel it, and no maximum accumulated line size exists.
+                handleLine(line, on: ctx)
             }
         }
         dropConnection(ctx)

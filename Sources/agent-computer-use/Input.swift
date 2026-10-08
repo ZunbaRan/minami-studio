@@ -16,29 +16,34 @@ import Foundation
 
 private enum SynthPost {
     typealias Fn = @convention(c) (Int32, CGEvent) -> Void
-    static let fn: Fn? = {
-        guard let h = dlopen("/System/Library/Frameworks/CoreGraphics.framework/CoreGraphics", RTLD_LAZY) else { return nil }
-        guard let sym = dlsym(h, "CGEventPostToPid") else { return nil }
+    /// [ALGORITHMS §11.1] dlopen flags 9 (RTLD_LAZY|RTLD_GLOBAL); a missing
+    /// CGEventPostToPid is fatal — no public-API fallback.
+    static let fn: Fn = {
+        guard let h = dlopen("/System/Library/Frameworks/CoreGraphics.framework/CoreGraphics", RTLD_LAZY | RTLD_GLOBAL),
+              let sym = dlsym(h, "CGEventPostToPid")
+        else { fatalError("CGEventPostToPid resolution failed") }
         return unsafeBitCast(sym, to: Fn.self)
     }()
-    static func post(pid: pid_t, _ ev: CGEvent) {
-        if let fn { fn(pid, ev) } else { ev.postToPid(pid) }
-    }
+    static func post(pid: pid_t, _ ev: CGEvent) { fn(pid, ev) }
 }
 
 private enum SetWindowLocation {
     typealias Fn = @convention(c) (CGEvent, CGPoint) -> Void
+    /// The ONLY dlopen'd symbol allowed a silent no-op fallback.
     static let fn: Fn? = {
-        guard let h = dlopen("/System/Library/Frameworks/CoreGraphics.framework/CoreGraphics", RTLD_LAZY) else { return nil }
-        guard let sym = dlsym(h, "CGEventSetWindowLocation") else { return nil }
+        guard let h = dlopen("/System/Library/Frameworks/CoreGraphics.framework/CoreGraphics", RTLD_LAZY | RTLD_GLOBAL),
+              let sym = dlsym(h, "CGEventSetWindowLocation")
+        else { return nil }
         return unsafeBitCast(sym, to: Fn.self)
     }()
 }
 
-/// Sentinel marker written to field 0x2a on every synthesized event so Alma's
-/// own tap/observer layers can recognize daemon-originated input.
+/// Sentinel written to field 0x2a on every synthesized event — the literal
+/// constant 0x414c4d414e4f464c ("ALMANOFL") so Alma's own tap/observer
+/// layers recognize daemon-originated input [ALGORITHMS §4.3].
 private func tagSentinel(_ ev: CGEvent) {
-    ev.setIntegerValueField(CGEventField(rawValue: 0x2a)!, value: 1)
+    ev.setIntegerValueField(CGEventField(rawValue: 0x2a)!,
+                            value: 0x414c4d414e4f464c)
 }
 
 // MARK: - KeyParser — verbatim tables
@@ -80,11 +85,14 @@ enum KeyParser {
         "/": 0x2c, "n": 0x2d, "m": 0x2e, ".": 0x2f, "`": 0x32, " ": 0x31,
     ]
 
-    /// parts = split("+", omitting empties); modifiers = dropLast lowercased;
-    /// key = last lowercased; named first, then single-char ansi.
+    /// parts = split("+", omitting empties); EACH component is trimmed with
+    /// CharacterSet.whitespaces before lookup; modifiers = dropLast
+    /// lowercased; key = last lowercased; named first, then single-char ansi.
     static func parse(_ s: String) throws -> Parsed {
         var flags = CGEventFlags()
+        let ws = CharacterSet.whitespaces
         let parts = s.split(separator: "+", omittingEmptySubsequences: true)
+            .map { $0.trimmingCharacters(in: ws) }
         guard !parts.isEmpty else {
             throw DaemonError("invalid_arg", "empty key combo \"\(s)\"")
         }
@@ -167,10 +175,10 @@ enum KeyboardLayoutTranslator {
                 var dead: UInt32 = 0
                 var buf = [UniChar](repeating: 0, count: 8)
                 var len = 0
+                // [DISASM] options are zero — dead-key mask is NOT passed.
                 let rc = UCKeyTranslate(layout, kc,
                     UInt16(kUCKeyActionDisplay), modState, kbd,
-                    OptionBits(kUCKeyTranslateNoDeadKeysMask),
-                    &dead, 8, &len, &buf)
+                    0, &dead, 8, &len, &buf)
                 guard rc == noErr, len >= 1 else { continue }
                 if String(utf16CodeUnits: buf, count: len) == String(ch) {
                     return KeyPress(keyCode: kc, flags: flags)
@@ -184,36 +192,85 @@ enum KeyboardLayoutTranslator {
 // MARK: - MenuShortcuts (press_key AX-menu fallback + menu_shortcuts wire)
 
 enum MenuShortcuts {
-    /// Walk the app's menubar collecting (chord → element) pairs.
-    static func collect(pid: pid_t, max: Int = 200) -> [(chord: String, el: AXUIElement)] {
+    /// AXMenuItemCmdModifiers is an INT bitmask [0x10003072c–308b4]:
+    ///   bit2 → Control, bit1 → Option, bit0 → Shift,
+    ///   bit3 CLEAR → Command (Command is the default when bit3 isn't set).
+    static func modifierFlags(_ bits: Int) -> CGEventFlags {
+        var f = CGEventFlags()
+        if bits & 0x8 == 0 { f.insert(.maskCommand) }
+        if bits & 0x4 != 0 { f.insert(.maskControl) }
+        if bits & 0x2 != 0 { f.insert(.maskAlternate) }
+        if bits & 0x1 != 0 { f.insert(.maskShift) }
+        return f
+    }
+
+    /// Named-key lookup: AXMenuItemCmdVirtualKey supplies the keyCode
+    /// directly; AXMenuItemCmdChar falls through glyph/ansi tables.
+    static func keyCode(for el: AXUIElement) -> UInt16? {
+        if let vk = (AXBridge.copyAttr(el, "AXMenuItemCmdVirtualKey") as? NSNumber)?.uint16Value {
+            return vk
+        }
+        guard let ch = AXBridge.copyString(el, kAXMenuItemCmdCharAttribute),
+              !ch.isEmpty else { return nil }
+        let name = glyphToKeyName(ch)
+        if let kc = KeyParser.named[name] { return kc }
+        if name.count == 1, let c = name.first, let kc = KeyParser.ansi[c] {
+            return kc
+        }
+        return nil
+    }
+
+    /// menu-item keyCode+flags pair for matching.
+    static func shortcut(_ el: AXUIElement) -> (keyCode: UInt16, flags: CGEventFlags)? {
+        guard let kc = keyCode(for: el) else { return nil }
+        let bits = (AXBridge.copyAttr(el, kAXMenuItemCmdModifiersAttribute) as? NSNumber)?.intValue ?? 0
+        return (kc, modifierFlags(bits))
+    }
+
+    /// Walk the app's menubar collecting shortcut-bearing menu items.
+    static func collect(pid: pid_t, max: Int = 200) -> [AXUIElement] {
         let app = AXUIElementCreateApplication(pid)
-        var out: [(String, AXUIElement)] = []
+        var out: [AXUIElement] = []
         var barValue: CFTypeRef?
         guard AXUIElementCopyAttributeValue(app, "AXMenuBar" as CFString, &barValue) == .success,
               let bar = barValue, CFGetTypeID(bar) == AXUIElementGetTypeID() else { return out }
         let menuBar = unsafeDowncast(bar, to: AXUIElement.self)
         func visit(_ el: AXUIElement) {
             if out.count >= max { return }
-            if let cmd = AXBridge.copyString(el, kAXMenuItemCmdCharAttribute),
-               !cmd.isEmpty {
-                let mods = AXBridge.copyString(el, kAXMenuItemCmdModifiersAttribute) ?? ""
-                out.append((chordString(char: cmd, modifiers: mods), el))
-            }
+            if shortcut(el) != nil { out.append(el) }
             for child in AXBridge.copyElements(el, kAXChildrenAttribute) { visit(child) }
         }
         for child in AXBridge.copyElements(menuBar, kAXChildrenAttribute) { visit(child) }
         return out
     }
 
-    /// AX shortcut modifiers → chord string in press_key syntax.
-    static func chordString(char: String, modifiers: String) -> String {
+    /// combo string in press_key syntax: cmd/ctrl/opt/shift in fixed order
+    /// + key name (named-table reverse of keyCode, else glyph).
+    static func chordString(_ el: AXUIElement) -> String? {
+        guard let (kc, flags) = shortcut(el) else { return nil }
         var parts: [String] = []
-        if modifiers.contains("@") || modifiers.contains("0") { parts.append("cmd") }
-        if modifiers.contains("^") || modifiers.contains("2") { parts.append("ctrl") }
-        if modifiers.contains("~") || modifiers.contains("1") { parts.append("opt") }
-        if modifiers.contains("$") || modifiers.contains("S") { parts.append("shift") }
-        parts.append(glyphToKeyName(char))
+        if flags.contains(.maskCommand) { parts.append("cmd") }
+        if flags.contains(.maskControl) { parts.append("ctrl") }
+        if flags.contains(.maskAlternate) { parts.append("opt") }
+        if flags.contains(.maskShift) { parts.append("shift") }
+        parts.append(keyName(for: kc) ?? "key\(kc)")
         return parts.joined(separator: "+")
+    }
+
+    /// Reverse the named table for a keyCode; unknown codes render as
+    /// the raw char glyph when available.
+    static func keyName(for kc: UInt16) -> String? {
+        for (name, code) in KeyParser.named where code == kc {
+            // prefer the canonical (non-alias) names
+            switch name {
+            case "return", "tab", "space", "delete", "escape", "capslock",
+                 "left", "right", "down", "up", "home", "end", "pageup",
+                 "pagedown", "help", "clear": return name
+            default:
+                if name.hasPrefix("f") || name.hasPrefix("kp_") { return name }
+            }
+        }
+        return nil
     }
 
     static func glyphToKeyName(_ char: String) -> String {
@@ -237,9 +294,9 @@ enum MenuShortcuts {
     /// `suppressed` immediately (no second-match retry).
     static func matchAndPress(pid: pid_t, key: String) -> Bool? {
         guard let wanted = try? KeyParser.parse(key) else { return nil }
-        for (chord, el) in collect(pid: pid) {
+        for el in collect(pid: pid) {
             if AXBridge.copyBool(el, kAXEnabledAttribute) == false { continue }
-            guard let m = try? KeyParser.parse(chord) else { continue }
+            guard let m = shortcut(el) else { continue }
             guard m.keyCode == wanted.keyCode,
                   (m.flags.rawValue ^ wanted.flags.rawValue) & 0x1e0000 == 0
             else { continue }
@@ -249,7 +306,8 @@ enum MenuShortcuts {
         return nil
     }
 
-    /// Wire projection for snap.menu_shortcuts — [{combo,title,path}].
+    /// Wire projection for snap.menu_shortcuts — [{combo, path:[String]}]
+    /// (0x10007da90–dae8: the path stays a TITLE ARRAY, no `title` key).
     static func wireEntries(pid: pid_t) -> [JSONDict] {
         let app = AXUIElementCreateApplication(pid)
         var out: [JSONDict] = []
@@ -261,13 +319,8 @@ enum MenuShortcuts {
             let title = AXBridge.copyString(el, kAXTitleAttribute) ?? ""
             var path = parents
             if !title.isEmpty { path.append(title) }
-            if let cmd = AXBridge.copyString(el, kAXMenuItemCmdCharAttribute), !cmd.isEmpty {
-                let mods = AXBridge.copyString(el, kAXMenuItemCmdModifiersAttribute) ?? ""
-                out.append([
-                    "combo": chordString(char: cmd, modifiers: mods),
-                    "title": title,
-                    "path": path.joined(separator: " > "),
-                ])
+            if let combo = chordString(el) {
+                out.append(["combo": combo, "path": path])
             }
             for child in AXBridge.copyElements(el, kAXChildrenAttribute) { visit(child, parents: path) }
         }
@@ -440,23 +493,34 @@ extension EventDispatch {
                       height: b["Height"] as? Double ?? 0)
     }
 
-    /// Mint one mouse CGEvent through NSEvent (Alma's construction path) with
-    /// all observed field writes, then SynthPost.
-    private static func postMouse(type nsType: NSEvent.EventType,
+    /// Whether the target app is currently inactive — background clicks and
+    /// EVERY drag phase get the 0x100000 command flag only in that case
+    /// [ALGORITHMS §4.2].
+    private static func isInactive(_ pid: pid_t) -> Bool {
+        NSRunningApplication(processIdentifier: pid)?.isActive == false
+    }
+
+    /// Mint one mouse CGEvent through NSEvent (Alma's construction path)
+    /// with all observed field writes. Does NOT post — callers construct
+    /// down+up pairs before delivering either [ALGORITHMS §4.3].
+    private static func mintMouse(type nsType: NSEvent.EventType,
                                   at p: CGPoint,
                                   button: MouseButtonTag,
                                   clickCount: Int,
+                                  pressure: Float,
                                   pid: pid_t, winID: CGWindowID?,
                                   winBounds: CGRect?,
                                   modifiers: CGEventFlags = [],
-                                  forceCommandFlag: Bool = false) throws {
+                                  forceCommandFlag: Bool = false) throws -> CGEvent {
         guard let ns = NSEvent.mouseEvent(
                 with: nsType, location: p,
                 modifierFlags: NSEvent.ModifierFlags(
                     rawValue: UInt(modifiers.rawValue)),
-                timestamp: 0, windowNumber: Int(winID ?? 0),
-                context: nil, eventNumber: Int(nextEventNumber()),
-                clickCount: clickCount, pressure: 1.0),
+                timestamp: ProcessInfo.processInfo.systemUptime,
+                windowNumber: Int(winID ?? 0),
+                context: nil,
+                eventNumber: Int(nextEventNumber() & 0x7fffffff),
+                clickCount: clickCount, pressure: pressure),
               let ev = ns.cgEvent
         else {
             throw DaemonError("internal", "NSEvent→CGEvent failed (click)")
@@ -464,14 +528,17 @@ extension EventDispatch {
         ev.setIntegerValueField(CGEventField(rawValue: 3)!,
                                 value: Int64(button.tag))
         ev.setIntegerValueField(CGEventField(rawValue: 7)!, value: 3)
-        if let winID, let wb = winBounds {
+        // Fields 0x5b/0x5c depend only on a resolved window ID.
+        if let winID {
             ev.setIntegerValueField(CGEventField(rawValue: 0x5b)!,
                                     value: Int64(winID))
             ev.setIntegerValueField(CGEventField(rawValue: 0x5c)!,
                                     value: Int64(winID))
             ev.location = p
-            SetWindowLocation.fn?(ev, CGPoint(x: p.x - wb.origin.x,
-                                              y: p.y - wb.origin.y))
+            if let wb = winBounds {
+                SetWindowLocation.fn?(ev, CGPoint(x: p.x - wb.origin.x,
+                                                  y: p.y - wb.origin.y))
+            }
         } else {
             ev.location = p
         }
@@ -479,62 +546,83 @@ extension EventDispatch {
         if forceCommandFlag { flags.insert(CGEventFlags(rawValue: 0x100000)) }
         if flags.rawValue != 0 { ev.flags = flags }
         tagSentinel(ev)
-        SynthPost.post(pid: pid, ev)
+        return ev
     }
 
-    /// click(at:button:clickCount:pid:) — NSEvent minting + 40ms rounds.
+    /// click(at:button:clickCount:pid:) — NSEvent minting, down+up
+    /// constructed as a pair before posting, 40ms rounds. Cursor/lens
+    /// feedback gated by show_cursor.
     static func click(at p: CGPoint, button: MouseButtonTag, clickCount: Int,
-                      pid: pid_t, modifiers: CGEventFlags = []) throws {
+                      pid: pid_t, modifiers: CGEventFlags = [],
+                      showCursor: Bool = true) throws {
         try withFocusPreserved(style: .preserved, pid: pid) {
             let winID = resolveClickWindowID(forPid: pid, screenPoint: p)
             let wb = winID.flatMap { windowBounds(cgWindowId: $0) }
+            let bg = isInactive(pid)
             for i in 0..<max(1, clickCount) {
-                try postMouse(type: button.nsDown, at: p, button: button,
-                              clickCount: i + 1, pid: pid, winID: winID,
-                              winBounds: wb, modifiers: modifiers)
-                try postMouse(type: button.nsUp, at: p, button: button,
-                              clickCount: i + 1, pid: pid, winID: winID,
-                              winBounds: wb, modifiers: modifiers)
+                let down = try mintMouse(type: button.nsDown, at: p,
+                    button: button, clickCount: i + 1, pressure: 1.0,
+                    pid: pid, winID: winID, winBounds: wb,
+                    modifiers: modifiers, forceCommandFlag: bg)
+                let up = try mintMouse(type: button.nsUp, at: p,
+                    button: button, clickCount: i + 1, pressure: 0,
+                    pid: pid, winID: winID, winBounds: wb,
+                    modifiers: modifiers, forceCommandFlag: bg)
+                SynthPost.post(pid: pid, down)
+                SynthPost.post(pid: pid, up)
                 if i < clickCount - 1 { usleep(40_000) }
             }
-            LensBus.postMove(p)
-            LensBus.postClick()
+            if showCursor {
+                LensBus.postMove(p)
+                LensBus.postClick()
+            }
         }
-        ActionCursor.record(p)
+        if showCursor { ActionCursor.record(p) }
     }
 
     /// drag(from:to:button:pid:steps=12) — 8ms between dragged events;
-    /// dragged/up carry the 0x100000 flag.
+    /// EVERY phase carries 0x100000 only while the target is inactive; a
+    /// failed intermediate mint is SKIPPED (drag continues), while down/up
+    /// failures still throw.
     static func drag(from s: CGPoint, to e: CGPoint,
                      button: MouseButtonTag, pid: pid_t,
-                     steps: Int = 12) throws {
+                     steps: Int = 12, showCursor: Bool = true) throws {
         try withFocusPreserved(style: .preserved, pid: pid) {
             let winID = resolveClickWindowID(forPid: pid, screenPoint: s)
             let wb = winID.flatMap { windowBounds(cgWindowId: $0) }
-            try postMouse(type: button.nsDown, at: s, button: button,
-                          clickCount: 1, pid: pid, winID: winID, winBounds: wb)
+            let bg = isInactive(pid)
+            let down = try mintMouse(type: button.nsDown, at: s,
+                button: button, clickCount: 1, pressure: 1.0,
+                pid: pid, winID: winID, winBounds: wb, forceCommandFlag: bg)
+            SynthPost.post(pid: pid, down)
             for i in 1..<steps {
                 let t = Double(i) / Double(steps)
                 let pt = CGPoint(x: s.x + (e.x - s.x) * t,
                                  y: s.y + (e.y - s.y) * t)
-                try postMouse(type: button.nsDragged, at: pt, button: button,
-                              clickCount: 1, pid: pid, winID: winID,
-                              winBounds: wb, forceCommandFlag: true)
+                if let mv = try? mintMouse(type: button.nsDragged, at: pt,
+                        button: button, clickCount: 1, pressure: 1.0,
+                        pid: pid, winID: winID, winBounds: wb,
+                        forceCommandFlag: bg) {
+                    SynthPost.post(pid: pid, mv)
+                }
                 usleep(8_000)
             }
-            try postMouse(type: button.nsUp, at: e, button: button,
-                          clickCount: 1, pid: pid, winID: winID,
-                          winBounds: wb, forceCommandFlag: true)
-            LensBus.postMove(e)
-            LensBus.postClick()
+            let up = try mintMouse(type: button.nsUp, at: e,
+                button: button, clickCount: 1, pressure: 0,
+                pid: pid, winID: winID, winBounds: wb, forceCommandFlag: bg)
+            SynthPost.post(pid: pid, up)
+            if showCursor {
+                LensBus.postMove(e)
+                LensBus.postClick()
+            }
         }
-        ActionCursor.record(e)
+        if showCursor { ActionCursor.record(e) }
     }
 
-    /// scroll(at:direction:pages:pid:) — CGEventSource .hidSystemState,
-    /// scrollWheelEvent2 in line units, one event per page.
+    /// scroll(at:direction:pages:pid:) — ONE scrollWheelEvent2 in PIXEL
+    /// units, wheel deltas = pages × 10, posted once [ALGORITHMS §6.1].
     static func scrollWheel(at p: CGPoint, direction: String, pages: Int,
-                            pid: pid_t) throws {
+                            pid: pid_t, showCursor: Bool = true) throws {
         var dx = 0, dy = 0
         switch direction.lowercased() {
         case "up": dy = pages
@@ -547,34 +635,33 @@ extension EventDispatch {
             guard let src = CGEventSource(stateID: .hidSystemState) else {
                 throw DaemonError("internal", "CGEventSource creation failed")
             }
-            for _ in 0..<max(pages, 1) {
-                guard let ev = CGEvent(scrollWheelEvent2Source: src,
-                        units: .line, wheelCount: 2,
-                        wheel1: Int32(clamping: dy),
-                        wheel2: Int32(clamping: dx), wheel3: 0)
-                else {
-                    throw DaemonError("internal", "CGEvent creation failed (scroll)")
-                }
-                ev.location = p
-                tagSentinel(ev)
-                SynthPost.post(pid: pid, ev)
+            guard let ev = CGEvent(scrollWheelEvent2Source: src,
+                    units: .pixel, wheelCount: 2,
+                    wheel1: Int32(clamping: dy * 10),
+                    wheel2: Int32(clamping: dx * 10), wheel3: 0)
+            else {
+                throw DaemonError("internal", "CGEvent creation failed (scroll)")
             }
-            LensBus.postScroll(direction: direction)
+            ev.location = p
+            tagSentinel(ev)
+            SynthPost.post(pid: pid, ev)
+            if showCursor { LensBus.postScroll(direction: direction) }
         }
-        ActionCursor.record(p)
+        if showCursor { ActionCursor.record(p) }
     }
 
-    /// pressKey — direct event only when the app has a key window or is
-    /// active (via: key_window/active_app); otherwise an ENABLED menu item
-    /// owning the chord is AXPress'ed (menu_ax_press); nothing posted →
-    /// suppressed. The daemon NEVER posts a bare keystroke into a
-    /// background app.
+    /// pressKey — the ENTIRE route runs under focus preservation, including
+    /// the AX-menu fallback. Direct event only when the app has a key
+    /// window or is active (via: key_window/active_app); otherwise an
+    /// ENABLED menu item owning the chord is AXPress'ed (menu_ax_press);
+    /// nothing posted → suppressed. The daemon NEVER posts a bare
+    /// keystroke into a background app.
     static func pressKey(_ key: String, pid: pid_t) throws -> KeyDelivery {
-        let parsed = try KeyParser.parse(key)
-        let hasKey = TypeVerification.hasKeyWindow(pid: pid)
-        let active = NSRunningApplication(processIdentifier: pid)?.isActive == true
-        if hasKey || active {
-            return try withFocusPreserved(style: .preserved, pid: pid) {
+        try withFocusPreserved(style: .preserved, pid: pid) {
+            let parsed = try KeyParser.parse(key)
+            let hasKey = TypeVerification.hasKeyWindow(pid: pid)
+            let active = NSRunningApplication(processIdentifier: pid)?.isActive == true
+            if hasKey || active {
                 guard let src = CGEventSource(stateID: .privateState) else {
                     throw DaemonError("internal", "CGEventSource creation failed")
                 }
@@ -594,11 +681,11 @@ extension EventDispatch {
                 SynthPost.post(pid: pid, up)
                 return hasKey ? .keyWindow : .activeApp
             }
+            if let ok = MenuShortcuts.matchAndPress(pid: pid, key: key) {
+                return ok ? .menuAXPress : .suppressed
+            }
+            return .suppressed
         }
-        if let ok = MenuShortcuts.matchAndPress(pid: pid, key: key) {
-            return ok ? .menuAXPress : .suppressed
-        }
-        return .suppressed
     }
 
     /// typeKeyPresses — private-source keyboard events, 4ms apart.
@@ -639,18 +726,23 @@ extension EventDispatch {
             let chunk = Array(String(String.UnicodeScalarView(
                 scalars[i..<i + n])).utf16)
             i += n
-            for down in [true, false] {
-                guard let ev = CGEvent(keyboardEventSource: src,
-                                       virtualKey: 0, keyDown: down) else {
-                    throw DaemonError("internal", "CGEvent creation failed (text)")
-                }
+            // down+up constructed as a pair before either is posted.
+            guard let down = CGEvent(keyboardEventSource: src,
+                                     virtualKey: 0, keyDown: true),
+                  let up = CGEvent(keyboardEventSource: src,
+                                   virtualKey: 0, keyDown: false)
+            else {
+                throw DaemonError("internal", "CGEvent creation failed (text)")
+            }
+            for ev in [down, up] {
                 chunk.withUnsafeBufferPointer { bp in
                     ev.keyboardSetUnicodeString(
                         stringLength: bp.count, unicodeString: bp.baseAddress)
                 }
                 tagSentinel(ev)
-                SynthPost.post(pid: pid, ev)
             }
+            SynthPost.post(pid: pid, down)
+            SynthPost.post(pid: pid, up)
         }
     }
 
