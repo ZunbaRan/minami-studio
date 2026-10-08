@@ -1,0 +1,22 @@
+{
+  "kind": "sample-derived-reference-candidates-not-independent-build-validation",
+  "electron": {
+    "version": "38.7.2",
+    "source": "extracted/Alma.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/Info.plist",
+    "sha256": "35da519fa0c05e641cb632415a14196a8e8918edd0a37ac4fd20461c6bd45725"
+  },
+  "mcp_sdk": {
+    "version": "1.24.3",
+    "engines": {
+      "node": ">=18"
+    },
+    "source": "extracted/asar/node_modules/@modelcontextprotocol/sdk/package.json",
+    "sha256": "83021686c2276b160b669a8207d93fc19f5d196539ce36aa2be2ceccef401cdd"
+  },
+  "package_manager": "pnpm@10.14.0",
+  "swift_tools_version": "5.9",
+  "swift_language_mode": "5",
+  "deployment_target": "macOS14 arm64",
+  "actual_local_build_toolchain": "UNSELECTED_UNVERIFIED_STOP_BOOTSTRAP",
+  "no_caret_tilde_latest": true
+}

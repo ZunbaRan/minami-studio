@@ -1,0 +1,481 @@
+{
+  "range_hash_definition": "SHA256 of original file bytes for inclusive source line range; no normalization",
+  "locators": [
+    {
+      "id": "MCP.tool.launch_app",
+      "path": "extracted/Alma.app/Contents/Resources/cli/alma-computer-use-mcp.mjs",
+      "lines_inclusive": [
+        35990,
+        36010
+      ],
+      "byte_range_half_open": [
+        1342850,
+        1344295
+      ],
+      "range_sha256": "6c1237759a85c4a3a76717171eb76910b95cb24487efde980e20f173cf8f5190",
+      "file_sha256": "d157be25e6f87879df47287a727070fd1d223d6e3bfb1addf187eb14bd9fb976"
+    },
+    {
+      "id": "MCP.tool.list_apps",
+      "path": "extracted/Alma.app/Contents/Resources/cli/alma-computer-use-mcp.mjs",
+      "lines_inclusive": [
+        36011,
+        36028
+      ],
+      "byte_range_half_open": [
+        1344295,
+        1345181
+      ],
+      "range_sha256": "3beb152fa261736cf596c44c12588c1f0cc768b00ad3002ece33057c6d8aae2e",
+      "file_sha256": "d157be25e6f87879df47287a727070fd1d223d6e3bfb1addf187eb14bd9fb976"
+    },
+    {
+      "id": "MCP.tool.get_app_state",
+      "path": "extracted/Alma.app/Contents/Resources/cli/alma-computer-use-mcp.mjs",
+      "lines_inclusive": [
+        36029,
+        36089
+      ],
+      "byte_range_half_open": [
+        1345181,
+        1348699
+      ],
+      "range_sha256": "3d2a6fdc51f54974cd70e9de4894931ed7f62b6f404398c6fd91455396569e47",
+      "file_sha256": "d157be25e6f87879df47287a727070fd1d223d6e3bfb1addf187eb14bd9fb976"
+    },
+    {
+      "id": "MCP.tool.click",
+      "path": "extracted/Alma.app/Contents/Resources/cli/alma-computer-use-mcp.mjs",
+      "lines_inclusive": [
+        36090,
+        36117
+      ],
+      "byte_range_half_open": [
+        1348699,
+        1349795
+      ],
+      "range_sha256": "81458150229a2d7540bef1bcdd6f160d6d93ace1e53d1c4270023f45875921bf",
+      "file_sha256": "d157be25e6f87879df47287a727070fd1d223d6e3bfb1addf187eb14bd9fb976"
+    },
+    {
+      "id": "MCP.tool.perform_secondary_action",
+      "path": "extracted/Alma.app/Contents/Resources/cli/alma-computer-use-mcp.mjs",
+      "lines_inclusive": [
+        36118,
+        36146
+      ],
+      "byte_range_half_open": [
+        1349795,
+        1351087
+      ],
+      "range_sha256": "387ce5ad9c48aa3a954c363b2623b534a0ebece41eeadce3bc32c142ceffafc7",
+      "file_sha256": "d157be25e6f87879df47287a727070fd1d223d6e3bfb1addf187eb14bd9fb976"
+    },
+    {
+      "id": "MCP.tool.drag",
+      "path": "extracted/Alma.app/Contents/Resources/cli/alma-computer-use-mcp.mjs",
+      "lines_inclusive": [
+        36147,
+        36176
+      ],
+      "byte_range_half_open": [
+        1351087,
+        1352207
+      ],
+      "range_sha256": "71e726eb27536fbca57f317e63067e0a933e29a3f596424cf8b2c92625a2c701",
+      "file_sha256": "d157be25e6f87879df47287a727070fd1d223d6e3bfb1addf187eb14bd9fb976"
+    },
+    {
+      "id": "MCP.tool.type_text",
+      "path": "extracted/Alma.app/Contents/Resources/cli/alma-computer-use-mcp.mjs",
+      "lines_inclusive": [
+        36177,
+        36199
+      ],
+      "byte_range_half_open": [
+        1352207,
+        1353376
+      ],
+      "range_sha256": "238ea4541c2692a359eb76e021f3f1563f6cb77d923d4bbb86f9f08bcd5b688e",
+      "file_sha256": "d157be25e6f87879df47287a727070fd1d223d6e3bfb1addf187eb14bd9fb976"
+    },
+    {
+      "id": "MCP.tool.press_key",
+      "path": "extracted/Alma.app/Contents/Resources/cli/alma-computer-use-mcp.mjs",
+      "lines_inclusive": [
+        36200,
+        36221
+      ],
+      "byte_range_half_open": [
+        1353376,
+        1354431
+      ],
+      "range_sha256": "813da11640acdaa9532085b5eeb15018ab3fa55a77591452c102dcce802e3d49",
+      "file_sha256": "d157be25e6f87879df47287a727070fd1d223d6e3bfb1addf187eb14bd9fb976"
+    },
+    {
+      "id": "MCP.tool.scroll",
+      "path": "extracted/Alma.app/Contents/Resources/cli/alma-computer-use-mcp.mjs",
+      "lines_inclusive": [
+        36222,
+        36243
+      ],
+      "byte_range_half_open": [
+        1354431,
+        1355141
+      ],
+      "range_sha256": "0972b591e8386fe90c657de6b6ecbf4f6b10656ec2edc985e71ab064e8eb2cce",
+      "file_sha256": "d157be25e6f87879df47287a727070fd1d223d6e3bfb1addf187eb14bd9fb976"
+    },
+    {
+      "id": "MCP.tool.set_value",
+      "path": "extracted/Alma.app/Contents/Resources/cli/alma-computer-use-mcp.mjs",
+      "lines_inclusive": [
+        36244,
+        36259
+      ],
+      "byte_range_half_open": [
+        1355141,
+        1355824
+      ],
+      "range_sha256": "4fd1d7bd6bb09782bee694babc6141dcbf50be2ba954517e42eefa31a4f0541e",
+      "file_sha256": "d157be25e6f87879df47287a727070fd1d223d6e3bfb1addf187eb14bd9fb976"
+    },
+    {
+      "id": "MCP.tool.select_text",
+      "path": "extracted/Alma.app/Contents/Resources/cli/alma-computer-use-mcp.mjs",
+      "lines_inclusive": [
+        36260,
+        36293
+      ],
+      "byte_range_half_open": [
+        1355824,
+        1357682
+      ],
+      "range_sha256": "8c90454c8f0527fe229d347442e12def2b7d8486b439efcac2bccd9b465ba799",
+      "file_sha256": "d157be25e6f87879df47287a727070fd1d223d6e3bfb1addf187eb14bd9fb976"
+    },
+    {
+      "id": "MCP.tool.sky_list_apps",
+      "path": "extracted/Alma.app/Contents/Resources/cli/alma-computer-use-mcp.mjs",
+      "lines_inclusive": [
+        36294,
+        36311
+      ],
+      "byte_range_half_open": [
+        1357682,
+        1358295
+      ],
+      "range_sha256": "a4592ab54b5ad907c7782cba2cfeeb35644570604637904c08fb99f634528877",
+      "file_sha256": "d157be25e6f87879df47287a727070fd1d223d6e3bfb1addf187eb14bd9fb976"
+    },
+    {
+      "id": "MCP.tool.sky_get_app_state",
+      "path": "extracted/Alma.app/Contents/Resources/cli/alma-computer-use-mcp.mjs",
+      "lines_inclusive": [
+        36312,
+        36343
+      ],
+      "byte_range_half_open": [
+        1358295,
+        1360089
+      ],
+      "range_sha256": "5b47c3822d0320d92289c6ecd70b39e9bdf687f84207f614a52d386d76f5650b",
+      "file_sha256": "d157be25e6f87879df47287a727070fd1d223d6e3bfb1addf187eb14bd9fb976"
+    },
+    {
+      "id": "MCP.tool.sky_click",
+      "path": "extracted/Alma.app/Contents/Resources/cli/alma-computer-use-mcp.mjs",
+      "lines_inclusive": [
+        36344,
+        36368
+      ],
+      "byte_range_half_open": [
+        1360089,
+        1361471
+      ],
+      "range_sha256": "1cdcf2cb222392d206cf291136e8a9dec2141139374cecbafb7aa73b3376935a",
+      "file_sha256": "d157be25e6f87879df47287a727070fd1d223d6e3bfb1addf187eb14bd9fb976"
+    },
+    {
+      "id": "MCP.tool.sky_press_key",
+      "path": "extracted/Alma.app/Contents/Resources/cli/alma-computer-use-mcp.mjs",
+      "lines_inclusive": [
+        36369,
+        36387
+      ],
+      "byte_range_half_open": [
+        1361471,
+        1362433
+      ],
+      "range_sha256": "892ab911ac6fff29c6db2f73185c42d2ce81192139ebd6151be76b49d1d16c34",
+      "file_sha256": "d157be25e6f87879df47287a727070fd1d223d6e3bfb1addf187eb14bd9fb976"
+    },
+    {
+      "id": "MCP.tool.sky_type_text",
+      "path": "extracted/Alma.app/Contents/Resources/cli/alma-computer-use-mcp.mjs",
+      "lines_inclusive": [
+        36388,
+        36398
+      ],
+      "byte_range_half_open": [
+        1362433,
+        1362912
+      ],
+      "range_sha256": "d362fe289925a763e7b4fd944560c94ad18ce3e54db86500f79a66a429868f49",
+      "file_sha256": "d157be25e6f87879df47287a727070fd1d223d6e3bfb1addf187eb14bd9fb976"
+    },
+    {
+      "id": "MCP.tool.sky_scroll",
+      "path": "extracted/Alma.app/Contents/Resources/cli/alma-computer-use-mcp.mjs",
+      "lines_inclusive": [
+        36399,
+        36418
+      ],
+      "byte_range_half_open": [
+        1362912,
+        1363633
+      ],
+      "range_sha256": "2b19d29554a436d3df79844e0724ab4b98a2bc028db2503b2d53d6176bc28b01",
+      "file_sha256": "d157be25e6f87879df47287a727070fd1d223d6e3bfb1addf187eb14bd9fb976"
+    },
+    {
+      "id": "MCP.tool.sky_set_value",
+      "path": "extracted/Alma.app/Contents/Resources/cli/alma-computer-use-mcp.mjs",
+      "lines_inclusive": [
+        36419,
+        36429
+      ],
+      "byte_range_half_open": [
+        1363633,
+        1364169
+      ],
+      "range_sha256": "475a586a934e81d424b2accbedfc690b5190887e713a06834d5b6732a878cf40",
+      "file_sha256": "d157be25e6f87879df47287a727070fd1d223d6e3bfb1addf187eb14bd9fb976"
+    },
+    {
+      "id": "MCP.tool.sky_drag",
+      "path": "extracted/Alma.app/Contents/Resources/cli/alma-computer-use-mcp.mjs",
+      "lines_inclusive": [
+        36430,
+        36447
+      ],
+      "byte_range_half_open": [
+        1364169,
+        1364842
+      ],
+      "range_sha256": "1004b65e1579a30a728c5569985f13cab943d96b187036022bf9a17b2b65c9a0",
+      "file_sha256": "d157be25e6f87879df47287a727070fd1d223d6e3bfb1addf187eb14bd9fb976"
+    },
+    {
+      "id": "MCP.tool.sky_perform_secondary_action",
+      "path": "extracted/Alma.app/Contents/Resources/cli/alma-computer-use-mcp.mjs",
+      "lines_inclusive": [
+        36448,
+        36458
+      ],
+      "byte_range_half_open": [
+        1364842,
+        1365454
+      ],
+      "range_sha256": "42cd8a64cd65c87818e36a840a23cff63838498e7d05fed986873314ea5f75f1",
+      "file_sha256": "d157be25e6f87879df47287a727070fd1d223d6e3bfb1addf187eb14bd9fb976"
+    },
+    {
+      "id": "MCP.tool.sky_select_text",
+      "path": "extracted/Alma.app/Contents/Resources/cli/alma-computer-use-mcp.mjs",
+      "lines_inclusive": [
+        36459,
+        36482
+      ],
+      "byte_range_half_open": [
+        1365454,
+        1366412
+      ],
+      "range_sha256": "8944120a280e8a76f62aed35b28cd9fe21e8213e8869d67f2201b4cf2e782b90",
+      "file_sha256": "d157be25e6f87879df47287a727070fd1d223d6e3bfb1addf187eb14bd9fb976"
+    },
+    {
+      "id": "MCP.tool.permissions",
+      "path": "extracted/Alma.app/Contents/Resources/cli/alma-computer-use-mcp.mjs",
+      "lines_inclusive": [
+        36483,
+        36493
+      ],
+      "byte_range_half_open": [
+        1366412,
+        1366734
+      ],
+      "range_sha256": "04bd0128565c8f98705ee03cfaae9ac95317b87807e46f35b838deaaaf7af549",
+      "file_sha256": "d157be25e6f87879df47287a727070fd1d223d6e3bfb1addf187eb14bd9fb976"
+    },
+    {
+      "id": "MCP.tool.grant",
+      "path": "extracted/Alma.app/Contents/Resources/cli/alma-computer-use-mcp.mjs",
+      "lines_inclusive": [
+        36494,
+        36504
+      ],
+      "byte_range_half_open": [
+        1366734,
+        1367053
+      ],
+      "range_sha256": "ba6756091866db660d090e3d882918999fb94b044b392be2889d641b291a0f46",
+      "file_sha256": "d157be25e6f87879df47287a727070fd1d223d6e3bfb1addf187eb14bd9fb976"
+    },
+    {
+      "id": "MCP.transport",
+      "path": "extracted/Alma.app/Contents/Resources/cli/alma-computer-use-mcp.mjs",
+      "lines_inclusive": [
+        35761,
+        35929
+      ],
+      "byte_range_half_open": [
+        1334683,
+        1340184
+      ],
+      "range_sha256": "df6baea109f599e03bc39a3f0fc6a73ca703570ef7087ab0313523a31bd135c7",
+      "file_sha256": "d157be25e6f87879df47287a727070fd1d223d6e3bfb1addf187eb14bd9fb976"
+    },
+    {
+      "id": "MCP.screenshot",
+      "path": "extracted/Alma.app/Contents/Resources/cli/alma-computer-use-mcp.mjs",
+      "lines_inclusive": [
+        35930,
+        35976
+      ],
+      "byte_range_half_open": [
+        1340184,
+        1341909
+      ],
+      "range_sha256": "6ac6c70507c04eaa023b5456b05d187008db4d89fdacba6b697564f62e419a7c",
+      "file_sha256": "d157be25e6f87879df47287a727070fd1d223d6e3bfb1addf187eb14bd9fb976"
+    },
+    {
+      "id": "MCP.approval",
+      "path": "extracted/Alma.app/Contents/Resources/cli/alma-computer-use-mcp.mjs",
+      "lines_inclusive": [
+        35666,
+        35759
+      ],
+      "byte_range_half_open": [
+        1331325,
+        1334650
+      ],
+      "range_sha256": "e574f9e1d1cd668e96df2077b7e60ec647d5549a4228b3b98803a3d600dda26e",
+      "file_sha256": "d157be25e6f87879df47287a727070fd1d223d6e3bfb1addf187eb14bd9fb976"
+    },
+    {
+      "id": "MCP.sky-render",
+      "path": "extracted/Alma.app/Contents/Resources/cli/alma-computer-use-mcp.mjs",
+      "lines_inclusive": [
+        35580,
+        35626
+      ],
+      "byte_range_half_open": [
+        1316960,
+        1318883
+      ],
+      "range_sha256": "057518195e58dec22df649c4b67410aae1a7bc17d234b02b40c660621e2d8172",
+      "file_sha256": "d157be25e6f87879df47287a727070fd1d223d6e3bfb1addf187eb14bd9fb976"
+    },
+    {
+      "id": "MCP.sdk-cancel",
+      "path": "extracted/Alma.app/Contents/Resources/cli/alma-computer-use-mcp.mjs",
+      "lines_inclusive": [
+        33165,
+        33169
+      ],
+      "byte_range_half_open": [
+        1222956,
+        1223299
+      ],
+      "range_sha256": "6955be4a57e92a32939338d67adb2351f7a208991de0f9ba1d643d5cf13c4a45",
+      "file_sha256": "d157be25e6f87879df47287a727070fd1d223d6e3bfb1addf187eb14bd9fb976"
+    },
+    {
+      "id": "MCP.sdk-handler-abort",
+      "path": "extracted/Alma.app/Contents/Resources/cli/alma-computer-use-mcp.mjs",
+      "lines_inclusive": [
+        33285,
+        33348
+      ],
+      "byte_range_half_open": [
+        1228192,
+        1231366
+      ],
+      "range_sha256": "8d0ab28c81480ce872cffee719e863108348c8a0bc3e827d89c64feb4c71318a",
+      "file_sha256": "d157be25e6f87879df47287a727070fd1d223d6e3bfb1addf187eb14bd9fb976"
+    },
+    {
+      "id": "MCP.sdk-error",
+      "path": "extracted/Alma.app/Contents/Resources/cli/alma-computer-use-mcp.mjs",
+      "lines_inclusive": [
+        34722,
+        34782
+      ],
+      "byte_range_half_open": [
+        1285764,
+        1288147
+      ],
+      "range_sha256": "1aa17e8d37481444b48166eaee6841426d92d4a58f2a0c09c05b1b24fde1bc61",
+      "file_sha256": "d157be25e6f87879df47287a727070fd1d223d6e3bfb1addf187eb14bd9fb976"
+    },
+    {
+      "id": "MCP.stdio",
+      "path": "extracted/Alma.app/Contents/Resources/cli/alma-computer-use-mcp.mjs",
+      "lines_inclusive": [
+        36506,
+        36514
+      ],
+      "byte_range_half_open": [
+        1367077,
+        1367381
+      ],
+      "range_sha256": "458ee0254ff200a7ba64827797588010631d007ffa4ddf97460aa14a2165486e",
+      "file_sha256": "d157be25e6f87879df47287a727070fd1d223d6e3bfb1addf187eb14bd9fb976"
+    },
+    {
+      "id": "CLI.http",
+      "path": "extracted/Alma.app/Contents/Resources/cli/alma",
+      "lines_inclusive": [
+        13,
+        80
+      ],
+      "byte_range_half_open": [
+        286,
+        2734
+      ],
+      "range_sha256": "1351033e7f6e16eb2000afab7114f68557062f3cead11cebde7e37d2ab8d0c2f",
+      "file_sha256": "2f156839ea5aec2eb4bc8bc117ff2bbd0ed73cae00d090ad04ea19266e506eeb"
+    },
+    {
+      "id": "CLI.computer-use",
+      "path": "extracted/Alma.app/Contents/Resources/cli/alma",
+      "lines_inclusive": [
+        8297,
+        8773
+      ],
+      "byte_range_half_open": [
+        391349,
+        412784
+      ],
+      "range_sha256": "3b6ae7dccc3f30e59dfcaa906d8245b0baa66ee434bff1674a85a38c0a355c12",
+      "file_sha256": "2f156839ea5aec2eb4bc8bc117ff2bbd0ed73cae00d090ad04ea19266e506eeb"
+    },
+    {
+      "id": "CLI.key-result",
+      "path": "extracted/Alma.app/Contents/Resources/cli/alma",
+      "lines_inclusive": [
+        8648,
+        8659
+      ],
+      "byte_range_half_open": [
+        407652,
+        408165
+      ],
+      "range_sha256": "c5ee2c08c307b9c5bc5e81538b56d9cec64635abc0a160d4b9746c27521aee99",
+      "file_sha256": "2f156839ea5aec2eb4bc8bc117ff2bbd0ed73cae00d090ad04ea19266e506eeb"
+    }
+  ]
+}

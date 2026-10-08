@@ -1,0 +1,94 @@
+[
+  {
+    "id": "S0",
+    "name": "资料一致性",
+    "entry": "只读证据已就绪",
+    "exit": [
+      "validate_conformance.py通过；所有evidence IDs存在；所有schema预期与转录schema一致"
+    ],
+    "stop_condition": "仅文档通过，不是产品通过",
+    "current_status": "DOCUMENT_VALIDATION_ONLY"
+  },
+  {
+    "id": "S1",
+    "name": "纯协议与归一化",
+    "entry": "S0",
+    "exit": [
+      "transport/schema/target/state/diff的mock seam tests通过",
+      "虚拟时钟，无OS调用"
+    ],
+    "stop_condition": "不接原生输入",
+    "current_status": "NOT_RUN"
+  },
+  {
+    "id": "S2",
+    "name": "包装与host模拟",
+    "entry": "S1",
+    "exit": [
+      "permissions/screenshots/errors/cancel全路径mock",
+      "普通/sky/CLI/HTTP差异不能合并"
+    ],
+    "stop_condition": "native结果只由fake daemon提供",
+    "current_status": "NOT_RUN"
+  },
+  {
+    "id": "S3",
+    "name": "受控夹具与权限",
+    "entry": "S2且动态实验已授权",
+    "exit": [
+      "AppKit/Electron/browser接收日志可复位",
+      "focus/cursor witness不会产生用户数据",
+      "TCC拒绝/授予分开记录"
+    ],
+    "stop_condition": "权限不足停止相依动作",
+    "current_status": "NOT_RUN"
+  },
+  {
+    "id": "S4",
+    "name": "macOS默认场景",
+    "entry": "S3",
+    "exit": [
+      "状态/ref/diff/capture真实几何",
+      "每类动作接收端真实效果和释放",
+      "no replay检查"
+    ],
+    "stop_condition": "禁止外推后台可靠性",
+    "current_status": "NOT_RUN"
+  },
+  {
+    "id": "S5",
+    "name": "后台与故障矩阵",
+    "entry": "S4",
+    "exit": [
+      "168个矩阵cell逐项报告",
+      "锁屏/遮挡/最小化/多屏/cancel无遗漏",
+      "unsupported允许但不得冒充supported"
+    ],
+    "stop_condition": "未知不得计PASS",
+    "current_status": "NOT_RUN"
+  },
+  {
+    "id": "S6",
+    "name": "镜像与完整路径",
+    "entry": "S5",
+    "exit": [
+      "关闭抑制/代际/流租约/焦点/Appshot",
+      "provider实际图片和错误呈现",
+      "总链路动作/截图/log身份一致性"
+    ],
+    "stop_condition": "safe偏离独立评估",
+    "current_status": "NOT_RUN"
+  },
+  {
+    "id": "S7",
+    "name": "发布判定",
+    "entry": "S6",
+    "exit": [
+      "需求→实现commit→测试run链接完整",
+      "无未解释wrong-target/no-replay/卡键/权限越界失败",
+      "能力矩阵明确支持系统版本与场景"
+    ],
+    "stop_condition": "只能发布已验证能力",
+    "current_status": "NOT_RUN"
+  }
+]

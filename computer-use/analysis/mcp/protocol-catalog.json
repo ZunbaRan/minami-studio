@@ -1,0 +1,1129 @@
+{
+  "sample_version": "0.4.164",
+  "evidence_mode": "static-only; no target code executed",
+  "tools": [
+    {
+      "name": "launch_app",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "bundle": {
+            "type": "string"
+          },
+          "activates": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "bundle"
+        ]
+      },
+      "native_command": "launch_app",
+      "payload_contract": {
+        "bundle": "bundle",
+        "activates": "activates ?? false"
+      },
+      "wrapper_defaults": {
+        "activates": false
+      },
+      "wrapper_gate": true,
+      "response_contract": "native-data-as-pretty-JSON-text",
+      "notes": [],
+      "evidence": [
+        "MCP.tool.launch_app"
+      ],
+      "schema_note": "Static Zod transcription, not runtime tools/list capture; descriptions omitted. Required fields and explicit numeric maxima preserve source. Additional-property behavior is not asserted here.",
+      "approval_bundle": "bundle only (no PID/ref resolution)"
+    },
+    {
+      "name": "list_apps",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "days": {
+            "type": "integer",
+            "maximum": 90
+          }
+        },
+        "required": []
+      },
+      "native_command": "list_apps",
+      "payload_contract": {
+        "days": "positive integer days else 14"
+      },
+      "wrapper_defaults": {
+        "days": 14
+      },
+      "wrapper_gate": false,
+      "response_contract": "native-data-as-pretty-JSON-text",
+      "notes": [],
+      "evidence": [
+        "MCP.tool.list_apps"
+      ],
+      "schema_note": "Static Zod transcription, not runtime tools/list capture; descriptions omitted. Required fields and explicit numeric maxima preserve source. Additional-property behavior is not asserted here."
+    },
+    {
+      "name": "get_app_state",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "bundle": {
+            "type": "string"
+          },
+          "pid": {
+            "type": "integer"
+          },
+          "window_id": {
+            "type": "integer"
+          },
+          "depth": {
+            "type": "integer",
+            "maximum": 20
+          },
+          "interactive_only": {
+            "type": "boolean"
+          },
+          "screenshot_max_width": {
+            "type": "integer"
+          },
+          "auto_launch": {
+            "type": "boolean"
+          }
+        },
+        "required": []
+      },
+      "native_command": "get_app_state",
+      "payload_contract": {
+        "bundle": "raw bundle",
+        "pid": "positive integer pid else omitted",
+        "window_id": "positive window_id else omitted",
+        "depth": "nonnegative integer depth else 6",
+        "interactive_only": "arg ?? true",
+        "include_screenshot": true,
+        "screenshot_max_width": "positive integer else 1280",
+        "auto_launch": "arg ?? true"
+      },
+      "wrapper_defaults": {
+        "depth": 6,
+        "interactive_only": true,
+        "screenshot_max_width": 1280,
+        "auto_launch": true
+      },
+      "wrapper_gate": false,
+      "response_contract": "optional-playbook+JSON-without-screenshot+path-read-JPEG-image-or-text-warning",
+      "notes": [
+        "Neither bundle nor pid is schema-required; daemon decides missing-target behavior.",
+        "No disable_diff argument supplied."
+      ],
+      "evidence": [
+        "MCP.tool.get_app_state"
+      ],
+      "schema_note": "Static Zod transcription, not runtime tools/list capture; descriptions omitted. Required fields and explicit numeric maxima preserve source. Additional-property behavior is not asserted here."
+    },
+    {
+      "name": "click",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "ref": {
+            "type": "string"
+          },
+          "x": {
+            "type": "number"
+          },
+          "y": {
+            "type": "number"
+          },
+          "coord_space": {
+            "type": "string",
+            "enum": [
+              "screenshot",
+              "screen"
+            ]
+          },
+          "button": {
+            "type": "string",
+            "enum": [
+              "left",
+              "right",
+              "middle"
+            ]
+          },
+          "click_count": {
+            "type": "integer",
+            "maximum": 3
+          },
+          "strategy": {
+            "type": "string",
+            "enum": [
+              "auto",
+              "physical",
+              "ax"
+            ]
+          },
+          "bundle": {
+            "type": "string"
+          },
+          "pid": {
+            "type": "integer"
+          },
+          "window_id": {
+            "type": "integer"
+          }
+        },
+        "required": []
+      },
+      "native_command": "click",
+      "payload_contract": {
+        "common": [
+          "button",
+          "positive click_count else 1",
+          "strategy",
+          "show_cursor=true"
+        ],
+        "ref_branch": [
+          "ref"
+        ],
+        "coordinate_branch": [
+          "x",
+          "y",
+          "coord_space",
+          "normalized pid",
+          "normalized bundle"
+        ]
+      },
+      "wrapper_defaults": {
+        "button": "left",
+        "click_count": 1,
+        "strategy": "auto",
+        "coord_space": "screenshot"
+      },
+      "wrapper_gate": true,
+      "response_contract": "action-summary+conditional-image",
+      "notes": [
+        "Truthy ref takes precedence. Otherwise both x and y must exist.",
+        "window_id is not sent to action; may be sent to post-action capture."
+      ],
+      "evidence": [
+        "MCP.tool.click"
+      ],
+      "schema_note": "Static Zod transcription, not runtime tools/list capture; descriptions omitted. Required fields and explicit numeric maxima preserve source. Additional-property behavior is not asserted here.",
+      "approval_bundle": "bundle only (no PID/ref resolution)"
+    },
+    {
+      "name": "perform_secondary_action",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "ref": {
+            "type": "string"
+          },
+          "x": {
+            "type": "number"
+          },
+          "y": {
+            "type": "number"
+          },
+          "coord_space": {
+            "type": "string",
+            "enum": [
+              "screenshot",
+              "screen"
+            ]
+          },
+          "bundle": {
+            "type": "string"
+          },
+          "pid": {
+            "type": "integer"
+          },
+          "window_id": {
+            "type": "integer"
+          }
+        },
+        "required": []
+      },
+      "native_command": "perform_secondary_action",
+      "payload_contract": {
+        "common": [
+          "show_cursor=true"
+        ],
+        "ref_branch": [
+          "ref"
+        ],
+        "coordinate_branch": [
+          "x",
+          "y",
+          "coord_space",
+          "normalized pid",
+          "normalized bundle"
+        ]
+      },
+      "wrapper_defaults": {
+        "coord_space": "screenshot"
+      },
+      "wrapper_gate": true,
+      "response_contract": "action-summary+conditional-image",
+      "notes": [
+        "No action string exposed in ordinary tool."
+      ],
+      "evidence": [
+        "MCP.tool.perform_secondary_action"
+      ],
+      "schema_note": "Static Zod transcription, not runtime tools/list capture; descriptions omitted. Required fields and explicit numeric maxima preserve source. Additional-property behavior is not asserted here.",
+      "approval_bundle": "bundle only (no PID/ref resolution)"
+    },
+    {
+      "name": "drag",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "start_x": {
+            "type": "number"
+          },
+          "start_y": {
+            "type": "number"
+          },
+          "end_x": {
+            "type": "number"
+          },
+          "end_y": {
+            "type": "number"
+          },
+          "coord_space": {
+            "type": "string",
+            "enum": [
+              "screenshot",
+              "screen"
+            ]
+          },
+          "button": {
+            "type": "string",
+            "enum": [
+              "left",
+              "right",
+              "middle"
+            ]
+          },
+          "bundle": {
+            "type": "string"
+          },
+          "pid": {
+            "type": "integer"
+          },
+          "window_id": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "start_x",
+          "start_y",
+          "end_x",
+          "end_y"
+        ]
+      },
+      "native_command": "drag",
+      "payload_contract": {
+        "forwarded": [
+          "start_x",
+          "start_y",
+          "end_x",
+          "end_y",
+          "coord_space",
+          "button",
+          "normalized pid",
+          "normalized bundle"
+        ],
+        "show_cursor": true
+      },
+      "wrapper_defaults": {
+        "coord_space": "screenshot",
+        "button": "left"
+      },
+      "wrapper_gate": true,
+      "response_contract": "action-summary+conditional-image",
+      "notes": [],
+      "evidence": [
+        "MCP.tool.drag"
+      ],
+      "schema_note": "Static Zod transcription, not runtime tools/list capture; descriptions omitted. Required fields and explicit numeric maxima preserve source. Additional-property behavior is not asserted here.",
+      "approval_bundle": "bundle only (no PID/ref resolution)"
+    },
+    {
+      "name": "type_text",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "ref": {
+            "type": "string"
+          },
+          "input_method": {
+            "type": "string",
+            "enum": [
+              "auto",
+              "physical",
+              "unicode",
+              "ax"
+            ]
+          },
+          "bundle": {
+            "type": "string"
+          },
+          "pid": {
+            "type": "integer"
+          },
+          "window_id": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "text"
+        ]
+      },
+      "native_command": "type_text",
+      "payload_contract": {
+        "forwarded": [
+          "text",
+          "ref",
+          "input_method",
+          "normalized pid",
+          "normalized bundle"
+        ]
+      },
+      "wrapper_defaults": {
+        "input_method": "auto"
+      },
+      "wrapper_gate": true,
+      "response_contract": "action-summary+conditional-image",
+      "notes": [
+        "Displayed text length uses JS UTF-16 code-unit count."
+      ],
+      "evidence": [
+        "MCP.tool.type_text"
+      ],
+      "schema_note": "Static Zod transcription, not runtime tools/list capture; descriptions omitted. Required fields and explicit numeric maxima preserve source. Additional-property behavior is not asserted here.",
+      "approval_bundle": "bundle only (no PID/ref resolution)"
+    },
+    {
+      "name": "press_key",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "bundle": {
+            "type": "string"
+          },
+          "pid": {
+            "type": "integer"
+          },
+          "window_id": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "key"
+        ]
+      },
+      "native_command": "press_key",
+      "payload_contract": {
+        "forwarded": [
+          "key",
+          "normalized pid",
+          "normalized bundle"
+        ]
+      },
+      "wrapper_defaults": {},
+      "wrapper_gate": true,
+      "response_contract": "delivery-aware-summary+conditional-image",
+      "notes": [],
+      "evidence": [
+        "MCP.tool.press_key"
+      ],
+      "schema_note": "Static Zod transcription, not runtime tools/list capture; descriptions omitted. Required fields and explicit numeric maxima preserve source. Additional-property behavior is not asserted here.",
+      "approval_bundle": "bundle only (no PID/ref resolution)"
+    },
+    {
+      "name": "scroll",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "ref": {
+            "type": "string"
+          },
+          "direction": {
+            "type": "string",
+            "enum": [
+              "up",
+              "down",
+              "left",
+              "right"
+            ]
+          },
+          "pages": {
+            "type": "integer",
+            "maximum": 20
+          },
+          "bundle": {
+            "type": "string"
+          },
+          "pid": {
+            "type": "integer"
+          },
+          "window_id": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "ref",
+          "direction"
+        ]
+      },
+      "native_command": "scroll",
+      "payload_contract": {
+        "forwarded": [
+          "ref",
+          "direction"
+        ],
+        "pages": "positive integer else 1",
+        "show_cursor": true
+      },
+      "wrapper_defaults": {
+        "pages": 1
+      },
+      "wrapper_gate": true,
+      "response_contract": "action-summary+conditional-image",
+      "notes": [],
+      "evidence": [
+        "MCP.tool.scroll"
+      ],
+      "schema_note": "Static Zod transcription, not runtime tools/list capture; descriptions omitted. Required fields and explicit numeric maxima preserve source. Additional-property behavior is not asserted here.",
+      "approval_bundle": "bundle only (no PID/ref resolution)"
+    },
+    {
+      "name": "set_value",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "ref": {
+            "type": "string"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              }
+            ]
+          },
+          "bundle": {
+            "type": "string"
+          },
+          "pid": {
+            "type": "integer"
+          },
+          "window_id": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "ref",
+          "value"
+        ]
+      },
+      "native_command": "set_value",
+      "payload_contract": {
+        "forwarded": [
+          "ref",
+          "value"
+        ]
+      },
+      "wrapper_defaults": {},
+      "wrapper_gate": true,
+      "response_contract": "action-summary+conditional-image",
+      "notes": [],
+      "evidence": [
+        "MCP.tool.set_value"
+      ],
+      "schema_note": "Static Zod transcription, not runtime tools/list capture; descriptions omitted. Required fields and explicit numeric maxima preserve source. Additional-property behavior is not asserted here.",
+      "approval_bundle": "bundle only (no PID/ref resolution)"
+    },
+    {
+      "name": "select_text",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "ref": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "prefix": {
+            "type": "string"
+          },
+          "suffix": {
+            "type": "string"
+          },
+          "selection_type": {
+            "type": "string",
+            "enum": [
+              "text",
+              "cursor_before",
+              "cursor_after"
+            ]
+          },
+          "bundle": {
+            "type": "string"
+          },
+          "pid": {
+            "type": "integer"
+          },
+          "window_id": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "ref",
+          "text"
+        ]
+      },
+      "native_command": "select_text",
+      "payload_contract": {
+        "forwarded": [
+          "ref",
+          "text",
+          "prefix",
+          "suffix",
+          "selection_type"
+        ]
+      },
+      "wrapper_defaults": {
+        "selection_type": "text"
+      },
+      "wrapper_gate": true,
+      "response_contract": "action-summary+conditional-image",
+      "notes": [],
+      "evidence": [
+        "MCP.tool.select_text"
+      ],
+      "schema_note": "Static Zod transcription, not runtime tools/list capture; descriptions omitted. Required fields and explicit numeric maxima preserve source. Additional-property behavior is not asserted here.",
+      "approval_bundle": "bundle only (no PID/ref resolution)"
+    },
+    {
+      "name": "sky_list_apps",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "native_command": "list_apps",
+      "payload_contract": {},
+      "wrapper_defaults": {},
+      "wrapper_gate": false,
+      "response_contract": "JSON-array-text-app-list-projection",
+      "notes": [],
+      "evidence": [
+        "MCP.tool.sky_list_apps"
+      ],
+      "schema_note": "Static Zod transcription, not runtime tools/list capture; descriptions omitted. Required fields and explicit numeric maxima preserve source. Additional-property behavior is not asserted here."
+    },
+    {
+      "name": "sky_get_app_state",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "app": {
+            "type": "string"
+          },
+          "disableDiff": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "app"
+        ]
+      },
+      "native_command": "get_app_state",
+      "payload_contract": {
+        "bundle": "app",
+        "disable_diff": "disableDiff === true OR no cached ref indices"
+      },
+      "wrapper_defaults": {},
+      "wrapper_gate": true,
+      "response_contract": "single-JSON-text-containing-app-screenshot-url-and-rendered-index-text",
+      "notes": [
+        "No snapshot defaults overridden here. Timeout is default 20s.",
+        "State screenshot uses data_url or url; does not read path."
+      ],
+      "evidence": [
+        "MCP.tool.sky_get_app_state"
+      ],
+      "schema_note": "Static Zod transcription, not runtime tools/list capture; descriptions omitted. Required fields and explicit numeric maxima preserve source. Additional-property behavior is not asserted here.",
+      "approval_bundle": "app"
+    },
+    {
+      "name": "sky_click",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "app": {
+            "type": "string"
+          },
+          "element_index": {
+            "type": "integer"
+          },
+          "x": {
+            "type": "number"
+          },
+          "y": {
+            "type": "number"
+          },
+          "click_count": {
+            "type": "integer"
+          },
+          "mouse_button": {
+            "type": "string",
+            "enum": [
+              "left",
+              "right",
+              "middle",
+              "l",
+              "r",
+              "m"
+            ]
+          }
+        },
+        "required": [
+          "app"
+        ]
+      },
+      "native_command": "click",
+      "payload_contract": {
+        "common": [
+          "normalized mouse_button as button",
+          "click_count ?? 1"
+        ],
+        "index_branch": [
+          "skyRefFor(app,element_index) as ref"
+        ],
+        "coordinate_branch": [
+          "x",
+          "y",
+          "app as bundle",
+          "coord_space=screenshot"
+        ]
+      },
+      "wrapper_defaults": {
+        "click_count": 1,
+        "mouse_button": "left"
+      },
+      "wrapper_gate": true,
+      "response_contract": "action-summary+conditional-image",
+      "notes": [
+        "Index branch wins when typeof element_index is number.",
+        "No max bound on click_count; no show_cursor passed."
+      ],
+      "evidence": [
+        "MCP.tool.sky_click"
+      ],
+      "schema_note": "Static Zod transcription, not runtime tools/list capture; descriptions omitted. Required fields and explicit numeric maxima preserve source. Additional-property behavior is not asserted here.",
+      "approval_bundle": "app"
+    },
+    {
+      "name": "sky_press_key",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "app": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "app",
+          "key"
+        ]
+      },
+      "native_command": "press_key",
+      "payload_contract": {
+        "bundle": "app",
+        "key": "keysym aliases normalized"
+      },
+      "wrapper_defaults": {},
+      "wrapper_gate": true,
+      "response_contract": "delivery-aware-summary+image",
+      "notes": [],
+      "evidence": [
+        "MCP.tool.sky_press_key"
+      ],
+      "schema_note": "Static Zod transcription, not runtime tools/list capture; descriptions omitted. Required fields and explicit numeric maxima preserve source. Additional-property behavior is not asserted here.",
+      "approval_bundle": "app"
+    },
+    {
+      "name": "sky_type_text",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "app": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "app",
+          "text"
+        ]
+      },
+      "native_command": "type_text",
+      "payload_contract": {
+        "bundle": "app",
+        "text": "text"
+      },
+      "wrapper_defaults": {},
+      "wrapper_gate": true,
+      "response_contract": "action-summary+conditional-image",
+      "notes": [
+        "No explicit ref/input_method."
+      ],
+      "evidence": [
+        "MCP.tool.sky_type_text"
+      ],
+      "schema_note": "Static Zod transcription, not runtime tools/list capture; descriptions omitted. Required fields and explicit numeric maxima preserve source. Additional-property behavior is not asserted here.",
+      "approval_bundle": "app"
+    },
+    {
+      "name": "sky_scroll",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "app": {
+            "type": "string"
+          },
+          "element_index": {
+            "type": "integer"
+          },
+          "direction": {
+            "type": "string",
+            "enum": [
+              "up",
+              "down",
+              "left",
+              "right",
+              "u",
+              "d",
+              "l",
+              "r"
+            ]
+          },
+          "pages": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "app",
+          "element_index",
+          "direction"
+        ]
+      },
+      "native_command": "scroll",
+      "payload_contract": {
+        "ref": "skyRefFor(app,element_index)",
+        "direction": "normalized direction",
+        "pages": "pages ?? 1"
+      },
+      "wrapper_defaults": {
+        "pages": 1
+      },
+      "wrapper_gate": true,
+      "response_contract": "action-summary+conditional-image",
+      "notes": [
+        "Unlike ordinary scroll, pages is any number with no max or positive normalization."
+      ],
+      "evidence": [
+        "MCP.tool.sky_scroll"
+      ],
+      "schema_note": "Static Zod transcription, not runtime tools/list capture; descriptions omitted. Required fields and explicit numeric maxima preserve source. Additional-property behavior is not asserted here.",
+      "approval_bundle": "app"
+    },
+    {
+      "name": "sky_set_value",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "app": {
+            "type": "string"
+          },
+          "element_index": {
+            "type": "integer"
+          },
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "app",
+          "element_index",
+          "value"
+        ]
+      },
+      "native_command": "set_value",
+      "payload_contract": {
+        "ref": "skyRefFor(app,element_index)",
+        "value": "value"
+      },
+      "wrapper_defaults": {},
+      "wrapper_gate": true,
+      "response_contract": "action-summary+conditional-image",
+      "notes": [
+        "String only; ordinary set_value accepts boolean and number too."
+      ],
+      "evidence": [
+        "MCP.tool.sky_set_value"
+      ],
+      "schema_note": "Static Zod transcription, not runtime tools/list capture; descriptions omitted. Required fields and explicit numeric maxima preserve source. Additional-property behavior is not asserted here.",
+      "approval_bundle": "app"
+    },
+    {
+      "name": "sky_drag",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "app": {
+            "type": "string"
+          },
+          "from_x": {
+            "type": "number"
+          },
+          "from_y": {
+            "type": "number"
+          },
+          "to_x": {
+            "type": "number"
+          },
+          "to_y": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "app",
+          "from_x",
+          "from_y",
+          "to_x",
+          "to_y"
+        ]
+      },
+      "native_command": "drag",
+      "payload_contract": {
+        "bundle": "app",
+        "start_x": "from_x",
+        "start_y": "from_y",
+        "end_x": "to_x",
+        "end_y": "to_y",
+        "coord_space": "screenshot"
+      },
+      "wrapper_defaults": {},
+      "wrapper_gate": true,
+      "response_contract": "action-summary+conditional-image",
+      "notes": [],
+      "evidence": [
+        "MCP.tool.sky_drag"
+      ],
+      "schema_note": "Static Zod transcription, not runtime tools/list capture; descriptions omitted. Required fields and explicit numeric maxima preserve source. Additional-property behavior is not asserted here.",
+      "approval_bundle": "app"
+    },
+    {
+      "name": "sky_perform_secondary_action",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "app": {
+            "type": "string"
+          },
+          "element_index": {
+            "type": "integer"
+          },
+          "action": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "app",
+          "element_index",
+          "action"
+        ]
+      },
+      "native_command": "perform_secondary_action",
+      "payload_contract": {
+        "ref": "skyRefFor(app,element_index)",
+        "action": "action"
+      },
+      "wrapper_defaults": {},
+      "wrapper_gate": true,
+      "response_contract": "action-summary+conditional-image",
+      "notes": [
+        "Unlike ordinary secondary action, explicit action string is forwarded."
+      ],
+      "evidence": [
+        "MCP.tool.sky_perform_secondary_action"
+      ],
+      "schema_note": "Static Zod transcription, not runtime tools/list capture; descriptions omitted. Required fields and explicit numeric maxima preserve source. Additional-property behavior is not asserted here.",
+      "approval_bundle": "app"
+    },
+    {
+      "name": "sky_select_text",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "app": {
+            "type": "string"
+          },
+          "element_index": {
+            "type": "integer"
+          },
+          "text": {
+            "type": "string"
+          },
+          "prefix": {
+            "type": "string"
+          },
+          "suffix": {
+            "type": "string"
+          },
+          "selection_type": {
+            "type": "string",
+            "enum": [
+              "text",
+              "cursor_before",
+              "cursor_after"
+            ]
+          }
+        },
+        "required": [
+          "app",
+          "element_index",
+          "text"
+        ]
+      },
+      "native_command": "select_text",
+      "payload_contract": {
+        "ref": "skyRefFor(app,element_index)",
+        "forwarded": [
+          "text",
+          "prefix",
+          "suffix",
+          "selection_type"
+        ]
+      },
+      "wrapper_defaults": {
+        "selection_type": "text"
+      },
+      "wrapper_gate": true,
+      "response_contract": "action-summary+conditional-image",
+      "notes": [],
+      "evidence": [
+        "MCP.tool.sky_select_text"
+      ],
+      "schema_note": "Static Zod transcription, not runtime tools/list capture; descriptions omitted. Required fields and explicit numeric maxima preserve source. Additional-property behavior is not asserted here.",
+      "approval_bundle": "app"
+    },
+    {
+      "name": "permissions",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "native_command": "permissions",
+      "payload_contract": {},
+      "wrapper_defaults": {},
+      "wrapper_gate": false,
+      "response_contract": "native-data-as-pretty-JSON-text",
+      "notes": [],
+      "evidence": [
+        "MCP.tool.permissions"
+      ],
+      "schema_note": "Static Zod transcription, not runtime tools/list capture; descriptions omitted. Required fields and explicit numeric maxima preserve source. Additional-property behavior is not asserted here."
+    },
+    {
+      "name": "grant",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "native_command": "grant",
+      "payload_contract": {},
+      "wrapper_defaults": {},
+      "wrapper_gate": false,
+      "response_contract": "native-data-as-pretty-JSON-text",
+      "notes": [],
+      "evidence": [
+        "MCP.tool.grant"
+      ],
+      "schema_note": "Static Zod transcription, not runtime tools/list capture; descriptions omitted. Required fields and explicit numeric maxima preserve source. Additional-property behavior is not asserted here."
+    }
+  ],
+  "transport": {
+    "mcp": "stdio JSON-RPC via MCP SDK",
+    "native": "Unix-domain stream; UTF-8 JSON lines",
+    "request_fields": {
+      "id": "random 8 bytes encoded as hex",
+      "cmd": "command string",
+      "args": "JSON object"
+    },
+    "response_fields": {
+      "id": "request correlation",
+      "ok": "truthy success test",
+      "data": "successful result",
+      "error": {
+        "message": "string",
+        "code": "attached to JS Error",
+        "hint": "attached to JS Error"
+      }
+    },
+    "request_timeout_ms": 20000,
+    "ordinary_state_timeout_ms": 30000,
+    "post_action_state_timeout_ms": 30000,
+    "sky_state_timeout_ms": 20000,
+    "daemon_idle_seconds": 900,
+    "spawn_connect_retry_window_ms": 4000,
+    "retry_delay_ms": 100,
+    "timeout_starts": "after ensureConnected resolves",
+    "socket_scope": "helper path string SHA1 first8, not binary hash",
+    "action_auto_retry": false,
+    "late_response": "ignored after pending removal",
+    "disconnect": "reject every pending; next call reconnects",
+    "cancel_forwarding": "No AbortSignal or cancel command in application DaemonClient",
+    "evidence": [
+      "MCP.transport",
+      "MCP.sdk-cancel",
+      "MCP.sdk-handler-abort",
+      "MCP.stdio"
+    ]
+  },
+  "response_contracts": {
+    "native_failure": "SDK tool error text+isError:true; code/hint not emitted by ordinary error wrapper",
+    "approval_denied": "text content without isError:true",
+    "key_suppressed": "delivered=false => semantic not-delivered text, not isError",
+    "key_menu_route": "via=menu_ax_press => menu route text",
+    "post_action_capture_failure": "summary plus warning text, not action error",
+    "ordinary_state_image": "read screenshot.path, base64 image/jpeg block",
+    "sky_state_image": "data_url || url embedded inside JSON text, path alone ignored",
+    "ref_only_capture": "none unless caller separately supplies bundle or positive pid"
+  },
+  "cross_version_note": "MCP SHA256 equals prior reported 0.4.153 hash; host, CLI, native do not."
+}

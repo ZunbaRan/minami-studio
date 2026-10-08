@@ -1,0 +1,284 @@
+[
+  {
+    "file": "alma_reverse_20261006/extracted/asar/out/main/index.js",
+    "sha256": "df95c2d383730265f251660761a480938989351d2278235366e55366a72c0175",
+    "bytes": 3130833,
+    "anchors": [
+      {
+        "anchor": "let Mh=null",
+        "char_offset": 412707,
+        "utf8_byte_offset": 414195,
+        "line": 1
+      },
+      {
+        "anchor": "function np(",
+        "char_offset": 422210,
+        "utf8_byte_offset": 423710,
+        "line": 1
+      },
+      {
+        "anchor": "function rp(",
+        "char_offset": 425542,
+        "utf8_byte_offset": 427042,
+        "line": 1
+      },
+      {
+        "anchor": "function op(",
+        "char_offset": 425675,
+        "utf8_byte_offset": 427175,
+        "line": 1
+      },
+      {
+        "anchor": "function cp(",
+        "char_offset": 425925,
+        "utf8_byte_offset": 427425,
+        "line": 1
+      },
+      {
+        "anchor": "function up(",
+        "char_offset": 427011,
+        "utf8_byte_offset": 428511,
+        "line": 1
+      },
+      {
+        "anchor": "maybeAutoShowPip(e,t)",
+        "char_offset": 433459,
+        "utf8_byte_offset": 434959,
+        "line": 1
+      },
+      {
+        "anchor": "async pipFrame(t)",
+        "char_offset": 454325,
+        "utf8_byte_offset": 455825,
+        "line": 1
+      },
+      {
+        "anchor": "subscribeFrames(e,t",
+        "char_offset": 455134,
+        "utf8_byte_offset": 456634,
+        "line": 1
+      },
+      {
+        "anchor": "ensureScreencast(e){",
+        "char_offset": 460399,
+        "utf8_byte_offset": 461899,
+        "line": 1
+      },
+      {
+        "anchor": "stopPipStream(e",
+        "char_offset": 429541,
+        "utf8_byte_offset": 431041,
+        "line": 1
+      },
+      {
+        "anchor": "stopPipStream(e",
+        "char_offset": 461406,
+        "utf8_byte_offset": 462906,
+        "line": 1
+      },
+      {
+        "anchor": "function Hp(",
+        "char_offset": 531263,
+        "utf8_byte_offset": 532782,
+        "line": 1
+      },
+      {
+        "anchor": "async lens(e)",
+        "char_offset": 533785,
+        "utf8_byte_offset": 535304,
+        "line": 1
+      },
+      {
+        "anchor": "this.app.use([\"/api/computer-use/get_app_state\"",
+        "char_offset": 2269418,
+        "utf8_byte_offset": 2285440,
+        "line": 1
+      },
+      {
+        "anchor": "this.app.get(\"/api/pip/frame\"",
+        "char_offset": 2263981,
+        "utf8_byte_offset": 2280003,
+        "line": 1
+      },
+      {
+        "anchor": "this.app.post(\"/api/pip/present\"",
+        "char_offset": 2264507,
+        "utf8_byte_offset": 2280529,
+        "line": 1
+      },
+      {
+        "anchor": "function zY(",
+        "char_offset": 2989638,
+        "utf8_byte_offset": 3007348,
+        "line": 1
+      },
+      {
+        "anchor": "const HY=",
+        "char_offset": 2990283,
+        "utf8_byte_offset": 3007993,
+        "line": 1
+      },
+      {
+        "anchor": "const XY=new class",
+        "char_offset": 2998222,
+        "utf8_byte_offset": 3015954,
+        "line": 1
+      },
+      {
+        "anchor": "async dispatchCapture(e)",
+        "char_offset": 3001451,
+        "utf8_byte_offset": 3019183,
+        "line": 1
+      },
+      {
+        "anchor": "async measureComposerDestFrame(e)",
+        "char_offset": 3004962,
+        "utf8_byte_offset": 3022694,
+        "line": 1
+      }
+    ]
+  },
+  {
+    "file": "alma_reverse_20261006/extracted/asar/out/main/chunks/computerUsePip-BTut449V.js",
+    "sha256": "cb01bc4f46b21b8077448b5737900de7ac30c7d1a09651d029e0d4eea118c8e2",
+    "bytes": 3570,
+    "anchors": [
+      {
+        "anchor": "const s=\"computer:desktop\"",
+        "char_offset": 2722,
+        "utf8_byte_offset": 2722,
+        "line": 1
+      },
+      {
+        "anchor": "function f(o={})",
+        "char_offset": 3065,
+        "utf8_byte_offset": 3065,
+        "line": 1
+      },
+      {
+        "anchor": "function u()",
+        "char_offset": 3381,
+        "utf8_byte_offset": 3381,
+        "line": 1
+      }
+    ]
+  },
+  {
+    "file": "alma_reverse_20261006/extracted/asar/out/main/chunks/pipFrameSources-BwOu2Plt.js",
+    "sha256": "2627830c47678782aec65d856900f02dbad07a00c15bb5f27a4a13c79db4717c",
+    "bytes": 4815,
+    "anchors": [
+      {
+        "anchor": "const d=new Map",
+        "char_offset": 2697,
+        "utf8_byte_offset": 2697,
+        "line": 1
+      },
+      {
+        "anchor": "function c(o,t)",
+        "char_offset": 2713,
+        "utf8_byte_offset": 2713,
+        "line": 1
+      },
+      {
+        "anchor": "function l(o)",
+        "char_offset": 3756,
+        "utf8_byte_offset": 3758,
+        "line": 1
+      },
+      {
+        "anchor": "async function u(o)",
+        "char_offset": 3911,
+        "utf8_byte_offset": 3913,
+        "line": 1
+      }
+    ]
+  },
+  {
+    "file": "alma_reverse_20261006/extracted/asar/out/preload/index.js",
+    "sha256": "41d68ca7d15ec9bf421527015b435fcd236810c3f716f30d7965832880d11ef6",
+    "bytes": 25411,
+    "anchors": [
+      {
+        "anchor": "\"appshots\"",
+        "char_offset": 8298,
+        "utf8_byte_offset": 8298,
+        "line": 1
+      }
+    ]
+  },
+  {
+    "file": "alma_reverse_20261006/extracted/asar/out/renderer/assets/App-CMj0T-97.js",
+    "sha256": "410c464f9b504b967ffc141084849e112f062bdce034082da317514615267518",
+    "bytes": 4001660,
+    "anchors": [
+      {
+        "anchor": "function useAppshotShortcut()",
+        "char_offset": 3844747,
+        "utf8_byte_offset": 3847661,
+        "line": 94941
+      },
+      {
+        "anchor": "const setAppshotHiddenContexts",
+        "char_offset": 308294,
+        "utf8_byte_offset": 308423,
+        "line": 6809
+      },
+      {
+        "anchor": "if (!pendingAppshot)",
+        "char_offset": 309099,
+        "utf8_byte_offset": 309228,
+        "line": 6832
+      },
+      {
+        "anchor": "if (!pendingAppshot)",
+        "char_offset": 1523024,
+        "utf8_byte_offset": 1523315,
+        "line": 36385
+      }
+    ]
+  },
+  {
+    "file": "alma_reverse_20261006/extracted/asar/out/renderer/assets/PluginNotificationListener-B2BL27X5.js",
+    "sha256": "a92c75f4f918e11d5d236ef3fb8341431357d4bb99a7870de33dc9f38133a7d4",
+    "bytes": 2147959,
+    "anchors": [
+      {
+        "anchor": "const pendingAppshotAtom",
+        "char_offset": 244155,
+        "utf8_byte_offset": 244161,
+        "line": 6269
+      },
+      {
+        "anchor": "function serialiseAppshotContexts",
+        "char_offset": 244238,
+        "utf8_byte_offset": 244244,
+        "line": 6271
+      },
+      {
+        "anchor": "const appshotPhaseAtom",
+        "char_offset": 245025,
+        "utf8_byte_offset": 245034,
+        "line": 6292
+      },
+      {
+        "anchor": "const appshotContexts =",
+        "char_offset": 304496,
+        "utf8_byte_offset": 304507,
+        "line": 7707
+      },
+      {
+        "anchor": "const pipEnabled =",
+        "char_offset": 1934937,
+        "utf8_byte_offset": 1937745,
+        "line": 37769
+      },
+      {
+        "anchor": "onUpdate({ computerUsePipEnabled: v2 })",
+        "char_offset": 1944168,
+        "utf8_byte_offset": 1946978,
+        "line": 37927
+      }
+    ]
+  }
+]

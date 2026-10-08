@@ -1,0 +1,1187 @@
+{
+  "status": "NOT_RUN; expected-observation checker provided; replacement harness must supply independent actual observations",
+  "cases": [
+    {
+      "id": "schema.click.null.ref",
+      "group": "schema",
+      "profile": "alma_0_4_164",
+      "input": {
+        "tool": "click",
+        "args": {
+          "ref": null
+        }
+      },
+      "harness_seam": "schema_validator",
+      "expected_observation": {
+        "schema_valid": false,
+        "scope": "schema only; handler/native side effects not asserted"
+      },
+      "oracle_operator": "recursive_exact_expected_projection",
+      "source_case": "schema.click.null.ref"
+    },
+    {
+      "id": "schema.click.bound.click_count.4",
+      "group": "schema",
+      "profile": "alma_0_4_164",
+      "input": {
+        "tool": "click",
+        "args": {
+          "click_count": 4
+        }
+      },
+      "harness_seam": "schema_validator",
+      "expected_observation": {
+        "schema_valid": false,
+        "scope": "schema only; handler/native side effects not asserted"
+      },
+      "oracle_operator": "recursive_exact_expected_projection",
+      "source_case": "schema.click.bound.click_count.4"
+    },
+    {
+      "id": "schema.click.bound.click_count.0",
+      "group": "schema",
+      "profile": "alma_0_4_164",
+      "input": {
+        "tool": "click",
+        "args": {
+          "click_count": 0
+        }
+      },
+      "harness_seam": "schema_validator",
+      "expected_observation": {
+        "schema_valid": true,
+        "scope": "schema only; handler/native side effects not asserted"
+      },
+      "oracle_operator": "recursive_exact_expected_projection",
+      "source_case": "schema.click.bound.click_count.0"
+    },
+    {
+      "id": "schema.sky_click.fractional.click_count",
+      "group": "schema",
+      "profile": "alma_0_4_164",
+      "input": {
+        "tool": "sky_click",
+        "args": {
+          "app": "org.example.cu.fixture",
+          "click_count": 1.5
+        }
+      },
+      "harness_seam": "schema_validator",
+      "expected_observation": {
+        "schema_valid": false,
+        "scope": "schema only; handler/native side effects not asserted"
+      },
+      "oracle_operator": "recursive_exact_expected_projection",
+      "source_case": "schema.sky_click.fractional.click_count"
+    },
+    {
+      "id": "schema.sky_scroll.valid.pages",
+      "group": "schema",
+      "profile": "alma_0_4_164",
+      "input": {
+        "tool": "sky_scroll",
+        "args": {
+          "app": "org.example.cu.fixture",
+          "element_index": 1,
+          "direction": "up",
+          "pages": 1.25
+        }
+      },
+      "harness_seam": "schema_validator",
+      "expected_observation": {
+        "schema_valid": true,
+        "scope": "schema only; handler/native side effects not asserted"
+      },
+      "oracle_operator": "recursive_exact_expected_projection",
+      "source_case": "schema.sky_scroll.valid.pages"
+    },
+    {
+      "id": "schema.set_value.null.value",
+      "group": "schema",
+      "profile": "alma_0_4_164",
+      "input": {
+        "tool": "set_value",
+        "args": {
+          "ref": "e_fixture",
+          "value": null
+        }
+      },
+      "harness_seam": "schema_validator",
+      "expected_observation": {
+        "schema_valid": false,
+        "scope": "schema only; handler/native side effects not asserted"
+      },
+      "oracle_operator": "recursive_exact_expected_projection",
+      "source_case": "schema.set_value.null.value"
+    },
+    {
+      "id": "transport.out_of_order",
+      "group": "transport",
+      "profile": "alma_0_4_164",
+      "input": {
+        "pending": [
+          "a",
+          "b"
+        ],
+        "receive_lines": [
+          {
+            "id": "b",
+            "ok": true,
+            "data": 2
+          },
+          {
+            "id": "a",
+            "ok": true,
+            "data": 1
+          }
+        ]
+      },
+      "harness_seam": "daemon_client_fake_bytestream",
+      "expected_observation": {
+        "resolutions": [
+          {
+            "id": "b",
+            "value": 2
+          },
+          {
+            "id": "a",
+            "value": 1
+          }
+        ]
+      },
+      "oracle_operator": "recursive_exact_expected_projection",
+      "source_case": "transport.out_of_order"
+    },
+    {
+      "id": "transport.no_lf",
+      "group": "transport",
+      "profile": "alma_0_4_164",
+      "input": {
+        "pending": [
+          "a"
+        ],
+        "receive_chunks": [
+          "{\"id\":\"a\",\"ok\":true,\"data\":7}"
+        ],
+        "advance_ms": 10
+      },
+      "harness_seam": "daemon_client_fake_bytestream",
+      "expected_observation": {
+        "resolution_count": 0,
+        "pending_after": [
+          "a"
+        ]
+      },
+      "oracle_operator": "recursive_exact_expected_projection",
+      "source_case": "transport.no_lf"
+    },
+    {
+      "id": "transport.disconnect",
+      "group": "transport",
+      "profile": "alma_0_4_164",
+      "input": {
+        "pending": [
+          "a",
+          "b"
+        ],
+        "event": "socket_close"
+      },
+      "harness_seam": "daemon_client_fake_bytestream",
+      "expected_observation": {
+        "rejection_count": 2,
+        "messages": [
+          "computer-use daemon disconnected",
+          "computer-use daemon disconnected"
+        ],
+        "socket": null,
+        "retry_sent": false
+      },
+      "oracle_operator": "recursive_exact_expected_projection",
+      "source_case": "transport.disconnect"
+    },
+    {
+      "id": "transport.truthy.yes",
+      "group": "transport",
+      "profile": "alma_0_4_164",
+      "input": {
+        "pending": [
+          "a"
+        ],
+        "response": {
+          "id": "a",
+          "ok": "yes",
+          "data": 7,
+          "error": {
+            "message": "fixture error",
+            "code": "fixture_code",
+            "hint": "fixture hint"
+          }
+        }
+      },
+      "harness_seam": "daemon_client_fake_bytestream",
+      "expected_observation": {
+        "resolved": true,
+        "value": 7,
+        "error": null
+      },
+      "oracle_operator": "recursive_exact_expected_projection",
+      "source_case": "transport.truthy.yes"
+    },
+    {
+      "id": "target.ref_wins",
+      "group": "target",
+      "profile": "alma_0_4_164",
+      "input": {
+        "tool": "click",
+        "args": {
+          "ref": "e_fixture",
+          "x": 0,
+          "y": 0,
+          "bundle": "org.example.other",
+          "pid": 222,
+          "window_id": 9
+        }
+      },
+      "harness_seam": "MCP_handler_fake_daemon",
+      "expected_observation": {
+        "native_call": {
+          "cmd": "click",
+          "args": {
+            "ref": "e_fixture",
+            "button": "left",
+            "click_count": 1,
+            "strategy": "auto",
+            "show_cursor": true
+          }
+        },
+        "approval_bundle": "org.example.other",
+        "postshot_target": {
+          "bundle": "org.example.other",
+          "pid": 222,
+          "window_id": 9
+        }
+      },
+      "oracle_operator": "recursive_exact_expected_projection",
+      "source_case": "target.ref_wins"
+    },
+    {
+      "id": "target.zero_coordinate",
+      "group": "target",
+      "profile": "alma_0_4_164",
+      "input": {
+        "tool": "click",
+        "args": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "harness_seam": "MCP_handler_fake_daemon",
+      "expected_observation": {
+        "native_call": {
+          "cmd": "click",
+          "args": {
+            "x": 0,
+            "y": 0,
+            "coord_space": "screenshot",
+            "button": "left",
+            "click_count": 1,
+            "strategy": "auto",
+            "show_cursor": true
+          }
+        },
+        "postshot_calls": 0
+      },
+      "oracle_operator": "recursive_exact_expected_projection",
+      "source_case": "target.zero_coordinate"
+    },
+    {
+      "id": "target.window_only",
+      "group": "target",
+      "profile": "alma_0_4_164",
+      "input": {
+        "tool": "click",
+        "args": {
+          "ref": "e_fixture",
+          "window_id": 9
+        }
+      },
+      "harness_seam": "MCP_handler_fake_daemon",
+      "expected_observation": {
+        "native_args_forbidden_keys": [
+          "window_id"
+        ],
+        "postshot_calls": 0
+      },
+      "oracle_operator": "recursive_exact_expected_projection",
+      "source_case": "target.window_only"
+    },
+    {
+      "id": "target.click.click_count.0",
+      "group": "target",
+      "profile": "alma_0_4_164",
+      "input": {
+        "tool": "click",
+        "args": {
+          "ref": "e_fixture",
+          "click_count": 0
+        },
+        "setup": {
+          "sky_index_map": {
+            "org.example.cu.fixture": [
+              "e_fixture"
+            ]
+          },
+          "approval": {
+            "status": 200,
+            "body": {
+              "approved": true
+            }
+          },
+          "daemon_default": {
+            "ok": true,
+            "data": {}
+          },
+          "postshot_default": {
+            "ok": true,
+            "data": {}
+          },
+          "playbooks": {}
+        }
+      },
+      "harness_seam": "MCP_handler_fake_daemon",
+      "expected_observation": {
+        "forwarded_field": "click_count",
+        "value": 1
+      },
+      "oracle_operator": "recursive_exact_expected_projection",
+      "source_case": "target.click.click_count.0"
+    },
+    {
+      "id": "target.sky_click.click_count.0",
+      "group": "target",
+      "profile": "alma_0_4_164",
+      "input": {
+        "tool": "sky_click",
+        "args": {
+          "app": "org.example.cu.fixture",
+          "element_index": 0,
+          "click_count": 0
+        },
+        "setup": {
+          "sky_index_map": {
+            "org.example.cu.fixture": [
+              "e_fixture"
+            ]
+          },
+          "approval": {
+            "status": 200,
+            "body": {
+              "approved": true
+            }
+          },
+          "daemon_default": {
+            "ok": true,
+            "data": {}
+          },
+          "postshot_default": {
+            "ok": true,
+            "data": {}
+          },
+          "playbooks": {}
+        }
+      },
+      "harness_seam": "MCP_handler_fake_daemon",
+      "expected_observation": {
+        "forwarded_field": "click_count",
+        "value": 0
+      },
+      "oracle_operator": "recursive_exact_expected_projection",
+      "source_case": "target.sky_click.click_count.0"
+    },
+    {
+      "id": "state.plain_defaults",
+      "group": "state",
+      "profile": "alma_0_4_164",
+      "input": {
+        "tool": "get_app_state",
+        "args": {}
+      },
+      "harness_seam": "MCP_handler_fake_daemon",
+      "expected_observation": {
+        "native_args": {
+          "depth": 6,
+          "interactive_only": true,
+          "include_screenshot": true,
+          "screenshot_max_width": 1280,
+          "auto_launch": true
+        },
+        "rpc_timeout_ms": 30000,
+        "approval_calls": 0
+      },
+      "oracle_operator": "recursive_exact_expected_projection",
+      "source_case": "state.plain_defaults"
+    },
+    {
+      "id": "state.sky_first_full",
+      "group": "state",
+      "profile": "alma_0_4_164",
+      "input": {
+        "tool": "sky_get_app_state",
+        "args": {
+          "app": "org.example.cu.fixture"
+        },
+        "prior_indices": []
+      },
+      "harness_seam": "MCP_handler_fake_daemon",
+      "expected_observation": {
+        "native_args": {
+          "bundle": "org.example.cu.fixture",
+          "disable_diff": true
+        },
+        "rpc_timeout_ms": 20000
+      },
+      "oracle_operator": "recursive_exact_expected_projection",
+      "source_case": "state.sky_first_full"
+    },
+    {
+      "id": "diff.sky_append",
+      "group": "diff",
+      "profile": "alma_0_4_164",
+      "input": {
+        "prior_refs": [
+          "e1",
+          "e2"
+        ],
+        "raw": {
+          "elements_are_diff": true,
+          "elements": [
+            {
+              "ref": "e2"
+            },
+            {
+              "ref": "e3"
+            }
+          ],
+          "removed_refs": [
+            "e1"
+          ]
+        }
+      },
+      "harness_seam": "state_diff_or_sky_renderer_pure",
+      "expected_observation": {
+        "refs": [
+          "e1",
+          "e2",
+          "e3"
+        ],
+        "emitted_indices": [
+          1,
+          2
+        ],
+        "deleted_ref_still_in_index": true
+      },
+      "oracle_operator": "recursive_exact_expected_projection",
+      "source_case": "diff.sky_append"
+    },
+    {
+      "id": "diff.sky_full_reset",
+      "group": "diff",
+      "profile": "alma_0_4_164",
+      "input": {
+        "prior_refs": [
+          "e1",
+          "e2"
+        ],
+        "raw": {
+          "elements_are_diff": false,
+          "elements": [
+            {
+              "ref": "e3"
+            },
+            {
+              "ref": "e2"
+            }
+          ]
+        }
+      },
+      "harness_seam": "state_diff_or_sky_renderer_pure",
+      "expected_observation": {
+        "refs": [
+          "e3",
+          "e2"
+        ],
+        "emitted_indices": [
+          0,
+          1
+        ]
+      },
+      "oracle_operator": "recursive_exact_expected_projection",
+      "source_case": "diff.sky_full_reset"
+    },
+    {
+      "id": "diff.labels_and_bounds",
+      "group": "diff",
+      "profile": "alma_0_4_164",
+      "input": {
+        "elements": [
+          {
+            "ref": "e1",
+            "role": "AXButton",
+            "title": "  ",
+            "description": " Save ",
+            "value": 3,
+            "bounds": {
+              "x": 1.4,
+              "y": 2.6,
+              "w": 10.5,
+              "h": 20.1
+            },
+            "enabled": false,
+            "focused": true
+          }
+        ]
+      },
+      "harness_seam": "state_diff_or_sky_renderer_pure",
+      "expected_observation": {
+        "text": "[0] Button \"Save\" @1,3 11x20 (focused,disabled)",
+        "refs": [
+          "e1"
+        ]
+      },
+      "oracle_operator": "recursive_exact_expected_projection",
+      "source_case": "diff.labels_and_bounds"
+    },
+    {
+      "id": "diff.native_add_change_remove",
+      "group": "diff",
+      "profile": "alma_0_4_164",
+      "input": {
+        "baseline": [
+          {
+            "ref": "e1",
+            "title": "one"
+          },
+          {
+            "ref": "e2",
+            "title": "two"
+          },
+          {
+            "ref": "e10",
+            "title": "ten"
+          }
+        ],
+        "next": [
+          {
+            "ref": "e2",
+            "title": "TWO"
+          },
+          {
+            "ref": "e3",
+            "title": "three"
+          }
+        ]
+      },
+      "harness_seam": "state_diff_or_sky_renderer_pure",
+      "expected_observation": {
+        "changed_refs": [
+          "e2",
+          "e3"
+        ],
+        "removed_refs": [
+          "e1",
+          "e10"
+        ],
+        "unchanged_count": 0,
+        "is_diff": true
+      },
+      "oracle_operator": "recursive_exact_expected_projection",
+      "source_case": "diff.native_add_change_remove"
+    },
+    {
+      "id": "diff.disabled_resets",
+      "group": "diff",
+      "profile": "alma_0_4_164",
+      "input": {
+        "baseline": [
+          {
+            "ref": "e1",
+            "title": "old"
+          }
+        ],
+        "disabled_snapshot": [
+          {
+            "ref": "e1",
+            "title": "new"
+          }
+        ],
+        "following_snapshot": [
+          {
+            "ref": "e1",
+            "title": "new"
+          }
+        ]
+      },
+      "harness_seam": "state_diff_or_sky_renderer_pure",
+      "expected_observation": {
+        "disabled_output": {
+          "full": true,
+          "removed_refs": [],
+          "unchanged_count": 0
+        },
+        "following_output": {
+          "changed_refs": [],
+          "unchanged_count": 1,
+          "is_diff": true
+        }
+      },
+      "oracle_operator": "recursive_exact_expected_projection",
+      "source_case": "diff.disabled_resets"
+    },
+    {
+      "id": "screenshots.get_app_state.path",
+      "group": "screenshots",
+      "profile": "alma_0_4_164",
+      "input": {
+        "tool": "get_app_state",
+        "native_data": {
+          "elements": [],
+          "screenshot": {
+            "path": "fixture://shot.jpg"
+          }
+        },
+        "mock_files": {
+          "fixture://shot.jpg": {
+            "bytes_hex": "010203"
+          }
+        },
+        "args": {
+          "bundle": "org.example.cu.fixture"
+        },
+        "setup": {
+          "sky_index_map": {},
+          "playbooks": {},
+          "approval": {
+            "status": 200,
+            "body": {
+              "approved": true
+            }
+          }
+        }
+      },
+      "harness_seam": "capture_mapping_or_MCP_fake_files",
+      "expected_observation": {
+        "image_blocks": 1,
+        "filesystem_read_count": 1,
+        "json_screenshot_key_present": false,
+        "base64": "AQID",
+        "mimeType": "image/jpeg"
+      },
+      "oracle_operator": "recursive_exact_expected_projection",
+      "source_case": "screenshots.get_app_state.path"
+    },
+    {
+      "id": "screenshots.sky_get_app_state.path",
+      "group": "screenshots",
+      "profile": "alma_0_4_164",
+      "input": {
+        "tool": "sky_get_app_state",
+        "native_data": {
+          "elements": [],
+          "screenshot": {
+            "path": "fixture://shot.jpg"
+          }
+        },
+        "mock_files": {
+          "fixture://shot.jpg": {
+            "bytes_hex": "010203"
+          }
+        },
+        "args": {
+          "app": "org.example.cu.fixture"
+        },
+        "setup": {
+          "sky_index_map": {},
+          "playbooks": {},
+          "approval": {
+            "status": 200,
+            "body": {
+              "approved": true
+            }
+          }
+        }
+      },
+      "harness_seam": "capture_mapping_or_MCP_fake_files",
+      "expected_observation": {
+        "image_blocks": 0,
+        "filesystem_read_count": 0,
+        "text_json_screenshot": null,
+        "content_blocks": 1
+      },
+      "oracle_operator": "recursive_exact_expected_projection",
+      "source_case": "screenshots.sky_get_app_state.path"
+    },
+    {
+      "id": "screenshots.sky_get_app_state.data_url",
+      "group": "screenshots",
+      "profile": "alma_0_4_164",
+      "input": {
+        "tool": "sky_get_app_state",
+        "native_data": {
+          "elements": [],
+          "screenshot": {
+            "data_url": "data:image/jpeg;base64,AQID",
+            "url": "alternate"
+          }
+        },
+        "mock_files": {
+          "fixture://shot.jpg": {
+            "bytes_hex": "010203"
+          }
+        },
+        "args": {
+          "app": "org.example.cu.fixture"
+        },
+        "setup": {
+          "sky_index_map": {},
+          "playbooks": {},
+          "approval": {
+            "status": 200,
+            "body": {
+              "approved": true
+            }
+          }
+        }
+      },
+      "harness_seam": "capture_mapping_or_MCP_fake_files",
+      "expected_observation": {
+        "image_blocks": 0,
+        "filesystem_read_count": 0,
+        "text_json_screenshot": {
+          "url": "data:image/jpeg;base64,AQID"
+        },
+        "content_blocks": 1
+      },
+      "oracle_operator": "recursive_exact_expected_projection",
+      "source_case": "screenshots.sky_get_app_state.data_url"
+    },
+    {
+      "id": "screenshots.postshot_no_path",
+      "group": "screenshots",
+      "profile": "alma_0_4_164",
+      "input": {
+        "call_seam": "respond(summary,target)",
+        "summary": "fixture mutation ok",
+        "target": {
+          "pid": 111
+        },
+        "daemon_reply_for_get_app_state": {
+          "ok": true,
+          "data": {}
+        },
+        "readFile_should_not_be_called": true
+      },
+      "harness_seam": "capture_mapping_or_MCP_fake_files",
+      "expected_observation": {
+        "summary_preserved": true,
+        "extra_text": "Post-action screenshot unavailable.",
+        "isError_present": false
+      },
+      "oracle_operator": "recursive_exact_expected_projection",
+      "source_case": "screenshots.postshot_no_path"
+    },
+    {
+      "id": "screenshots.mapping",
+      "group": "screenshots",
+      "profile": "alma_0_4_164",
+      "input": {
+        "mapping": {
+          "origin": [
+            -1920,
+            100
+          ],
+          "point_size": [
+            1920,
+            1080
+          ],
+          "pixel_size": [
+            960,
+            540
+          ]
+        },
+        "screenshot_xy": [
+          240,
+          135
+        ]
+      },
+      "harness_seam": "capture_mapping_or_MCP_fake_files",
+      "expected_observation": {
+        "desktop_xy": [
+          -1440,
+          370
+        ]
+      },
+      "oracle_operator": "recursive_exact_expected_projection",
+      "source_case": "screenshots.mapping"
+    },
+    {
+      "id": "permissions.denied",
+      "group": "permissions",
+      "profile": "alma_0_4_164",
+      "input": {
+        "tool": "click",
+        "args": {
+          "bundle": "org.example.cu.fixture",
+          "ref": "e1"
+        },
+        "approval_mock": {
+          "status": 200,
+          "body": {
+            "approved": false
+          }
+        }
+      },
+      "harness_seam": "MCP_handler_fake_HTTP",
+      "expected_observation": {
+        "dispatch_allowed": false,
+        "denial_isError_present": false,
+        "denial_log_and_pip_calls": 0
+      },
+      "oracle_operator": "recursive_exact_expected_projection",
+      "source_case": "permissions.denied"
+    },
+    {
+      "id": "permissions.http503",
+      "group": "permissions",
+      "profile": "alma_0_4_164",
+      "input": {
+        "tool": "click",
+        "args": {
+          "bundle": "org.example.cu.fixture",
+          "ref": "e1"
+        },
+        "approval_mock": {
+          "status": 503
+        }
+      },
+      "harness_seam": "MCP_handler_fake_HTTP",
+      "expected_observation": {
+        "dispatch_allowed": true,
+        "denial_isError_present": null,
+        "denial_log_and_pip_calls": null
+      },
+      "oracle_operator": "recursive_exact_expected_projection",
+      "source_case": "permissions.http503"
+    },
+    {
+      "id": "UI.dismiss_boundary",
+      "group": "UI",
+      "profile": "alma_0_4_164",
+      "input": {
+        "dismissed_at_ms": 0,
+        "automatic_present_at_ms": 600000,
+        "item": {
+          "id": "computer:desktop",
+          "threadId": "fixture-thread-A",
+          "kind": "computer"
+        },
+        "initial_live_items": [],
+        "dismissal_key_parts": [
+          "computer:desktop",
+          "fixture-thread-A"
+        ]
+      },
+      "harness_seam": "UI_state_machine_virtual_clock",
+      "expected_observation": {
+        "suppressed": true,
+        "new_timestamp_ms": 600000
+      },
+      "oracle_operator": "recursive_exact_expected_projection",
+      "source_case": "UI.dismiss_boundary"
+    },
+    {
+      "id": "UI.dismiss_expired",
+      "group": "UI",
+      "profile": "alma_0_4_164",
+      "input": {
+        "dismissed_at_ms": 0,
+        "automatic_present_at_ms": 600001,
+        "item": {
+          "id": "computer:desktop",
+          "threadId": "fixture-thread-A",
+          "kind": "computer"
+        },
+        "initial_live_items": [],
+        "dismissal_key_parts": [
+          "computer:desktop",
+          "fixture-thread-A"
+        ]
+      },
+      "harness_seam": "UI_state_machine_virtual_clock",
+      "expected_observation": {
+        "suppressed": false
+      },
+      "oracle_operator": "recursive_exact_expected_projection",
+      "source_case": "UI.dismiss_expired"
+    },
+    {
+      "id": "UI.electron_ring",
+      "group": "UI",
+      "profile": "alma_0_4_164",
+      "input": {
+        "panel_size": [
+          380,
+          250
+        ],
+        "source_size": [
+          1920,
+          1080
+        ],
+        "normalized": [
+          0.5,
+          0.25
+        ]
+      },
+      "harness_seam": "UI_state_machine_virtual_clock",
+      "expected_observation": {
+        "ring_xy_top_down": [
+          190,
+          53.4375
+        ],
+        "fit_size": [
+          380,
+          213.75
+        ],
+        "top_offset": 0
+      },
+      "oracle_operator": "recursive_exact_expected_projection",
+      "source_case": "UI.electron_ring"
+    },
+    {
+      "id": "transport.utf8_split",
+      "group": "transport",
+      "profile": "alma_0_4_164",
+      "input": {
+        "pending": [
+          "a"
+        ],
+        "receive_chunks_hex": [
+          "7b226964223a2261222c226f6b223a747275652c2264617461223a22e4",
+          "b8ad227d0a"
+        ]
+      },
+      "harness_seam": "daemon_client_fake_bytestream",
+      "expected_observation": {
+        "resolutions": [
+          {
+            "id": "a",
+            "value": "中"
+          }
+        ],
+        "replacement_character_seen": false
+      },
+      "oracle_operator": "recursive_exact_expected_projection",
+      "source_case": "transport.utf8_split"
+    },
+    {
+      "id": "transport.timeout_local_no_replay",
+      "group": "transport",
+      "profile": "alma_0_4_164",
+      "input": {
+        "request": {
+          "id": "a",
+          "cmd": "click",
+          "args": {
+            "ref": "e_fixture"
+          }
+        },
+        "timeout_ms": 20000,
+        "late_response_at_ms": 20001,
+        "late_response": {
+          "id": "a",
+          "ok": true,
+          "data": {}
+        }
+      },
+      "harness_seam": "daemon_client_fake_bytestream",
+      "expected_observation": {
+        "local_rejection_count": 1,
+        "pending_after": [],
+        "late_resolution_count": 0,
+        "mutation_send_count": 1,
+        "native_cancel_frames": 0
+      },
+      "oracle_operator": "recursive_exact_expected_projection",
+      "source_case": "transport.timeout_local_no_replay"
+    },
+    {
+      "id": "transport.safe_reconnect",
+      "group": "transport",
+      "profile": "safe_profile",
+      "input": {
+        "partial_line_before_disconnect": true
+      },
+      "harness_seam": "daemon_client_fake_bytestream",
+      "expected_observation": {
+        "buffer_reset": true,
+        "old_epoch_response_accepted": false,
+        "mutation_replay_count": 0
+      },
+      "oracle_operator": "recursive_exact_expected_projection",
+      "source_case": "transport.safe_reconnect"
+    },
+    {
+      "id": "cancel.safe_uncertain",
+      "group": "cancel",
+      "profile": "safe_profile",
+      "input": {
+        "dispatch_ack": true,
+        "connection_lost_before_result": true
+      },
+      "harness_seam": "SDK_adapter_virtual_scheduler",
+      "expected_observation": {
+        "outcome": "UNKNOWN_OUTCOME",
+        "automatic_retry_count": 0,
+        "next_step": "read-only reconciliation or explicit user decision"
+      },
+      "oracle_operator": "recursive_exact_expected_projection",
+      "source_case": "cancel.safe_uncertain"
+    },
+    {
+      "id": "target.safe_binding",
+      "group": "target",
+      "profile": "safe_profile",
+      "input": {
+        "resolved_ref_owner": "org.example.A",
+        "supplied_bundle": "org.example.B"
+      },
+      "harness_seam": "MCP_handler_fake_daemon",
+      "expected_observation": {
+        "dispatch_count": 0,
+        "error_class": "TARGET_MISMATCH",
+        "approval_action_capture_log_identity_equal": true
+      },
+      "oracle_operator": "recursive_exact_expected_projection",
+      "source_case": "target.safe_binding"
+    },
+    {
+      "id": "target.visual_ref_loses_target",
+      "group": "target",
+      "profile": "alma_0_4_164",
+      "input": {
+        "tool": "click",
+        "args": {
+          "ref": "v1",
+          "bundle": "org.example.cu.fixture"
+        },
+        "setup": {
+          "approval": {
+            "status": 200,
+            "body": {
+              "approved": true
+            }
+          },
+          "visual_cache": {
+            "111": {
+              "v1": {
+                "x": 10,
+                "y": 20,
+                "w": 30,
+                "h": 40
+              }
+            }
+          },
+          "focus_guard_healthy": true
+        }
+      },
+      "harness_seam": "MCP_handler_fake_daemon",
+      "expected_observation": {
+        "schema_valid": true,
+        "approval_bundle": "org.example.cu.fixture",
+        "native_call": {
+          "cmd": "click",
+          "args": {
+            "ref": "v1",
+            "button": "left",
+            "click_count": 1,
+            "strategy": "auto",
+            "show_cursor": true
+          }
+        },
+        "native_error": {
+          "code": "invalid_arg",
+          "message": "visual refs (v*) require `pid` or `bundle`"
+        },
+        "visual_cache_read_count": 0,
+        "input_dispatch_count": 0,
+        "postshot_call_count": 0,
+        "MCP_isError": true,
+        "MCP_structured_native_code_preserved": false
+      },
+      "oracle_operator": "recursive_exact_expected_projection",
+      "source_case": "target.visual_ref_loses_target"
+    },
+    {
+      "id": "state.sky_ignores_visual_regions",
+      "group": "state",
+      "profile": "alma_0_4_164",
+      "input": {
+        "tool": "sky_get_app_state",
+        "args": {
+          "app": "org.example.cu.fixture"
+        },
+        "setup": {
+          "sky_index_map": {},
+          "playbooks": {},
+          "approval": {
+            "status": 200,
+            "body": {
+              "approved": true
+            }
+          }
+        },
+        "native_data": {
+          "app": {
+            "bundle": "org.example.cu.fixture",
+            "pid": 111
+          },
+          "elements": [],
+          "elements_are_diff": false,
+          "visual_regions": [
+            {
+              "ref": "v1",
+              "text": "Synthetic OCR",
+              "bounds": {
+                "x": 10,
+                "y": 20,
+                "w": 30,
+                "h": 40
+              },
+              "confidence": 0.9
+            }
+          ],
+          "screenshot": {
+            "data_url": "data:image/jpeg;base64,AQID"
+          }
+        }
+      },
+      "harness_seam": "MCP_handler_fake_daemon",
+      "expected_observation": {
+        "content_blocks": 1,
+        "image_blocks": 0,
+        "text_json": {
+          "app": "org.example.cu.fixture",
+          "screenshot": {
+            "url": "data:image/jpeg;base64,AQID"
+          },
+          "text": ""
+        },
+        "sky_index_map_after": {
+          "org.example.cu.fixture": []
+        },
+        "visual_ref_index_created": false
+      },
+      "oracle_operator": "recursive_exact_expected_projection",
+      "source_case": "state.sky_ignores_visual_regions"
+    }
+  ]
+}

@@ -1,0 +1,442 @@
+[
+  {
+    "module": "jsonl_framer",
+    "prerequisites": [
+      "S0"
+    ],
+    "allowed_files": [
+      "native/Sources/CUDaemon/Protocol/JSONLFramer.swift",
+      "tests/unit/jsonl_framer.*",
+      "tests/contract/jsonl_framer.*"
+    ],
+    "vector_groups": [
+      "transport"
+    ],
+    "prompt_zh_CN": "仅实现jsonl_framer模块；先读主工程手册对应工单、向量、证据和profile。先列当前已证接口与UNKNOWN，不要猜常量或新增fallback。为allowed_files内模块写失败测试，再作最小独立实现。不得执行Alma原包或复制专有实现。一次提交只解决此模块，接口变更须停止报告。",
+    "accepted_change": "所选profile的已证契约逐项可观测；测试fixture与产品代码分开；未知能力明确unsupported/unverified；无变更重放",
+    "run_checks": [
+      "运行本仓库格式/类型/编译检查",
+      "执行列出group中与本模块相关全部case，并附case ID→结果",
+      "错误/超时/重复关闭/迟到回调负例不可省略",
+      "只有获授权的macOS阶段才跑OS操作"
+    ],
+    "stop_conditions": [
+      "prerequisite未通过",
+      "需要猜测native私有字段/算法/常量",
+      "需修改allowed_files以外模块接口",
+      "涉及新权限或用户真实应用",
+      "未知结果可能已造成副作用"
+    ],
+    "completion_report": [
+      "changed files",
+      "case IDs and exact commands",
+      "profile",
+      "passed/failed/not-run counts",
+      "remaining UNKNOWN + required evidence"
+    ]
+  },
+  {
+    "module": "transport",
+    "prerequisites": [
+      "jsonl_framer"
+    ],
+    "allowed_files": [
+      "adapters/src/daemonClient.ts",
+      "tests/unit/transport.*",
+      "tests/contract/transport.*"
+    ],
+    "vector_groups": [
+      "transport",
+      "cancel"
+    ],
+    "prompt_zh_CN": "仅实现transport模块；先读主工程手册对应工单、向量、证据和profile。先列当前已证接口与UNKNOWN，不要猜常量或新增fallback。为allowed_files内模块写失败测试，再作最小独立实现。不得执行Alma原包或复制专有实现。一次提交只解决此模块，接口变更须停止报告。",
+    "accepted_change": "所选profile的已证契约逐项可观测；测试fixture与产品代码分开；未知能力明确unsupported/unverified；无变更重放",
+    "run_checks": [
+      "运行本仓库格式/类型/编译检查",
+      "执行列出group中与本模块相关全部case，并附case ID→结果",
+      "错误/超时/重复关闭/迟到回调负例不可省略",
+      "只有获授权的macOS阶段才跑OS操作"
+    ],
+    "stop_conditions": [
+      "prerequisite未通过",
+      "需要猜测native私有字段/算法/常量",
+      "需修改allowed_files以外模块接口",
+      "涉及新权限或用户真实应用",
+      "未知结果可能已造成副作用"
+    ],
+    "completion_report": [
+      "changed files",
+      "case IDs and exact commands",
+      "profile",
+      "passed/failed/not-run counts",
+      "remaining UNKNOWN + required evidence"
+    ]
+  },
+  {
+    "module": "ordinary_adapter",
+    "prerequisites": [
+      "transport"
+    ],
+    "allowed_files": [
+      "adapters/src/mcp/ordinary.ts",
+      "tests/unit/ordinary_adapter.*",
+      "tests/contract/ordinary_adapter.*"
+    ],
+    "vector_groups": [
+      "schema",
+      "target",
+      "screenshots",
+      "permissions",
+      "error_propagation"
+    ],
+    "prompt_zh_CN": "仅实现ordinary_adapter模块；先读主工程手册对应工单、向量、证据和profile。先列当前已证接口与UNKNOWN，不要猜常量或新增fallback。为allowed_files内模块写失败测试，再作最小独立实现。不得执行Alma原包或复制专有实现。一次提交只解决此模块，接口变更须停止报告。",
+    "accepted_change": "所选profile的已证契约逐项可观测；测试fixture与产品代码分开；未知能力明确unsupported/unverified；无变更重放",
+    "run_checks": [
+      "运行本仓库格式/类型/编译检查",
+      "执行列出group中与本模块相关全部case，并附case ID→结果",
+      "错误/超时/重复关闭/迟到回调负例不可省略",
+      "只有获授权的macOS阶段才跑OS操作"
+    ],
+    "stop_conditions": [
+      "prerequisite未通过",
+      "需要猜测native私有字段/算法/常量",
+      "需修改allowed_files以外模块接口",
+      "涉及新权限或用户真实应用",
+      "未知结果可能已造成副作用"
+    ],
+    "completion_report": [
+      "changed files",
+      "case IDs and exact commands",
+      "profile",
+      "passed/failed/not-run counts",
+      "remaining UNKNOWN + required evidence"
+    ]
+  },
+  {
+    "module": "sky_adapter",
+    "prerequisites": [
+      "ordinary_adapter"
+    ],
+    "allowed_files": [
+      "adapters/src/mcp/sky.ts",
+      "tests/unit/sky_adapter.*",
+      "tests/contract/sky_adapter.*"
+    ],
+    "vector_groups": [
+      "schema",
+      "state",
+      "diff",
+      "screenshots"
+    ],
+    "prompt_zh_CN": "仅实现sky_adapter模块；先读主工程手册对应工单、向量、证据和profile。先列当前已证接口与UNKNOWN，不要猜常量或新增fallback。为allowed_files内模块写失败测试，再作最小独立实现。不得执行Alma原包或复制专有实现。一次提交只解决此模块，接口变更须停止报告。",
+    "accepted_change": "所选profile的已证契约逐项可观测；测试fixture与产品代码分开；未知能力明确unsupported/unverified；无变更重放",
+    "run_checks": [
+      "运行本仓库格式/类型/编译检查",
+      "执行列出group中与本模块相关全部case，并附case ID→结果",
+      "错误/超时/重复关闭/迟到回调负例不可省略",
+      "只有获授权的macOS阶段才跑OS操作"
+    ],
+    "stop_conditions": [
+      "prerequisite未通过",
+      "需要猜测native私有字段/算法/常量",
+      "需修改allowed_files以外模块接口",
+      "涉及新权限或用户真实应用",
+      "未知结果可能已造成副作用"
+    ],
+    "completion_report": [
+      "changed files",
+      "case IDs and exact commands",
+      "profile",
+      "passed/failed/not-run counts",
+      "remaining UNKNOWN + required evidence"
+    ]
+  },
+  {
+    "module": "element_store",
+    "prerequisites": [
+      "S3"
+    ],
+    "allowed_files": [
+      "native/Sources/CUDaemon/AX/ElementStore.swift",
+      "tests/unit/element_store.*",
+      "tests/contract/element_store.*"
+    ],
+    "vector_groups": [
+      "ref"
+    ],
+    "prompt_zh_CN": "仅实现element_store模块；先读主工程手册对应工单、向量、证据和profile。先列当前已证接口与UNKNOWN，不要猜常量或新增fallback。为allowed_files内模块写失败测试，再作最小独立实现。不得执行Alma原包或复制专有实现。一次提交只解决此模块，接口变更须停止报告。",
+    "accepted_change": "所选profile的已证契约逐项可观测；测试fixture与产品代码分开；未知能力明确unsupported/unverified；无变更重放",
+    "run_checks": [
+      "运行本仓库格式/类型/编译检查",
+      "执行列出group中与本模块相关全部case，并附case ID→结果",
+      "错误/超时/重复关闭/迟到回调负例不可省略",
+      "只有获授权的macOS阶段才跑OS操作"
+    ],
+    "stop_conditions": [
+      "prerequisite未通过",
+      "需要猜测native私有字段/算法/常量",
+      "需修改allowed_files以外模块接口",
+      "涉及新权限或用户真实应用",
+      "未知结果可能已造成副作用"
+    ],
+    "completion_report": [
+      "changed files",
+      "case IDs and exact commands",
+      "profile",
+      "passed/failed/not-run counts",
+      "remaining UNKNOWN + required evidence"
+    ]
+  },
+  {
+    "module": "state_diff",
+    "prerequisites": [
+      "element_store"
+    ],
+    "allowed_files": [
+      "native/Sources/CUDaemon/AX/StateDiff.swift",
+      "tests/unit/state_diff.*",
+      "tests/contract/state_diff.*"
+    ],
+    "vector_groups": [
+      "diff"
+    ],
+    "prompt_zh_CN": "仅实现state_diff模块；先读主工程手册对应工单、向量、证据和profile。先列当前已证接口与UNKNOWN，不要猜常量或新增fallback。为allowed_files内模块写失败测试，再作最小独立实现。不得执行Alma原包或复制专有实现。一次提交只解决此模块，接口变更须停止报告。",
+    "accepted_change": "所选profile的已证契约逐项可观测；测试fixture与产品代码分开；未知能力明确unsupported/unverified；无变更重放",
+    "run_checks": [
+      "运行本仓库格式/类型/编译检查",
+      "执行列出group中与本模块相关全部case，并附case ID→结果",
+      "错误/超时/重复关闭/迟到回调负例不可省略",
+      "只有获授权的macOS阶段才跑OS操作"
+    ],
+    "stop_conditions": [
+      "prerequisite未通过",
+      "需要猜测native私有字段/算法/常量",
+      "需修改allowed_files以外模块接口",
+      "涉及新权限或用户真实应用",
+      "未知结果可能已造成副作用"
+    ],
+    "completion_report": [
+      "changed files",
+      "case IDs and exact commands",
+      "profile",
+      "passed/failed/not-run counts",
+      "remaining UNKNOWN + required evidence"
+    ]
+  },
+  {
+    "module": "coordinate_mapper",
+    "prerequisites": [
+      "S3"
+    ],
+    "allowed_files": [
+      "native/Sources/CUDaemon/Capture/CoordinateMapper.swift",
+      "tests/unit/coordinate_mapper.*",
+      "tests/contract/coordinate_mapper.*"
+    ],
+    "vector_groups": [
+      "screenshots"
+    ],
+    "prompt_zh_CN": "仅实现coordinate_mapper模块；先读主工程手册对应工单、向量、证据和profile。先列当前已证接口与UNKNOWN，不要猜常量或新增fallback。为allowed_files内模块写失败测试，再作最小独立实现。不得执行Alma原包或复制专有实现。一次提交只解决此模块，接口变更须停止报告。",
+    "accepted_change": "所选profile的已证契约逐项可观测；测试fixture与产品代码分开；未知能力明确unsupported/unverified；无变更重放",
+    "run_checks": [
+      "运行本仓库格式/类型/编译检查",
+      "执行列出group中与本模块相关全部case，并附case ID→结果",
+      "错误/超时/重复关闭/迟到回调负例不可省略",
+      "只有获授权的macOS阶段才跑OS操作"
+    ],
+    "stop_conditions": [
+      "prerequisite未通过",
+      "需要猜测native私有字段/算法/常量",
+      "需修改allowed_files以外模块接口",
+      "涉及新权限或用户真实应用",
+      "未知结果可能已造成副作用"
+    ],
+    "completion_report": [
+      "changed files",
+      "case IDs and exact commands",
+      "profile",
+      "passed/failed/not-run counts",
+      "remaining UNKNOWN + required evidence"
+    ]
+  },
+  {
+    "module": "host_outcome",
+    "prerequisites": [
+      "ordinary_adapter"
+    ],
+    "allowed_files": [
+      "host/src/tools/modelOutput.ts",
+      "tests/unit/host_outcome.*",
+      "tests/contract/host_outcome.*"
+    ],
+    "vector_groups": [
+      "error_propagation"
+    ],
+    "prompt_zh_CN": "仅实现host_outcome模块；先读主工程手册对应工单、向量、证据和profile。先列当前已证接口与UNKNOWN，不要猜常量或新增fallback。为allowed_files内模块写失败测试，再作最小独立实现。不得执行Alma原包或复制专有实现。一次提交只解决此模块，接口变更须停止报告。",
+    "accepted_change": "所选profile的已证契约逐项可观测；测试fixture与产品代码分开；未知能力明确unsupported/unverified；无变更重放",
+    "run_checks": [
+      "运行本仓库格式/类型/编译检查",
+      "执行列出group中与本模块相关全部case，并附case ID→结果",
+      "错误/超时/重复关闭/迟到回调负例不可省略",
+      "只有获授权的macOS阶段才跑OS操作"
+    ],
+    "stop_conditions": [
+      "prerequisite未通过",
+      "需要猜测native私有字段/算法/常量",
+      "需修改allowed_files以外模块接口",
+      "涉及新权限或用户真实应用",
+      "未知结果可能已造成副作用"
+    ],
+    "completion_report": [
+      "changed files",
+      "case IDs and exact commands",
+      "profile",
+      "passed/failed/not-run counts",
+      "remaining UNKNOWN + required evidence"
+    ]
+  },
+  {
+    "module": "host_deadline",
+    "prerequisites": [
+      "host_outcome"
+    ],
+    "allowed_files": [
+      "host/src/tools/deadline.ts",
+      "tests/unit/host_deadline.*",
+      "tests/contract/host_deadline.*"
+    ],
+    "vector_groups": [
+      "cancel"
+    ],
+    "prompt_zh_CN": "仅实现host_deadline模块；先读主工程手册对应工单、向量、证据和profile。先列当前已证接口与UNKNOWN，不要猜常量或新增fallback。为allowed_files内模块写失败测试，再作最小独立实现。不得执行Alma原包或复制专有实现。一次提交只解决此模块，接口变更须停止报告。",
+    "accepted_change": "所选profile的已证契约逐项可观测；测试fixture与产品代码分开；未知能力明确unsupported/unverified；无变更重放",
+    "run_checks": [
+      "运行本仓库格式/类型/编译检查",
+      "执行列出group中与本模块相关全部case，并附case ID→结果",
+      "错误/超时/重复关闭/迟到回调负例不可省略",
+      "只有获授权的macOS阶段才跑OS操作"
+    ],
+    "stop_conditions": [
+      "prerequisite未通过",
+      "需要猜测native私有字段/算法/常量",
+      "需修改allowed_files以外模块接口",
+      "涉及新权限或用户真实应用",
+      "未知结果可能已造成副作用"
+    ],
+    "completion_report": [
+      "changed files",
+      "case IDs and exact commands",
+      "profile",
+      "passed/failed/not-run counts",
+      "remaining UNKNOWN + required evidence"
+    ]
+  },
+  {
+    "module": "pip_stack",
+    "prerequisites": [
+      "S1"
+    ],
+    "allowed_files": [
+      "host/src/pip/stack.ts",
+      "tests/unit/pip_stack.*",
+      "tests/contract/pip_stack.*"
+    ],
+    "vector_groups": [
+      "UI"
+    ],
+    "prompt_zh_CN": "仅实现pip_stack模块；先读主工程手册对应工单、向量、证据和profile。先列当前已证接口与UNKNOWN，不要猜常量或新增fallback。为allowed_files内模块写失败测试，再作最小独立实现。不得执行Alma原包或复制专有实现。一次提交只解决此模块，接口变更须停止报告。",
+    "accepted_change": "所选profile的已证契约逐项可观测；测试fixture与产品代码分开；未知能力明确unsupported/unverified；无变更重放",
+    "run_checks": [
+      "运行本仓库格式/类型/编译检查",
+      "执行列出group中与本模块相关全部case，并附case ID→结果",
+      "错误/超时/重复关闭/迟到回调负例不可省略",
+      "只有获授权的macOS阶段才跑OS操作"
+    ],
+    "stop_conditions": [
+      "prerequisite未通过",
+      "需要猜测native私有字段/算法/常量",
+      "需修改allowed_files以外模块接口",
+      "涉及新权限或用户真实应用",
+      "未知结果可能已造成副作用"
+    ],
+    "completion_report": [
+      "changed files",
+      "case IDs and exact commands",
+      "profile",
+      "passed/failed/not-run counts",
+      "remaining UNKNOWN + required evidence"
+    ]
+  },
+  {
+    "module": "computer_pump",
+    "prerequisites": [
+      "pip_stack"
+    ],
+    "allowed_files": [
+      "host/src/pip/computerPump.ts",
+      "tests/unit/computer_pump.*",
+      "tests/contract/computer_pump.*"
+    ],
+    "vector_groups": [
+      "UI"
+    ],
+    "prompt_zh_CN": "仅实现computer_pump模块；先读主工程手册对应工单、向量、证据和profile。先列当前已证接口与UNKNOWN，不要猜常量或新增fallback。为allowed_files内模块写失败测试，再作最小独立实现。不得执行Alma原包或复制专有实现。一次提交只解决此模块，接口变更须停止报告。",
+    "accepted_change": "所选profile的已证契约逐项可观测；测试fixture与产品代码分开；未知能力明确unsupported/unverified；无变更重放",
+    "run_checks": [
+      "运行本仓库格式/类型/编译检查",
+      "执行列出group中与本模块相关全部case，并附case ID→结果",
+      "错误/超时/重复关闭/迟到回调负例不可省略",
+      "只有获授权的macOS阶段才跑OS操作"
+    ],
+    "stop_conditions": [
+      "prerequisite未通过",
+      "需要猜测native私有字段/算法/常量",
+      "需修改allowed_files以外模块接口",
+      "涉及新权限或用户真实应用",
+      "未知结果可能已造成副作用"
+    ],
+    "completion_report": [
+      "changed files",
+      "case IDs and exact commands",
+      "profile",
+      "passed/failed/not-run counts",
+      "remaining UNKNOWN + required evidence"
+    ]
+  },
+  {
+    "module": "fixture_witness",
+    "prerequisites": [
+      "S2"
+    ],
+    "allowed_files": [
+      "tests/macos/",
+      "tests/unit/fixture_witness.*",
+      "tests/contract/fixture_witness.*"
+    ],
+    "vector_groups": [
+      "UI"
+    ],
+    "prompt_zh_CN": "仅实现fixture_witness模块；先读主工程手册对应工单、向量、证据和profile。先列当前已证接口与UNKNOWN，不要猜常量或新增fallback。为allowed_files内模块写失败测试，再作最小独立实现。不得执行Alma原包或复制专有实现。一次提交只解决此模块，接口变更须停止报告。",
+    "accepted_change": "所选profile的已证契约逐项可观测；测试fixture与产品代码分开；未知能力明确unsupported/unverified；无变更重放",
+    "run_checks": [
+      "运行本仓库格式/类型/编译检查",
+      "执行列出group中与本模块相关全部case，并附case ID→结果",
+      "错误/超时/重复关闭/迟到回调负例不可省略",
+      "只有获授权的macOS阶段才跑OS操作"
+    ],
+    "stop_conditions": [
+      "prerequisite未通过",
+      "需要猜测native私有字段/算法/常量",
+      "需修改allowed_files以外模块接口",
+      "涉及新权限或用户真实应用",
+      "未知结果可能已造成副作用"
+    ],
+    "completion_report": [
+      "changed files",
+      "case IDs and exact commands",
+      "profile",
+      "passed/failed/not-run counts",
+      "remaining UNKNOWN + required evidence"
+    ]
+  }
+]

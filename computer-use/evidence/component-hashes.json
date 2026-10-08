@@ -1,0 +1,27 @@
+[
+  {
+    "path": "extracted/Alma.app/Contents/Resources/cli/alma-computer-use-mcp.mjs",
+    "size": 1367381,
+    "sha256": "d157be25e6f87879df47287a727070fd1d223d6e3bfb1addf187eb14bd9fb976"
+  },
+  {
+    "path": "extracted/Alma.app/Contents/Resources/cli/alma",
+    "size": 457791,
+    "sha256": "2f156839ea5aec2eb4bc8bc117ff2bbd0ed73cae00d090ad04ea19266e506eeb"
+  },
+  {
+    "path": "extracted/asar/out/main/index.js",
+    "size": 3130833,
+    "sha256": "df95c2d383730265f251660761a480938989351d2278235366e55366a72c0175"
+  },
+  {
+    "path": "extracted/Alma.app/Contents/Resources/Alma Computer Use.app/Contents/MacOS/AlmaComputerUse",
+    "size": 2415328,
+    "sha256": "453d60872ac801f44497b34d2f68edf7d0fee497420ac44c5d05d785c62b8551"
+  },
+  {
+    "path": "extracted/Alma.app/Contents/Resources/app.asar",
+    "size": 795174904,
+    "sha256": "d95de4f6b73ff9e332c3596902c0774504ebe306877e5098a741259b5f676611"
+  }
+]

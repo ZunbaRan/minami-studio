@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Static native list_apps row contract",
+  "type": "object",
+  "properties": {
+    "bundle": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "name": {
+      "type": "string"
+    },
+    "pid": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "active": {
+      "type": "boolean"
+    },
+    "running": {
+      "type": "boolean"
+    },
+    "path": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "use_count": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "last_used_at": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "intents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "required_params": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "optional_params": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "name",
+          "description",
+          "required_params",
+          "optional_params"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "bundle",
+    "name",
+    "pid",
+    "active",
+    "running",
+    "path",
+    "use_count",
+    "last_used_at",
+    "intents"
+  ],
+  "additionalProperties": false,
+  "x-source": "analysis/native-snapshot/APP_USAGE_CONTRACT.md",
+  "x-note": "Date is default NSISO8601DateFormatter output; native nulls retained; sky adapter has separate schema."
+}

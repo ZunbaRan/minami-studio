@@ -1,0 +1,25 @@
+{
+  "kind": "independent-design-not-observed-alma-defaults",
+  "behaviorProfile": "UNSELECTED",
+  "allowedProfiles": [
+    "alma_0_4_164",
+    "safe_profile"
+  ],
+  "maxNativeFrameBytes": 8388608,
+  "maxImageBytes": 16777216,
+  "maxImagesPerMessage": 4,
+  "maxActiveThreadImageBytes": 134217728,
+  "maxTotalImageCacheBytes": 1073741824,
+  "maxTextLogValueChars": 0,
+  "approvalTimeoutMs": 5000,
+  "defaultRpcTimeoutMs": 20000,
+  "captureRpcTimeoutMs": 30000,
+  "maxConcurrentActionsPerTarget": 1,
+  "liveInputEnabled": false,
+  "mutationAutoRetry": false,
+  "unknownDispatchedOutcome": "unknown",
+  "errorNamespace": "replica.",
+  "cacheEviction": "oldest unreferenced assets only; reject if still over budget",
+  "state": "specified-not-implemented-or-run",
+  "profileSelectionRequired": true
+}

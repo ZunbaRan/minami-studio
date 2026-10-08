@@ -1,0 +1,286 @@
+{
+  "status": "Design fixtures only; not executed against Alma or a clone",
+  "provenance": "Independently authored from static interface behavior. All app IDs and screenshot bytes synthetic.",
+  "cases": [
+    {
+      "id": "click-ref-only",
+      "tool": "click",
+      "input": {
+        "ref": "e7"
+      },
+      "expected_native": {
+        "cmd": "click",
+        "args": {
+          "ref": "e7",
+          "button": "left",
+          "click_count": 1,
+          "strategy": "auto",
+          "show_cursor": true
+        }
+      },
+      "expected_wrapper": "No post-action get_app_state because bundle/PID absent",
+      "evidence": [
+        "MCP.tool.click",
+        "MCP.screenshot"
+      ]
+    },
+    {
+      "id": "click-window-observation-only",
+      "tool": "click",
+      "input": {
+        "x": 30,
+        "y": 40,
+        "bundle": "test.app",
+        "window_id": 42
+      },
+      "expected_native": {
+        "cmd": "click",
+        "args": {
+          "x": 30,
+          "y": 40,
+          "bundle": "test.app",
+          "coord_space": "screenshot",
+          "button": "left",
+          "click_count": 1,
+          "strategy": "auto",
+          "show_cursor": true
+        }
+      },
+      "expected_followup": {
+        "cmd": "get_app_state",
+        "args": {
+          "bundle": "test.app",
+          "window_id": 42,
+          "include_screenshot": true,
+          "interactive_only": true,
+          "depth": 0,
+          "screenshot_max_width": 1280
+        }
+      },
+      "evidence": [
+        "MCP.tool.click",
+        "MCP.screenshot"
+      ]
+    },
+    {
+      "id": "key-suppressed",
+      "tool": "press_key",
+      "input": {
+        "bundle": "test.app",
+        "key": "Left"
+      },
+      "mock_native_data": {
+        "delivered": false,
+        "delivery_note": "synthetic suppression"
+      },
+      "expected_wrapper": "not-delivered text; conditional post-shot; no isError=true",
+      "evidence": [
+        "MCP.tool.press_key"
+      ]
+    },
+    {
+      "id": "key-menu",
+      "tool": "sky_press_key",
+      "input": {
+        "app": "test.app",
+        "key": "Super_L+s"
+      },
+      "expected_native": {
+        "cmd": "press_key",
+        "args": {
+          "bundle": "test.app",
+          "key": "cmd+s"
+        }
+      },
+      "mock_native_data": {
+        "via": "menu_ax_press"
+      },
+      "expected_wrapper": "menu-route summary, then screenshot",
+      "evidence": [
+        "MCP.tool.sky_press_key"
+      ]
+    },
+    {
+      "id": "plain-state-path-only",
+      "tool": "get_app_state",
+      "input": {
+        "bundle": "test.app"
+      },
+      "mock_native_data": {
+        "elements": [],
+        "screenshot": {
+          "path": "synthetic.jpg"
+        }
+      },
+      "expected_wrapper": "Read path; emit image/jpeg block, omit screenshot object from JSON text",
+      "evidence": [
+        "MCP.tool.get_app_state"
+      ]
+    },
+    {
+      "id": "sky-state-path-only",
+      "tool": "sky_get_app_state",
+      "input": {
+        "app": "test.app"
+      },
+      "mock_native_data": {
+        "elements": [],
+        "screenshot": {
+          "path": "synthetic.jpg"
+        }
+      },
+      "expected_wrapper": "single JSON text with screenshot:null; no filesystem read",
+      "evidence": [
+        "MCP.tool.sky_get_app_state"
+      ]
+    },
+    {
+      "id": "sky-state-data-url",
+      "tool": "sky_get_app_state",
+      "input": {
+        "app": "test.app"
+      },
+      "mock_native_data": {
+        "elements": [],
+        "screenshot": {
+          "data_url": "data:image/jpeg;base64,AA==",
+          "url": "alternate"
+        }
+      },
+      "expected_wrapper": "JSON screenshot.url uses data_url; no separate MCP image block",
+      "evidence": [
+        "MCP.tool.sky_get_app_state"
+      ]
+    },
+    {
+      "id": "approval-denied",
+      "tool": "click",
+      "input": {
+        "bundle": "test.app",
+        "ref": "e7"
+      },
+      "mock_approval": {
+        "approved": false
+      },
+      "expected_wrapper": "No daemon call; normal text content, not isError=true",
+      "evidence": [
+        "MCP.approval"
+      ]
+    },
+    {
+      "id": "approval-unavailable",
+      "tool": "click",
+      "input": {
+        "bundle": "test.app",
+        "ref": "e7"
+      },
+      "mock_approval_http_status": 503,
+      "expected_wrapper": "This wrapper proceeds; no claim about outer host/native authorization",
+      "evidence": [
+        "MCP.approval"
+      ]
+    },
+    {
+      "id": "timeout-late-response",
+      "sequence": [
+        "send cmd with id=x",
+        "wait beyond call timeout",
+        "receive ok response id=x"
+      ],
+      "expected_wrapper": "promise rejected once, pending deleted, late response ignored; no retry or cancel frame",
+      "evidence": [
+        "MCP.transport"
+      ]
+    },
+    {
+      "id": "mcp-cancel-inflight",
+      "sequence": [
+        "MCP tool handler starts native call",
+        "notifications/cancelled requestId",
+        "native returns later"
+      ],
+      "expected_wrapper": "SDK suppresses eventual response; no app-level native cancel forwarded",
+      "evidence": [
+        "MCP.sdk-cancel",
+        "MCP.sdk-handler-abort",
+        "MCP.transport"
+      ]
+    },
+    {
+      "id": "diff-carryover",
+      "prior_refs": [
+        "e1",
+        "e2"
+      ],
+      "native_diff_elements": [
+        {
+          "ref": "e2",
+          "role": "AXButton",
+          "title": "changed"
+        },
+        {
+          "ref": "e3",
+          "role": "AXButton",
+          "title": "new"
+        }
+      ],
+      "expected_indices": {
+        "e1": 0,
+        "e2": 1,
+        "e3": 2
+      },
+      "expected_wrapper": "diff text emits only entries1,2; carried e1 not removed by renderer",
+      "evidence": [
+        "MCP.sky-render",
+        "MCP.tool.sky_get_app_state"
+      ]
+    },
+    {
+      "id": "ordinary-v-sky-schema",
+      "tests": [
+        {
+          "tool": "click",
+          "input": {
+            "ref": "e1",
+            "click_count": 4
+          },
+          "expect": "schema rejects above maximum3"
+        },
+        {
+          "tool": "sky_click",
+          "input": {
+            "app": "test.app",
+            "element_index": 0,
+            "click_count": 4
+          },
+          "expect": "schema allows4; index lookup/native may still fail"
+        },
+        {
+          "tool": "scroll",
+          "input": {
+            "ref": "e1",
+            "direction": "down",
+            "pages": 0
+          },
+          "expect": "schema permits0; wrapper defaults1"
+        },
+        {
+          "tool": "sky_scroll",
+          "input": {
+            "app": "test.app",
+            "element_index": 0,
+            "direction": "d",
+            "pages": 0
+          },
+          "expect": "schema permits0; wrapper forwards0"
+        }
+      ],
+      "evidence": [
+        "MCP.tool.click",
+        "MCP.tool.sky_click",
+        "MCP.tool.scroll",
+        "MCP.tool.sky_scroll"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "url": "https://updates.alma.now/alma-0.4.164-mac-arm64.zip",
+  "size": 489040837,
+  "sha256": "2bca9d726ab88e3f68290d0aa82a231cbd0491d2242d6d1ddb638ad7bd236901",
+  "sha512_base64": "lluVfJj9XNV3G0WRVloeWRXMeukHbkvhb+GWIEhMpYguBjQMdjVixvN9Bi/OxTw1EToTVHe1/8hG9EypK2BTSg==",
+  "version": "0.4.164",
+  "platform": "macOS arm64",
+  "type": "official electron-update ZIP"
+}

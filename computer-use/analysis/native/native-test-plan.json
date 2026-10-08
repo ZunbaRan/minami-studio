@@ -1,0 +1,445 @@
+{
+  "schema_version": 1,
+  "status": "test specifications only, not macOS execution results",
+  "tests": [
+    {
+      "id": "REF-01",
+      "module": "ElementStore",
+      "setup": "same PID, CFEqual node, existing e1 from previous snapshot",
+      "action": "beginSnapshot then register same node",
+      "expected": "e1 reused; snapshotId refreshed"
+    },
+    {
+      "id": "REF-02",
+      "module": "ElementStore",
+      "setup": "e1 reused earlier this snapshot",
+      "action": "register same PID+node again",
+      "expected": "do not reuse e1; allocate another available/new ref"
+    },
+    {
+      "id": "REF-03",
+      "module": "ElementStore",
+      "setup": "AXRole returns invalidUIElement for e1",
+      "action": "beginSnapshot",
+      "expected": "e1 removed; later resolve is element_not_found"
+    },
+    {
+      "id": "REF-04",
+      "module": "ElementStore",
+      "setup": "AX destruction callback for e1 element",
+      "action": "notify destruction",
+      "expected": "e1 remains with invalidated=true"
+    },
+    {
+      "id": "REF-05",
+      "module": "ElementStore",
+      "setup": "invalidated e1 descriptor has exactly one match within limits",
+      "action": "resolve e1",
+      "expected": "same ref repaired, same PID, invalidated=false"
+    },
+    {
+      "id": "REF-06",
+      "module": "ElementStore",
+      "setup": "descriptor matches two candidates",
+      "action": "resolve invalidated ref",
+      "expected": "ref_stale; do not select first"
+    },
+    {
+      "id": "REF-07",
+      "module": "ElementStore",
+      "setup": "only candidate visited at node201 or child below depth12",
+      "action": "refetch",
+      "expected": "not found within budget"
+    },
+    {
+      "id": "REF-08",
+      "module": "ElementStore",
+      "setup": "currentSnapshotRefs has e1 and counter nonzero",
+      "action": "clear",
+      "expected": "table/observers empty counter0; currentSnapshotRefs clearing not observed until next beginSnapshot"
+    },
+    {
+      "id": "CLICK-01",
+      "module": "RefActions",
+      "input": {
+        "strategy": "auto",
+        "button": "left",
+        "count": 1,
+        "actions": [
+          "AXConfirm",
+          "AXPick",
+          "AXPress"
+        ]
+      },
+      "expected": "AXPress once, no CGEvent"
+    },
+    {
+      "id": "CLICK-02",
+      "module": "RefActions",
+      "input": {
+        "strategy": "auto",
+        "actions": [
+          "AXPress"
+        ],
+        "perform_error": "failure"
+      },
+      "expected": "throw mapped AX error; no synthetic retry"
+    },
+    {
+      "id": "CLICK-03",
+      "module": "RefActions",
+      "input": {
+        "strategy": "ax",
+        "button": "right",
+        "bounds": [
+          10,
+          20,
+          40,
+          60
+        ]
+      },
+      "expected": "synthetic path; point30,50"
+    },
+    {
+      "id": "CLICK-04",
+      "module": "InputDispatcher",
+      "input": {
+        "count": 2,
+        "active": false,
+        "modifiers": 0
+      },
+      "expected": "down/up pairs with clickCounts1,2; flags0x100000;40ms only between pairs"
+    },
+    {
+      "id": "CLICK-05",
+      "module": "EventFactory",
+      "input": {
+        "global": [
+          200,
+          150
+        ],
+        "window_origin": [
+          100,
+          50
+        ],
+        "window_id": 77
+      },
+      "expected": {
+        "global": [
+          200,
+          150
+        ],
+        "local": [
+          100,
+          100
+        ],
+        "fields91and92": 77
+      }
+    },
+    {
+      "id": "DRAG-01",
+      "module": "InputDispatcher",
+      "input": {
+        "from": [
+          0,
+          0
+        ],
+        "to": [
+          20,
+          10
+        ],
+        "steps": 2
+      },
+      "expected": "down0,0; drag10,5; up20,10;8ms after drag"
+    },
+    {
+      "id": "DRAG-02",
+      "module": "InputDispatcher",
+      "setup": "one intermediate drag event cannot be created",
+      "expected": "skip that intermediate event and continue toward final up"
+    },
+    {
+      "id": "DRAG-03",
+      "module": "InputDispatcher",
+      "setup": "final up cannot be created",
+      "expected": "internal; original unconditional rescue-up not established",
+      "recommended_test": "replacement safety finally emits release"
+    },
+    {
+      "id": "KEY-01",
+      "module": "KeyParser",
+      "input": "Cmd+Shift+A",
+      "expected": {
+        "keyCode": 0,
+        "flags": 1179648
+      }
+    },
+    {
+      "id": "KEY-02",
+      "module": "InputDispatcher",
+      "setup": "AXFocusedWindow exists but app inactive, enabled matching menu shortcut",
+      "expected": "AXPress menu, status menu_ax_press"
+    },
+    {
+      "id": "KEY-03",
+      "module": "InputDispatcher",
+      "setup": "app active but AXFocusedWindow missing",
+      "expected": "CGEvent down/up, status active_app"
+    },
+    {
+      "id": "KEY-04",
+      "module": "InputDispatcher",
+      "setup": "inactive and no enabled matching shortcut",
+      "expected": "suppressed; no key CGEvent"
+    },
+    {
+      "id": "TEXT-01",
+      "module": "KeyboardCodec",
+      "input": "21 ASCII scalar characters in forced Unicode mode",
+      "expected": "2 down/up pairs, payload lengths20 then1"
+    },
+    {
+      "id": "TEXT-02",
+      "module": "KeyboardCodec",
+      "input": "20 emoji scalars in forced Unicode mode",
+      "expected": "one chunk of40 UTF16 code units; no surrogate split"
+    },
+    {
+      "id": "TEXT-03",
+      "module": "KeyboardCodec",
+      "setup": "last input Character lacks layout mapping",
+      "action": "auto text",
+      "expected": "no physical events emitted before whole-string Unicode fallback"
+    },
+    {
+      "id": "TEXT-04",
+      "module": "InputDispatcher",
+      "setup": "physical event construction fails after successful mapping",
+      "expected": "error; no whole-string Unicode retry"
+    },
+    {
+      "id": "TEXT-05",
+      "module": "RefActions",
+      "setup": "AXSelectedText settable but setter fails",
+      "expected": "ref type throws; focused-AX helper instead tries AXValue fallback"
+    },
+    {
+      "id": "TEXT-06",
+      "module": "TypeVerification",
+      "setup": "baseline abc, after unrelated value xyz, typed123",
+      "expected": "landed because value changed; does not prove123 landed"
+    },
+    {
+      "id": "FOCUS-01",
+      "module": "FocusGuard",
+      "setup": "target disallowed but temporary allowance unexpired",
+      "expected": "shouldDrop false"
+    },
+    {
+      "id": "FOCUS-02",
+      "module": "FocusGuard",
+      "setup": "event sentinel matches",
+      "expected": "pass even if data1 PID disallowed"
+    },
+    {
+      "id": "FOCUS-03",
+      "module": "FocusGuard",
+      "setup": "type14 subtype not8",
+      "expected": "pass"
+    },
+    {
+      "id": "FOCUS-04",
+      "module": "FocusGuard",
+      "setup": "action finished at t0",
+      "expected": "guard cleanup scheduled t0+5s; not immediate"
+    },
+    {
+      "id": "DIFF-01",
+      "module": "SnapshotDiff",
+      "setup": "no prior baseline",
+      "input": [
+        {
+          "ref": "e1",
+          "role": "AXButton",
+          "title": "A"
+        }
+      ],
+      "expected": "full elements, isDiff false, baseline saved"
+    },
+    {
+      "id": "DIFF-02",
+      "module": "SnapshotDiff",
+      "setup": "e1 unchanged and e2 removed",
+      "action": "same key apply only e1",
+      "expected": "elements empty, removed_refs e2, unchanged_count1,isDiff true"
+    },
+    {
+      "id": "DIFF-03",
+      "module": "SnapshotDiff",
+      "setup": "e1 bounds x10.1→10.4 all other fields same",
+      "expected": "unchanged under rounded bounds fingerprint"
+    },
+    {
+      "id": "DIFF-04",
+      "module": "SnapshotDiff",
+      "setup": "disabled=true",
+      "expected": "full elements and replaces baseline"
+    },
+    {
+      "id": "COORD-01",
+      "module": "CoordinateMapping",
+      "input": {
+        "origin": [
+          100,
+          50
+        ],
+        "point_size": [
+          800,
+          600
+        ],
+        "pixel_size": [
+          1600,
+          1200
+        ],
+        "pixel": [
+          400,
+          300
+        ]
+      },
+      "expected": [
+        300,
+        200
+      ]
+    },
+    {
+      "id": "COORD-02",
+      "module": "CoordinateMapping",
+      "setup": "same PID second window capture replaces cached map",
+      "expected": "PID lookup uses latest stored map; no window key"
+    },
+    {
+      "id": "LIFE-01",
+      "module": "Transport",
+      "setup": "peer disconnects while synchronous native action is in progress",
+      "expected": "action not proven cancelled; receive loop observes closure only after dispatch returns"
+    },
+    {
+      "id": "VALUE-01",
+      "module": "RefActions",
+      "input": {
+        "value": 123
+      },
+      "expected": "NSNumber numeric payload, not string123"
+    },
+    {
+      "id": "VALUE-02",
+      "module": "RefActions",
+      "setup": "AXValue settable query fails",
+      "expected": "action_unsupported before setting"
+    },
+    {
+      "id": "SELECT-01",
+      "module": "RefActions",
+      "input": {
+        "content": "😀AB",
+        "text": "A",
+        "selection_type": "selection"
+      },
+      "expected": {
+        "CFRange": {
+          "location": 2,
+          "length": 1
+        }
+      }
+    },
+    {
+      "id": "SELECT-02",
+      "module": "RefActions",
+      "input": {
+        "content": "one one",
+        "text": "one"
+      },
+      "expected": {
+        "CFRange": {
+          "location": 0,
+          "length": 3
+        }
+      },
+      "note": "ambiguity is not rejected"
+    },
+    {
+      "id": "SELECT-03",
+      "module": "RefActions",
+      "input": {
+        "content": "one one",
+        "text": "one",
+        "prefix": "one "
+      },
+      "expected": {
+        "CFRange": {
+          "location": 4,
+          "length": 3
+        }
+      }
+    },
+    {
+      "id": "SELECT-04",
+      "module": "RefActions",
+      "input": {
+        "content": "😀AB",
+        "text": "A",
+        "selection_type": "cursor_after"
+      },
+      "expected": {
+        "CFRange": {
+          "location": 3,
+          "length": 0
+        }
+      }
+    },
+    {
+      "id": "SELECT-05",
+      "module": "RefActions",
+      "input": {
+        "content": "AB",
+        "text": "A",
+        "selection_type": "INVALID"
+      },
+      "expected": {
+        "CFRange": {
+          "location": 0,
+          "length": 1
+        }
+      },
+      "note": "native method treats unrecognized string as full selection"
+    },
+    {
+      "id": "SELECT-06",
+      "module": "RefActions",
+      "input": {
+        "content": "AB",
+        "text": "Z"
+      },
+      "expected": "internal; no range write"
+    },
+    {
+      "id": "SPI-01",
+      "module": "EventFactory",
+      "setup": "CGEventPostToPid dlsym missing",
+      "expected": "original helper fatal failure; replacement should capability STOP"
+    },
+    {
+      "id": "SPI-02",
+      "module": "EventFactory",
+      "setup": "CGEventSetWindowLocation dlsym missing",
+      "expected": "original helper no-op local setter; other event fields still set"
+    },
+    {
+      "id": "DIFF-05",
+      "module": "SnapshotDiff",
+      "setup": "full get_app_state baseline then MCP post-action depth0 get_app_state",
+      "expected": "shallow snapshot changes diff baseline; subsequent full snapshot may re-report previously absent refs",
+      "contrast": "direct native snap does not update AppStateDiff"
+    }
+  ]
+}

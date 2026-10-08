@@ -1,0 +1,58 @@
+{
+  "file": "alma_reverse_20261006/extracted/Alma.app/Contents/Resources/Alma Computer Use.app/Contents/MacOS/AlmaComputerUse",
+  "sha256": "453d60872ac801f44497b34d2f68edf7d0fee497420ac44c5d05d785c62b8551",
+  "arch": "arm64",
+  "fat_slice_offset": 1228800,
+  "image_base": "0x100000000",
+  "ranges": [
+    {
+      "purpose": "ActionCursor normalization and expiry",
+      "start_va": "0x10002a0e4",
+      "end_va_exclusive": "0x10002a454",
+      "start_fat_offset": 1401060,
+      "end_fat_offset_exclusive": 1401940
+    },
+    {
+      "purpose": "Lens initialization and enable gate",
+      "start_va": "0x100041a9c",
+      "end_va_exclusive": "0x100042358",
+      "start_fat_offset": 1497756,
+      "end_fat_offset_exclusive": 1499992
+    },
+    {
+      "purpose": "Window capture cursor config",
+      "start_va": "0x10003faf8",
+      "end_va_exclusive": "0x10003fb34",
+      "start_fat_offset": 1489656,
+      "end_fat_offset_exclusive": 1489716
+    },
+    {
+      "purpose": "Display capture cursor config",
+      "start_va": "0x100040460",
+      "end_va_exclusive": "0x100040478",
+      "start_fat_offset": 1492064,
+      "end_fat_offset_exclusive": 1492088
+    },
+    {
+      "purpose": "Lens visibility watcher",
+      "start_va": "0x100047d1c",
+      "end_va_exclusive": "0x100047da0",
+      "start_fat_offset": 1522972,
+      "end_fat_offset_exclusive": 1523104
+    },
+    {
+      "purpose": "Native PiP cursor mapping",
+      "start_va": "0x1000538b8",
+      "end_va_exclusive": "0x100053cb8",
+      "start_fat_offset": 1571000,
+      "end_fat_offset_exclusive": 1572024
+    },
+    {
+      "purpose": "Native stream config",
+      "start_va": "0x10004b288",
+      "end_va_exclusive": "0x10004b304",
+      "start_fat_offset": 1536648,
+      "end_fat_offset_exclusive": 1536772
+    }
+  ]
+}

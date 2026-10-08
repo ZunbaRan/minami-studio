@@ -1,0 +1,94 @@
+[
+  {
+    "name": "launch_app",
+    "line": 35990
+  },
+  {
+    "name": "list_apps",
+    "line": 36011
+  },
+  {
+    "name": "get_app_state",
+    "line": 36029
+  },
+  {
+    "name": "click",
+    "line": 36090
+  },
+  {
+    "name": "perform_secondary_action",
+    "line": 36118
+  },
+  {
+    "name": "drag",
+    "line": 36147
+  },
+  {
+    "name": "type_text",
+    "line": 36177
+  },
+  {
+    "name": "press_key",
+    "line": 36200
+  },
+  {
+    "name": "scroll",
+    "line": 36222
+  },
+  {
+    "name": "set_value",
+    "line": 36244
+  },
+  {
+    "name": "select_text",
+    "line": 36260
+  },
+  {
+    "name": "sky_list_apps",
+    "line": 36294
+  },
+  {
+    "name": "sky_get_app_state",
+    "line": 36312
+  },
+  {
+    "name": "sky_click",
+    "line": 36344
+  },
+  {
+    "name": "sky_press_key",
+    "line": 36369
+  },
+  {
+    "name": "sky_type_text",
+    "line": 36388
+  },
+  {
+    "name": "sky_scroll",
+    "line": 36399
+  },
+  {
+    "name": "sky_set_value",
+    "line": 36419
+  },
+  {
+    "name": "sky_drag",
+    "line": 36430
+  },
+  {
+    "name": "sky_perform_secondary_action",
+    "line": 36448
+  },
+  {
+    "name": "sky_select_text",
+    "line": 36459
+  },
+  {
+    "name": "permissions",
+    "line": 36483
+  },
+  {
+    "name": "grant",
+    "line": 36494
+  }
+]

@@ -1,0 +1,74 @@
+# 原始反汇编节选 auto-input-routing
+
+样本：用户提供 .153 universal helper；本页只用ARM64反汇编。helper SHA256 `b4d8e4257c025650c60d8b173ca51080905ed2f38018c439e1f6bc2a7d7801a3`；ARM64 slice SHA256 `de569c288715c2e12243832aa61a02e671c497784c3d87d6dda9e9fc8d7d3fb4`。原文档路径 `alma-computer-use-0.4.153/evidence/disasm.annot.txt`；全文件SHA256 `543703cdfb815fb3bcab348eff7212e0eb787b7f5d3d3d8a95e7bf2f0ad330e5`。
+
+证据强度：原始二进制的既有带注释反汇编文本（STATIC、NOT_EXECUTED），不是厂商Swift源码，也不是本次运行结果。保留原注释便于复核，但自动字符串注释可能使用陈旧寄存器，结论必须从指令与分支推导。此页不能单独证明 .164 同行为；对应 .164 研究契约与跨版本局部核验分开引用。代码前的行号为原文件行号。
+
+## L32756
+
+### auto先focusedAX再layout再Unicode或physical
+
+原行范围 `32756–32815`（inclusive）；VA `0000000100021010–00000001000210e8`；最近函数符号 `_$s4main13EventDispatchO8pressKey_3pidAC0E8DeliveryOSS_s5Int32VtKFZ:`；原区间SHA256 `3b84fe35471d5a694ca217b4d0efd435a70ede0f4b4e5c6c4ad5e78f0ff067c1`。
+
+```asm
+032756  0000000100021010	bl	0x100089d88 ; symbol stub for: _swift_once
+032757  0000000100021014	b	0x100020854
+032758  _$s4main9KeyParserO5parseyAC6ParsedVSSKFZ:
+032759  0000000100021018	stp	x29, x30, [sp, #-0x10]!
+032760  000000010002101c	mov	x29, sp
+032761  0000000100021020	bl	_$s4main9KeyParserO5parseyAC6ParsedVSSKFZTf4nd_n
+032762  0000000100021024	ldp	x29, x30, [sp], #0x10
+032763  0000000100021028	ret
+032764  _$s4main13EventDispatchO8typeText_3pidySS_s5Int32VtKFZ:
+032765  000000010002102c	str	x22, [sp, #-0x30]!
+032766  0000000100021030	stp	x20, x19, [sp, #0x10]
+032767  0000000100021034	stp	x29, x30, [sp, #0x20]
+032768  0000000100021038	add	x29, sp, #0x20
+032769  000000010002103c	mov	x19, x2
+032770  0000000100021040	mov	x20, x1
+032771  0000000100021044	mov	x22, x0
+032772  0000000100021048	bl	_$s4main13EventDispatchO27typeTextViaFocusedAXElement_3pidSbSS_s5Int32VtKFZTf4nnd_n
+032773  000000010002104c	cbnz	x21, 0x1000210a0
+032774  0000000100021050	tbnz	w0, #0x0, 0x1000210a0
+032775  0000000100021054	mov	x0, x22
+032776  0000000100021058	mov	x1, x20
+032777  000000010002105c	bl	_$s4main24KeyboardLayoutTranslatorO10keyPresses3forSayAC8KeyPressVGSS_tKFZTf4nd_n
+032778  0000000100021060	cbz	x21, 0x100021090
+032779  0000000100021064	mov	x0, x21
+032780  0000000100021068	bl	0x100089ca4 ; symbol stub for: _swift_errorRelease
+032781  000000010002106c	mov	x0, x20
+032782  0000000100021070	bl	0x100089bb4 ; symbol stub for: _swift_bridgeObjectRetain
+032783  0000000100021074	mov	x0, x19
+032784  0000000100021078	mov	x1, x22
+032785  000000010002107c	mov	x2, x20
+032786  0000000100021080	mov	x3, x19
+032787  0000000100021084	mov	x21, #0x0
+032788  0000000100021088	bl	_$s4main13EventDispatchO18withFocusPreserved33_1F83F26BA3567A6E474EB2A8C9435E44LL10activating5style_xs5Int32V_AC0C5StyleOxyKXEtKlFZyt_Tt3g509$s4main13bc29O15typeUnicodeText_3pidySS_s5R13VtKFZyyKXEfU_SSACXMtAITf1nnnc_n
+032789  000000010002108c	b	0x1000210a0
+032790  0000000100021090	mov	x1, x0
+032791  0000000100021094	mov	x0, x19
+032792  0000000100021098	mov	x2, x19
+032793  000000010002109c	bl	_$s4main13EventDispatchO18withFocusPreserved33_1F83F26BA3567A6E474EB2A8C9435E44LL10activating5style_xs5Int32V_AC0C5StyleOxyKXEtKlFZyt_Tt3g509$s4main13bc21O14typeKeyPresses33_1ghijklmno53LL_3pidySayAA24KeyboardLayoutTranslatorO0E5PressVG_s5R13VtKFZyyKXEfU_SayAA24KeyboardLayoutTranslatorO0V5PressVGACXMtAITf1nnnc_n
+032794  00000001000210a0	ldp	x29, x30, [sp, #0x20]
+032795  00000001000210a4	ldp	x20, x19, [sp, #0x10]
+032796  00000001000210a8	ldr	x22, [sp], #0x30
+032797  00000001000210ac	ret
+032798  _$s4main13EventDispatchO27typeTextViaFocusedAXElement_3pidSbSS_s5Int32VtKFZ:
+032799  00000001000210b0	stp	x29, x30, [sp, #-0x10]!
+032800  00000001000210b4	mov	x29, sp
+032801  00000001000210b8	bl	_$s4main13EventDispatchO27typeTextViaFocusedAXElement_3pidSbSS_s5Int32VtKFZTf4nnd_n
+032802  00000001000210bc	and	w0, w0, #0x1
+032803  00000001000210c0	ldp	x29, x30, [sp], #0x10
+032804  00000001000210c4	ret
+032805  _$s4main24KeyboardLayoutTranslatorO10keyPresses3forSayAC8KeyPressVGSS_tKFZ:
+032806  00000001000210c8	stp	x29, x30, [sp, #-0x10]!
+032807  00000001000210cc	mov	x29, sp
+032808  00000001000210d0	bl	_$s4main24KeyboardLayoutTranslatorO10keyPresses3forSayAC8KeyPressVGSS_tKFZTf4nd_n
+032809  00000001000210d4	ldp	x29, x30, [sp], #0x10
+032810  00000001000210d8	ret
+032811  _$s4main13EventDispatchO15typeUnicodeText_3pidySS_s5Int32VtKFZ:
+032812  00000001000210dc	str	x22, [sp, #-0x30]!
+032813  00000001000210e0	stp	x20, x19, [sp, #0x10]
+032814  00000001000210e4	stp	x29, x30, [sp, #0x20]
+032815  00000001000210e8	add	x29, sp, #0x20
+```

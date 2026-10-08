@@ -1,0 +1,32 @@
+{
+  "old_version": "0.4.153",
+  "old_evidence": "2026-10-07: user-provided .153 helper and MCP raw bytes verified; original .153 host/registration/CLI remain metadata-only in this input set",
+  "source_url": "https://github.com/ZunbaRan/agent-research-artifact/blob/36ac0d71817b31449e2e0db2ba9021a963a173c9/docs/plans/computer-use-alma-parity/2026-10-02_reverse-alma-computer-use-report.md",
+  "old_components": {
+    "host-main": {
+      "bytes": 3101237,
+      "sha256": "052e2dc61ab5168f5badc72300fbaac89b39428cf38515f0e7114d663e214bb0"
+    },
+    "registration": {
+      "bytes": 2589,
+      "sha256": "2cb387b00712d377a29523330d183cd2eabff3353a57f6f921bab57d4cbca840"
+    },
+    "mcp": {
+      "bytes": 1367381,
+      "sha256": "d157be25e6f87879df47287a727070fd1d223d6e3bfb1addf187eb14bd9fb976"
+    },
+    "cli": {
+      "bytes": 455943,
+      "sha256": "9abaee6b100bca194af9168d35e3ec732a6203decd8c73138d0b48d2c1915037"
+    },
+    "native-fat": {
+      "bytes": 2376512,
+      "sha256": "b4d8e4257c025650c60d8b173ca51080905ed2f38018c439e1f6bc2a7d7801a3"
+    }
+  },
+  "current_version": "0.4.164",
+  "current_components_source": "evidence/component-hashes.json",
+  "conclusion": "Only MCP entrypoint SHA256 equal; no behavioral change attribution from differing hashes alone",
+  "mcp_byte_identity_verified": true,
+  "native_equivalence": "Both universal helpers differ in both slices. Bounded symbol comparison is not whole-program semantic equivalence."
+}

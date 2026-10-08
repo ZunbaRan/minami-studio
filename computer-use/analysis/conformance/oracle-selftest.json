@@ -1,0 +1,10 @@
+{
+  "status": "PASS_CHECKER_SELFTEST_ONLY",
+  "case_count": 39,
+  "tests": [
+    "all expected synthetic projections accepted",
+    "missing case fails"
+  ],
+  "product_observations": 0,
+  "warning": "Expected projections used only to test comparator mechanics; not product validation."
+}

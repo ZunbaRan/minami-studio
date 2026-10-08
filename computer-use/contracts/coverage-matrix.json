@@ -1,0 +1,216 @@
+{
+  "kind": "cross-layer-original-evidence-and-runtime-gap-matrix",
+  "product_tests_run": 0,
+  "capabilities": [
+    {
+      "capability": "样本同一性",
+      "static_evidence": "S1 下载hash与feed及ASAR integrity一致",
+      "unknown_boundary": "Apple签名/公证信任",
+      "next_required_observation": "在授权Mac只读codesign/spctl核验当前同hash app并记录结果",
+      "product_runtime_status": "NOT_RUN"
+    },
+    {
+      "capability": "23 MCP schema",
+      "static_evidence": "S1 protocol-catalog及34 source locators",
+      "unknown_boundary": "运行SDK未知属性处理",
+      "next_required_observation": "用fake daemon跑schema排列，区分schema通过与handler拒绝",
+      "product_runtime_status": "NOT_RUN"
+    },
+    {
+      "capability": "CLI命令",
+      "static_evidence": "S1 cli-command-catalog位置参数/flags/HTTP顺序",
+      "unknown_boundary": "终端实际退出/网络挂起",
+      "next_required_observation": "每cmd用fakeHTTP观察body/stdout/stderr/exit，不触真实app",
+      "product_runtime_status": "NOT_RUN"
+    },
+    {
+      "capability": "native wire",
+      "static_evidence": "S1 WIRE_SCHEMA类型/null/省略/错误",
+      "unknown_boundary": "数值极值跨语言细节",
+      "next_required_observation": "numeric id、args null/array、nested null、encoding fallback goldens",
+      "product_runtime_status": "NOT_RUN"
+    },
+    {
+      "capability": "45 native dispatch",
+      "static_evidence": "S1 DISPATCH_INVENTORY地址链",
+      "unknown_boundary": "部分extra handler完整契约",
+      "next_required_observation": "按extra-command表标SUPPORTED/PARTIAL/STOP，不自动注册未闭合能力",
+      "product_runtime_status": "NOT_RUN"
+    },
+    {
+      "capability": "JSONL客户端",
+      "static_evidence": "S1 pending/id/超时/late/close",
+      "unknown_boundary": "残帧重连实际表现",
+      "next_required_observation": "UTF8分片、半行断连、未知/乱序id，确认不重放mutation",
+      "product_runtime_status": "NOT_RUN"
+    },
+    {
+      "capability": "native服务调度",
+      "static_evidence": "S1 多peer并发、单peer同步",
+      "unknown_boundary": "OS动作交错与共享state",
+      "next_required_observation": "两连接在beginSnapshot/register间设受控屏障并比ref状态",
+      "product_runtime_status": "NOT_RUN"
+    },
+    {
+      "capability": "idle",
+      "static_evidence": "S1 CLI900s、initializer/help600s、30s检查",
+      "unknown_boundary": "在途动作与退出时序",
+      "next_required_observation": "虚拟clock检查strict超过；热键保持；真实退出观察pending",
+      "product_runtime_status": "NOT_RUN"
+    },
+    {
+      "capability": "AppUsage与intent metadata",
+      "static_evidence": "S1 Spotlight2s/query/merge/sort、7bundle15intent",
+      "unknown_boundary": "Spotlight实效与URL builder扩展",
+      "next_required_observation": "重复bundle旧history覆盖count/date、active/running优先、精确case lookup",
+      "product_runtime_status": "NOT_RUN"
+    },
+    {
+      "capability": "ForbiddenTargets",
+      "static_evidence": "S1 18精确bundle与11cmd gate",
+      "unknown_boundary": "其它层policy/OS拒绝实效",
+      "next_required_observation": "fake identity大小写、nilPID/ref mismatch；不操作系统隐私UI",
+      "product_runtime_status": "NOT_RUN"
+    },
+    {
+      "capability": "AX遍历",
+      "static_evidence": "S1 preorder、16role、depth、wakeups",
+      "unknown_boundary": "app异常AX响应",
+      "next_required_observation": "fixture过滤父/交互子、depth0/1、缺window与4次attempt",
+      "product_runtime_status": "NOT_RUN"
+    },
+    {
+      "capability": "AX字段序列化",
+      "static_evidence": "S1 六必需七可选、title/value/default链",
+      "unknown_boundary": "Foundation桥接异常",
+      "next_required_observation": "空title/help、NSNumber、NSAttributedString、坏AXTitleUIElement负例",
+      "product_runtime_status": "NOT_RUN"
+    },
+    {
+      "capability": "ref生命周期",
+      "static_evidence": "S1 table复用/销毁invalidated/恢复界限",
+      "unknown_boundary": "app退出/跨连接竞态",
+      "next_required_observation": "同PID同CFEqual、销毁、重建唯一/重复、201节点及12层",
+      "product_runtime_status": "NOT_RUN"
+    },
+    {
+      "capability": "diff",
+      "static_evidence": "S1 固定10字段+整像素bounds、removed_refs",
+      "unknown_boundary": "极值与Swift描述跨版本",
+      "next_required_observation": "full→delta→remove→disable reset，并单独测±0.5边界",
+      "product_runtime_status": "NOT_RUN"
+    },
+    {
+      "capability": "shallow状态",
+      "static_evidence": "S1 MCP补图get_app_state会diff；snap不diff",
+      "unknown_boundary": "交错更新消费端影响",
+      "next_required_observation": "三步连续调用确认基线与ref generation，不能重建新实例",
+      "product_runtime_status": "NOT_RUN"
+    },
+    {
+      "capability": "capture",
+      "static_evidence": "S1 SCK window路径、quality/scale/14分支",
+      "unknown_boundary": "多DPI与实际OS限制",
+      "next_required_observation": "四角标记误差≤1 screenshot pixel；13明确unsupported或新降级",
+      "product_runtime_status": "NOT_RUN"
+    },
+    {
+      "capability": "SCK cache",
+      "static_evidence": "S1 actor2s/30s、singleflight、missing重试",
+      "unknown_boundary": "await取消/并发error身份",
+      "next_required_observation": "两joiner一个失败、TTL边界、窗口消失再现并追task结果",
+      "product_runtime_status": "NOT_RUN"
+    },
+    {
+      "capability": "screenshot mapping",
+      "static_evidence": "S1 PID key、AX bounds+图像pixel尺寸",
+      "unknown_boundary": "移动/换窗/PID复用",
+      "next_required_observation": "同PID两window切换与失败截图，观察陈旧mapping不得默改结果",
+      "product_runtime_status": "NOT_RUN"
+    },
+    {
+      "capability": "OCR",
+      "static_evidence": "S1 raw AX≤1且抓图成功触发，80上限",
+      "unknown_boundary": "Vision识别/缓存陈旧命中",
+      "next_required_observation": "raw2且diff0不OCR；raw0/1 OCR；空OCR保留旧v表",
+      "product_runtime_status": "NOT_RUN"
+    },
+    {
+      "capability": "v ref可达",
+      "static_evidence": "S1 native要求pid/bundle，MCP ref分支丢目标",
+      "unknown_boundary": "不存在自动补目标支持",
+      "next_required_observation": "ref=v1+bundle经普通MCP应invalid_arg；坐标路径单独通过",
+      "product_runtime_status": "NOT_RUN"
+    },
+    {
+      "capability": "AX动作",
+      "static_evidence": "S1 click/secondary/type/press/scroll/set/select分支",
+      "unknown_boundary": "各app支持/真实效果",
+      "next_required_observation": "受控控件计数/值/selection精确断言，失败不双重投递",
+      "product_runtime_status": "NOT_RUN"
+    },
+    {
+      "capability": "pointer SPI",
+      "static_evidence": "S1 字段/ABI/target window/Command位/步骤",
+      "unknown_boundary": "私有SPI跨OS/丢事件",
+      "next_required_observation": "先只读feature probe，再fixture接收端与前台旁路见证",
+      "product_runtime_status": "NOT_RUN"
+    },
+    {
+      "capability": "keyboard/text",
+      "static_evidence": "S1 parser/layout/scalar分块/菜单fallback",
+      "unknown_boundary": "IME/SecureInput/目标app",
+      "next_required_observation": "emoji21scalar、布局失败、disabled menu与suppressed",
+      "product_runtime_status": "NOT_RUN"
+    },
+    {
+      "capability": "焦点防护",
+      "static_evidence": "S1 tap mask/sentinel/5s尾期/健康",
+      "unknown_boundary": "零瞬时焦点抢占",
+      "next_required_observation": "foreground通知与连续旁路输入；重叠动作、tap失效、人工切换",
+      "product_runtime_status": "NOT_RUN"
+    },
+    {
+      "capability": "权限",
+      "static_evidence": "S1 MCP gate、host ledger、TCC分层",
+      "unknown_boundary": "真实签名身份和OS授权体验",
+      "next_required_observation": "严格拒绝/服务坏响应/PID-only/ref-only，TCC分别拒绝",
+      "product_runtime_status": "NOT_RUN"
+    },
+    {
+      "capability": "取消",
+      "static_evidence": "S1 signal未端到端、disconnect不撤同步dispatch",
+      "unknown_boundary": "异步系统回调最终副作用",
+      "next_required_observation": "predispatch/during/postshot取消，记录接收端与unknown，不重放",
+      "product_runtime_status": "NOT_RUN"
+    },
+    {
+      "capability": "模型图片/错误",
+      "static_evidence": "S1 isError损失、image block、2600/600压缩",
+      "unknown_boundary": "具体provider最终处理",
+      "next_required_observation": "text-only/vision及PTC raw对照，图片/AX/error逐层记录",
+      "product_runtime_status": "NOT_RUN"
+    },
+    {
+      "capability": "Electron PiP",
+      "static_evidence": "S1 stack/滑动600s/420ms/双循环",
+      "unknown_boundary": "关闭晚完成、resource leak",
+      "next_required_observation": "持续活动>10min、同/异thread、多个items、4s忙超时晚完成",
+      "product_runtime_status": "NOT_RUN"
+    },
+    {
+      "capability": "原生 Lens/PiP",
+      "static_evidence": "S1 光标8s、门控、center-fit+yflip",
+      "unknown_boundary": "Spaces/锁屏/遮挡/observer",
+      "next_required_observation": "模拟cursor与硬件轨迹分离，多session关闭与跨screen",
+      "product_runtime_status": "NOT_RUN"
+    },
+    {
+      "capability": "Appshot",
+      "static_evidence": "S1 guard/IPC/715ms/1100ms/context规则",
+      "unknown_boundary": "热键/TCC/多屏动画实效",
+      "next_required_observation": "重复key、重arm、early/late AX、附件读/上传失败且不自动发送",
+      "product_runtime_status": "NOT_RUN"
+    }
+  ]
+}

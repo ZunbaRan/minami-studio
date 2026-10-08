@@ -1,0 +1,5 @@
+.build/
+bin/agent-computer-use
+alma-computer-use-archive/
+*.zip
+.DS_Store

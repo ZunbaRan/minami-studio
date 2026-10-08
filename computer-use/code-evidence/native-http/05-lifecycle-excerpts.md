@@ -1,0 +1,185 @@
+# 服务生命周期与令牌文件原始片段
+
+这是原始 `.153 arm64` 注释反汇编的有界摘录，不是可编译源码、重建实现或运行日志。只在行前加原始行号；原指令和原注释未改写。完整 SDK、二进制及产品 prompt 不随交付复制。
+
+- 原始路径：`comparison_cu_inputs/extracted/alma-computer-use-0.4.153-reconstruction/alma-computer-use-0.4.153/evidence/disasm.annot.txt`
+- 整文件 SHA256：`543703cdfb815fb3bcab348eff7212e0eb787b7f5d3d3d8a95e7bf2f0ad330e5`
+- 版本：Alma 0.4.153；VA 均为未 slide 的 arm64 地址
+- 证据强度：P153，直接原始静态证据；证明列出的指令和控制流，不代表动态验收
+
+## 启动写 token 文件的唯一直接调用点
+
+- 原始行：84761–84784
+- 符号：`_$s4main9MCPServerC5start6daemon4port13tokenFilePathSDySSypSgGAA6DaemonC_s6UInt16VSgSSSgtKF`
+- 片段 VA：`0x1000528f8–0x100052954`
+- 摘录内容 SHA256（不含新增行号，逐行 LF，末尾 LF）：`d8eb0304617c168c411afeb74c19171f245ca316596500010d88f14f40a05d5e`
+
+```asm
+84761: 00000001000528f8	bl	0x100089bb4 ; symbol stub for: _swift_bridgeObjectRetain
+84762: 00000001000528fc	mov	x0, x19
+84763: 0000000100052900	mov	x1, x26
+84764: 0000000100052904	mov	x2, x21
+84765: 0000000100052908	mov	x3, x24
+84766: 000000010005290c	ldur	x21, [x29, #-0x48]
+84767: 0000000100052910	bl	_$s4main9MCPServerC14writeTokenFile33_6C068AD0977CC296278B01659FDD0FC7LL4path5tokenySS_SStKFZTf4nnd_n
+84768: 0000000100052914	mov	x19, x21
+84769: 0000000100052918	mov	x0, x26
+84770: 000000010005291c	bl	0x100089b9c ; symbol stub for: _swift_bridgeObjectRelease
+84771: 0000000100052920	mov	x0, x24
+84772: 0000000100052924	bl	0x100089b9c ; symbol stub for: _swift_bridgeObjectRelease
+84773: 0000000100052928	stur	x19, [x29, #-0x48]
+84774: 000000010005292c	cbnz	x19, 0x100052b3c
+84775: 0000000100052930	ldp	x8, x9, [x20, #0x68]
+84776: 0000000100052934	and	x8, x8, #0xffffffffffff
+84777: 0000000100052938	ubfx	x10, x9, #56, #4
+84778: 000000010005293c	tst	x9, #0x2000000000000000
+84779: 0000000100052940	csel	x8, x8, x10, eq
+84780: 0000000100052944	cbnz	x8, 0x1000529b0
+84781: 0000000100052948	bl	_$s4main9MCPServerC13generateToken33_6C068AD0977CC296278B01659FDD0FC7LLSSyFZTf4d_n
+84782: 000000010005294c	mov	x2, x0
+84783: 0000000100052950	mov	x19, x1
+84784: 0000000100052954	mov	w0, #0x20
+```
+
+## TCP 明确选择 loopback interface
+
+- 原始行：84808–84826
+- 符号：`_$s4main9MCPServerC5start6daemon4port13tokenFilePathSDySSypSgGAA6DaemonC_s6UInt16VSgSSSgtKF`
+- 片段 VA：`0x1000529b4–0x1000529fc`
+- 摘录内容 SHA256（不含新增行号，逐行 LF，末尾 LF）：`04420388118c1718461e15825eb591691f1558ea37c938c2d0ee252d4390d247`
+
+```asm
+84808: 00000001000529b4	mov	x0, #0x0
+84809: 00000001000529b8	bl	0x100088c78 ; symbol stub for: _$s7Network12NWParametersCMa
+84810: 00000001000529bc	mov	x20, x0
+84811: 00000001000529c0	bl	0x100088c6c ; symbol stub for: _$s7Network12NWParametersC3tcpACvgZ
+84812: 00000001000529c4	mov	x20, x0
+84813: 00000001000529c8	adrp	x8, 79 ; 0x1000a1000
+84814: 00000001000529cc	ldr	x8, [x8, #0x350] ; literal pool symbol address: _$s7Network11NWInterfaceV13InterfaceTypeO8loopbackyA2EmFWC
+84815: 00000001000529d0	ldr	w1, [x8]
+84816: 00000001000529d4	sub	x8, x29, #0x8
+84817: 00000001000529d8	ldur	x8, [x8, #-0x100]
+84818: 00000001000529dc	ldr	x8, [x8, #0x68]
+84819: 00000001000529e0	sub	x9, x29, #0x10
+84820: 00000001000529e4	ldur	x19, [x9, #-0x100]
+84821: 00000001000529e8	mov	x0, x19
+84822: 00000001000529ec	ldur	x2, [x29, #-0x100]
+84823: 00000001000529f0	blr	x8
+84824: 00000001000529f4	mov	x0, x19
+84825: 00000001000529f8	mov	x26, x20
+84826: 00000001000529fc	bl	0x100088c60 ; symbol stub for: _$s7Network12NWParametersC21requiredInterfaceTypeAA11NWInterfaceV0dE0Ovs
+```
+
+## 启动超时2秒错误
+
+- 原始行：85038–85063
+- 符号：`_$s4main9MCPServerC5start6daemon4port13tokenFilePathSDySSypSgGAA6DaemonC_s6UInt16VSgSSSgtKF`
+- 片段 VA：`0x100052d4c–0x100052db0`
+- 摘录内容 SHA256（不含新增行号，逐行 LF，末尾 LF）：`74f1998bec44b6c7cd64cb7ee43064740b846d1950bac6f2422d858af9e2f86d`
+
+```asm
+85038: 0000000100052d4c	bl	0x100088bd0 ; symbol stub for: _$s7Network10NWListenerC6cancelyyF
+85039: 0000000100052d50	ldur	x20, [x29, #-0x98]
+85040: 0000000100052d54	mov	x0, x19
+85041: 0000000100052d58	bl	0x100089da0 ; symbol stub for: _swift_release
+85042: 0000000100052d5c	ldr	x0, [x20, #0x18]
+85043: 0000000100052d60	b	0x100052d68
+85044: 0000000100052d64	mov	x0, #0x0
+85045: 0000000100052d68	ldur	x19, [x29, #-0xc8]
+85046: 0000000100052d6c	ldp	x25, x24, [x29, #-0xe0]
+85047: 0000000100052d70	str	xzr, [x20, #0x18]
+85048: 0000000100052d74	bl	0x100089da0 ; symbol stub for: _swift_release
+85049: 0000000100052d78	adrp	x8, 62 ; 0x100090000
+85050: 0000000100052d7c	add	x8, x8, #0xae0 ; literal pool for: "MCP listener failed to bind within 2s"   ; "MCP listener failed to bind within 2s"
+85051: 0000000100052d80	sub	x9, x8, #0x20
+85052: 0000000100052d84	mov	x10, #0x12
+85053: 0000000100052d88	movk	x10, #0xd000, lsl #48
+85054: 0000000100052d8c	sub	x8, x29, #0x88
+85055: 0000000100052d90	add	x0, x10, #0x13
+85056: 0000000100052d94	orr	x1, x9, #0x8000000000000000
+85057: 0000000100052d98	bl	_$s4main7CUErrorV13internalErroryACSSFZ
+85058: 0000000100052d9c	bl	_$s4main7CUErrorVACs5ErrorAAWl
+85059: 0000000100052da0	mov	x1, x0
+85060: 0000000100052da4	adrp	x0, 79 ; 0x1000a1000
+85061: 0000000100052da8	add	x0, x0, #0x690
+85062: 0000000100052dac	mov	x2, #0x0
+85063: 0000000100052db0	mov	w3, #0x0
+```
+
+## stop listener nil 与 boundPort 归零
+
+- 原始行：85688–85714
+- 符号：`_$s4main9MCPServerC4stopyyF`
+- 片段 VA：`0x100053758–0x1000537c0`
+- 摘录内容 SHA256（不含新增行号，逐行 LF，末尾 LF）：`1b0ffdafca7ee2ed88c7322f7b0bce70e27cfb7a055cc5be5e1775c387996d15`
+
+```asm
+85688: 0000000100053758	bl	0x1000899a4 ; symbol stub for: __Block_release
+85689: 000000010005375c	adrp	x1, 59 ; 0x10008e000
+85690: 0000000100053760	add	x1, x1, #0x978 ; literal pool for: ""
+85691: 0000000100053764	mov	x0, x21
+85692: 0000000100053768	mov	w2, #0x4f
+85693: 000000010005376c	mov	w3, #0xb6
+85694: 0000000100053770	mov	w4, #0x14
+85695: 0000000100053774	mov	w5, #0x1
+85696: 0000000100053778	bl	0x100089d58 ; symbol stub for: _swift_isEscapingClosureAtFileLocation
+85697: 000000010005377c	mov	x20, x0
+85698: 0000000100053780	mov	x0, x21
+85699: 0000000100053784	bl	0x100089da0 ; symbol stub for: _swift_release
+85700: 0000000100053788	tbnz	w20, #0x0, 0x1000537e0
+85701: 000000010005378c	ldr	x20, [x19, #0x18]
+85702: 0000000100053790	cbz	x20, 0x1000537b0
+85703: 0000000100053794	mov	x0, x20
+85704: 0000000100053798	bl	0x100089db8 ; symbol stub for: _swift_retain
+85705: 000000010005379c	bl	0x100088bd0 ; symbol stub for: _$s7Network10NWListenerC6cancelyyF
+85706: 00000001000537a0	mov	x0, x20
+85707: 00000001000537a4	bl	0x100089da0 ; symbol stub for: _swift_release
+85708: 00000001000537a8	ldr	x0, [x19, #0x18]
+85709: 00000001000537ac	b	0x1000537b4
+85710: 00000001000537b0	mov	x0, #0x0
+85711: 00000001000537b4	str	xzr, [x19, #0x18]
+85712: 00000001000537b8	bl	0x100089da0 ; symbol stub for: _swift_release
+85713: 00000001000537bc	strh	wzr, [x19, #0x48]
+85714: 00000001000537c0	mov	x0, x19
+```
+
+## 写 token 后 chmod0600
+
+- 原始行：104011–104040
+- 符号：`_$s4main9MCPServerC14writeTokenFile33_6C068AD0977CC296278B01659FDD0FC7LL4path5tokenySS_SStKFZTf4nnd_n`
+- 片段 VA：`0x1000653b0–0x100065420`
+- 摘录内容 SHA256（不含新增行号，逐行 LF，末尾 LF）：`4938032b50a0081e09266ee2ff0a196b11875cf372a8a641c0a209e51db8daa0`
+
+```asm
+104011: 00000001000653b0	bl	0x100088984 ; symbol stub for: _$s10Foundation22_convertNSErrorToErrorys0E0_pSo0C0CSgF
+104012: 00000001000653b4	mov	x20, x0
+104013: 00000001000653b8	mov	x0, x22
+104014: 00000001000653bc	bl	0x100089ad0 ; symbol stub for: _objc_release
+104015: 00000001000653c0	mov	x21, x20
+104016: 00000001000653c4	bl	0x100089ed8 ; symbol stub for: _swift_willThrow
+104017: 00000001000653c8	mov	x0, x24
+104018: 00000001000653cc	mov	x1, x19
+104019: 00000001000653d0	blr	x23
+104020: 00000001000653d4	b	0x100065410
+104021: 00000001000653d8	mov	x0, x28
+104022: 00000001000653dc	mov	x1, x25
+104023: 00000001000653e0	bl	_$s10Foundation4DataV15_RepresentationOSgWOe
+104024: 00000001000653e4	ldp	x0, x1, [x29, #-0x90]
+104025: 00000001000653e8	bl	0x100088dec ; symbol stub for: _$sSS11utf8CStrings15ContiguousArrayVys4Int8VGvg
+104026: 00000001000653ec	mov	x22, x0
+104027: 00000001000653f0	add	x0, x0, #0x20
+104028: 00000001000653f4	mov	w1, #0x180
+104029: 00000001000653f8	bl	0x1000899f8 ; symbol stub for: _chmod
+104030: 00000001000653fc	mov	x0, x24
+104031: 0000000100065400	mov	x1, x19
+104032: 0000000100065404	blr	x23
+104033: 0000000100065408	mov	x0, x22
+104034: 000000010006540c	bl	0x100089da0 ; symbol stub for: _swift_release
+104035: 0000000100065410	ldur	x8, [x29, #-0x58]
+104036: 0000000100065414	adrp	x9, 59 ; 0x1000a0000
+104037: 0000000100065418	ldr	x9, [x9, #0x340] ; literal pool symbol address: ___stack_chk_guard   ; "`"
+104038: 0000000100065418	ldr	x9, [x9, #0x340] ; literal pool symbol address: ___stack_chk_guard
+104039: 000000010006541c	ldr	x9, [x9]
+104040: 0000000100065420	cmp	x9, x8
+```
+

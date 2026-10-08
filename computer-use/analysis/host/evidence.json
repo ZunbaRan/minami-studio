@@ -1,0 +1,126 @@
+[
+  {
+    "file": "extracted/asar/out/main/index.js",
+    "bytes": 3130833,
+    "sha256": "df95c2d383730265f251660761a480938989351d2278235366e55366a72c0175",
+    "markers": [
+      {
+        "anchor": "function Gp()",
+        "char_offset": 531459,
+        "byte_offset": 532978
+      },
+      {
+        "anchor": "const Xp=",
+        "char_offset": 532096,
+        "byte_offset": 533615
+      },
+      {
+        "anchor": "async call(e,t={},n=2e4)",
+        "char_offset": 534776,
+        "byte_offset": 536295
+      },
+      {
+        "anchor": "async ensureConnected()",
+        "char_offset": 535306,
+        "byte_offset": 536825
+      },
+      {
+        "anchor": "wireSocket(t)",
+        "char_offset": 536202,
+        "byte_offset": 537721
+      },
+      {
+        "anchor": "spawnDaemon(t)",
+        "char_offset": 535623,
+        "byte_offset": 537142
+      },
+      {
+        "anchor": "function aE(e,t)",
+        "char_offset": 727873,
+        "byte_offset": 729545
+      },
+      {
+        "anchor": "function Qk(e,t)",
+        "char_offset": 750749,
+        "byte_offset": 752520
+      },
+      {
+        "anchor": "function eT(e)",
+        "char_offset": 754554,
+        "byte_offset": 756329
+      },
+      {
+        "anchor": "async callTool(e,t,n)",
+        "char_offset": 1049678,
+        "byte_offset": 1051817
+      },
+      {
+        "anchor": "getMCPToolSet()",
+        "char_offset": 1050212,
+        "byte_offset": 1052351
+      },
+      {
+        "anchor": "setupMiddleware()",
+        "char_offset": 2223420,
+        "byte_offset": 2239426
+      },
+      {
+        "anchor": "externalizeToolImages(e)",
+        "char_offset": 2232203,
+        "byte_offset": 2248213
+      },
+      {
+        "anchor": "async rehydrateToolImagesForModel(e)",
+        "char_offset": 2232807,
+        "byte_offset": 2248817
+      },
+      {
+        "anchor": "stopGeneration(e,t)",
+        "char_offset": 2527743,
+        "byte_offset": 2544245
+      },
+      {
+        "anchor": "UJ=[",
+        "char_offset": 2201394,
+        "byte_offset": 2217394
+      },
+      {
+        "anchor": "/api/computer-use/check_approval",
+        "char_offset": 2268124,
+        "byte_offset": 2284146
+      },
+      {
+        "anchor": "/api/computer-use/action_log",
+        "char_offset": 2268763,
+        "byte_offset": 2284785
+      },
+      {
+        "anchor": "this.server.listen(this.port,\"127.0.0.1\"",
+        "char_offset": 2770714,
+        "byte_offset": 2788339
+      },
+      {
+        "anchor": "registerComputerUseMCPServer",
+        "char_offset": 2768549,
+        "byte_offset": 2786174
+      },
+      {
+        "anchor": "const qm=",
+        "char_offset": 596052,
+        "byte_offset": 597571
+      }
+    ]
+  },
+  {
+    "file": "extracted/asar/out/preload/index.js",
+    "bytes": 25411,
+    "sha256": "41d68ca7d15ec9bf421527015b435fcd236810c3f716f30d7965832880d11ef6",
+    "markers": []
+  },
+  {
+    "file": "extracted/asar/out/main/chunks/computer-use-register-B_NFTJR3.js",
+    "bytes": 2589,
+    "sha256": "84ab2b91ab1e59f93534523d30c0f86dd588852059bd9496b2efaf2a74352425",
+    "markers": []
+  }
+]

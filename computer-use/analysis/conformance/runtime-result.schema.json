@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "case_id",
+    "run_id",
+    "profile",
+    "implementation",
+    "environment",
+    "result",
+    "witness_files",
+    "dispatch_count",
+    "limitations"
+  ],
+  "properties": {
+    "case_id": {
+      "type": "string"
+    },
+    "run_id": {
+      "type": "string"
+    },
+    "profile": {
+      "enum": [
+        "alma_0_4_164",
+        "safe_profile"
+      ]
+    },
+    "implementation": {
+      "type": "object",
+      "required": [
+        "version_or_commit",
+        "sha256_manifest"
+      ]
+    },
+    "environment": {
+      "type": "object",
+      "required": [
+        "macOS_build",
+        "architecture",
+        "display_layout",
+        "permissions",
+        "fixture_version"
+      ]
+    },
+    "result": {
+      "enum": [
+        "PASS",
+        "FAIL",
+        "INCONCLUSIVE",
+        "UNSUPPORTED",
+        "NOT_RUN"
+      ]
+    },
+    "witness_files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "path",
+          "sha256",
+          "producer"
+        ]
+      }
+    },
+    "dispatch_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "observations": {
+      "type": "object"
+    },
+    "unresolved_unknowns": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

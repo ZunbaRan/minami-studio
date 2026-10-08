@@ -1,0 +1,596 @@
+> 来源：用户提供的 .164 研究资料 `chapters/14_附录宿主HTTP契约.md`；原文件 SHA256 `c8fa73422cbda1e11966e86c3109427098814570aa53ec58b3566f6359b5addc`；全文件 1–594 行。类别：研究契约/设计参考，非厂商原始源码；当前版本经过整合勘误，详见根目录 CHANGELOG.md。原静态结论与未运行验收必须区分。
+
+# 附录 E 全部宿主 HTTP 路由
+30条静态route注册。host client方法存在不等于有同名HTTP route。route顺序决定activity middleware是否执行；该活动记录不是授权。
+
+## 共用错误映射
+- prefix：/api/computer-use
+- listen_address：127.0.0.1
+- authentication：No blanket auth added by inspected setupMiddleware; do not equate with remote reachability
+- app_approval_enforcement：Helper-wrapper routes do not consult per-app approval ledger; explicit check_approval route does
+- helper_error_mapping：{"http400_codes":["ax_not_granted","sc_not_granted","invalid_arg","app_not_found","element_not_found","ref_stale","action_unsupported","unsupported_platform"],"other_typed_errors_http":500,"typed_error_body":{"error":"message","code":"code","hint":"hint when defined"},"untyped_errors_http":500,"untyped_error_body":{"error":"exception message or computer-use failed","code":"internal"}}
+- db_error_mapping：{"status":500,"body":{"error":"exception.message"}}
+
+## 活动 middleware
+- declaration_byte_offset：2285440
+- pretty_line：72900
+- listed_paths：["/api/computer-use/get_app_state","/api/computer-use/click","/api/computer-use/perform_secondary_action","/api/computer-use/drag","/api/computer-use/type","/api/computer-use/type_text","/api/computer-use/press","/api/computer-use/press_key","/api/computer-use/set_value","/api/computer-use/scroll","/api/computer-use/raise","/api/computer-use/launch_app"]
+- behavior：fire-and-forget dynamic import; noteComputerUseActivity; errors swallowed; immediately next()
+- normalized_activity_fields：{"threadId":"body.threadId truthy else undefined","bundle":"body.bundle only if string","pid":"body.pid only if number"}
+- ordering_effect：launch_app POST handler registered before middleware and sends response without next, so this middleware does not run for that route. Other listed POST actions registered later do run it. It can run for other methods on listed paths before eventual404; it is not a POST-only middleware.
+- not_authorization：Activity notification is not an approval check
+
+## GET /api/computer-use/status
+- declaration_order：1
+- method：GET
+- path：/api/computer-use/status
+- http_reachable_in_static_router：true
+- source_byte_offset：2282875
+- source_pretty_line：72793
+- registered_before_activity_middleware：true
+- activity_middleware_matches_path：false
+- activity_middleware_runs_for_matching_successful_route：false
+- handler：host-only
+- helper_command：null
+- input：{"body_and_query":"ignored"}
+- success_body：{"available":"macOS and helper file discoverable; not permission guarantee","helper_path":"resolved helper path or null","platform":"process.platform"}
+- errors：No local try/catch in handler
+
+## GET /api/computer-use/ping
+- declaration_order：2
+- method：GET
+- path：/api/computer-use/ping
+- http_reachable_in_static_router：true
+- source_byte_offset：2283016
+- source_pretty_line：72799
+- registered_before_activity_middleware：true
+- activity_middleware_matches_path：false
+- activity_middleware_runs_for_matching_successful_route：false
+- handler：helper-wrapper
+- client_method：ping
+- helper_command：ping
+- errors：helper_error_mapping
+- success_http_status：200
+- success_body：native data returned unchanged
+- input：{"args":{},"body":"ignored"}
+- request_timeout_ms：20000
+
+## GET /api/computer-use/permissions
+- declaration_order：3
+- method：GET
+- path：/api/computer-use/permissions
+- http_reachable_in_static_router：true
+- source_byte_offset：2283081
+- source_pretty_line：72799
+- registered_before_activity_middleware：true
+- activity_middleware_matches_path：false
+- activity_middleware_runs_for_matching_successful_route：false
+- handler：helper-wrapper
+- client_method：permissions
+- helper_command：permissions
+- errors：helper_error_mapping
+- success_http_status：200
+- success_body：native data returned unchanged
+- input：{"args":{},"body":"ignored"}
+- request_timeout_ms：20000
+
+## POST /api/computer-use/grant
+- declaration_order：4
+- method：POST
+- path：/api/computer-use/grant
+- http_reachable_in_static_router：true
+- source_byte_offset：2283160
+- source_pretty_line：72799
+- registered_before_activity_middleware：true
+- activity_middleware_matches_path：false
+- activity_middleware_runs_for_matching_successful_route：false
+- handler：helper-wrapper
+- client_method：grant
+- helper_command：grant
+- errors：helper_error_mapping
+- success_http_status：200
+- success_body：native data returned unchanged
+- input：{"args":{},"body":"ignored"}
+- request_timeout_ms：20000
+
+## GET /api/computer-use/apps
+- declaration_order：5
+- method：GET
+- path：/api/computer-use/apps
+- http_reachable_in_static_router：true
+- source_byte_offset：2283228
+- source_pretty_line：72799
+- registered_before_activity_middleware：true
+- activity_middleware_matches_path：false
+- activity_middleware_runs_for_matching_successful_route：false
+- handler：helper-wrapper
+- client_method：apps
+- helper_command：apps
+- errors：helper_error_mapping
+- success_http_status：200
+- success_body：native data returned unchanged
+- input：{"args":{},"body":"ignored"}
+- request_timeout_ms：20000
+
+## POST /api/computer-use/list_apps
+- declaration_order：6
+- method：POST
+- path：/api/computer-use/list_apps
+- http_reachable_in_static_router：true
+- source_byte_offset：2283293
+- source_pretty_line：72799
+- registered_before_activity_middleware：true
+- activity_middleware_matches_path：false
+- activity_middleware_runs_for_matching_successful_route：false
+- handler：helper-wrapper
+- client_method：listApps
+- helper_command：list_apps
+- errors：helper_error_mapping
+- success_http_status：200
+- success_body：native data returned unchanged
+- input：{"source":"entire body","default_if_falsy":{},"unknown_fields":"passed through","field_validation":"none in this HTTP handler; native command contract validates downstream"}
+- request_timeout_ms：20000
+
+## POST /api/computer-use/launch_app
+- declaration_order：7
+- method：POST
+- path：/api/computer-use/launch_app
+- http_reachable_in_static_router：true
+- source_byte_offset：2283378
+- source_pretty_line：72799
+- registered_before_activity_middleware：true
+- activity_middleware_matches_path：true
+- activity_middleware_runs_for_matching_successful_route：false
+- handler：helper-wrapper
+- client_method：launchApp
+- helper_command：launch_app
+- errors：helper_error_mapping
+- success_http_status：200
+- success_body：native data returned unchanged
+- input：{"selected_fields":{"bundle":{"source":"body.bundle","default":"undefined/omitted in JSON"},"activates":{"source":"body.activates","rule":"true only when input is exactly boolean true; otherwise false"}},"unknown_fields":"dropped; absence yields undefined properties omitted by JSON.stringify","validation":"no independent HTTP schema/type validation except the stated coercions"}
+- request_timeout_ms：20000
+
+## GET /api/computer-use/approvals
+- declaration_order：8
+- method：GET
+- path：/api/computer-use/approvals
+- http_reachable_in_static_router：true
+- source_byte_offset：2283492
+- source_pretty_line：72799
+- registered_before_activity_middleware：true
+- activity_middleware_matches_path：false
+- activity_middleware_runs_for_matching_successful_route：false
+- handler：database
+- helper_command：null
+- input：{}
+- success_body：{"approvals":"all rows ordered approvedAt descending"}
+- errors：db_error_mapping
+
+## POST /api/computer-use/approvals
+- declaration_order：9
+- method：POST
+- path：/api/computer-use/approvals
+- http_reachable_in_static_router：true
+- source_byte_offset：2283650
+- source_pretty_line：72809
+- registered_before_activity_middleware：true
+- activity_middleware_matches_path：false
+- activity_middleware_runs_for_matching_successful_route：false
+- handler：database
+- helper_command：null
+- input：{"bundle_id":"body field; required truthy, not string validated","app_name":"optional body field"}
+- success_body：{"approved":true,"bundle_id":"echo input"}
+- mutation：upsert approval time; clear revoked time; preserve existing name if omitted; use count not incremented here
+- errors：{"400":"missing/falsy bundle_id","500":"exception message"}
+
+## DELETE /api/computer-use/approvals/:bundle
+- declaration_order：10
+- method：DELETE
+- path：/api/computer-use/approvals/:bundle
+- http_reachable_in_static_router：true
+- source_byte_offset：2283928
+- source_pretty_line：72827
+- registered_before_activity_middleware：true
+- activity_middleware_matches_path：false
+- activity_middleware_runs_for_matching_successful_route：false
+- handler：database
+- helper_command：null
+- input：{"bundle":"path parameter"}
+- success_body：{"revoked":true,"bundle_id":"path bundle"}
+- mutation：update revokedAt for matching row; no existence requirement
+- errors：db_error_mapping
+
+## GET /api/computer-use/check_approval
+- declaration_order：11
+- method：GET
+- path：/api/computer-use/check_approval
+- http_reachable_in_static_router：true
+- source_byte_offset：2284132
+- source_pretty_line：72838
+- registered_before_activity_middleware：true
+- activity_middleware_matches_path：false
+- activity_middleware_runs_for_matching_successful_route：false
+- handler：database-and-settings
+- helper_command：null
+- input：{"bundle":"String(query.bundle or empty string); reject empty","app_name":"query.app_name truthy -> String(value), otherwise undefined"}
+- branches：[{"when":"approvedAt truthy and revokedAt falsy","result":{"approved":true,"strict_mode":"strict setting exactly true"},"mutation":"increment usage and lastUsedAt"},{"when":"strict setting is not exactly true and no valid approval","result":{"approved":true,"auto_approved":true,"strict_mode":false},"mutation":"upsert approval and increment usage"},{"when":"strict exactly true and no valid approval","result":{"approved":false,"strict_mode":true},"mutation":"none"}]
+- errors：{"400":"empty bundle","500":"exception message"}
+- note：GET can mutate approval/usage; denial is HTTP200, not403
+
+## GET /api/computer-use/action_log
+- declaration_order：12
+- method：GET
+- path：/api/computer-use/action_log
+- http_reachable_in_static_router：true
+- source_byte_offset：2284771
+- source_pretty_line：72866
+- registered_before_activity_middleware：true
+- activity_middleware_matches_path：false
+- activity_middleware_runs_for_matching_successful_route：false
+- handler：database
+- helper_command：null
+- input：{"limit":"Number(query.limit) || 100, then min(value,1000); no lower clamp or integer validation"}
+- success_body：{"entries":"rows ordered descending ID"}
+- errors：db_error_mapping
+
+## POST /api/computer-use/action_log
+- declaration_order：13
+- method：POST
+- path：/api/computer-use/action_log
+- http_reachable_in_static_router：true
+- source_byte_offset：2284975
+- source_pretty_line：72877
+- registered_before_activity_middleware：true
+- activity_middleware_matches_path：false
+- activity_middleware_runs_for_matching_successful_route：false
+- handler：database-and-settings
+- helper_command：null
+- input：{"selected_fields":["tool_name","bundle_id","pid","args","duration_ms","screenshot_sha","error_code"],"duration_ms_default_on_null_or_absent":0}
+- branches：[{"when":"computerUseActionLogging is not exactly true","result":{"logged":false,"reason":"logging_disabled"}},{"when":"setting exactly true and insert succeeds","result":{"logged":true}}]
+- errors：db_error_mapping
+- note：No independent HTTP input schema; DB insertion may fail on missing fields
+
+## POST /api/computer-use/windows
+- declaration_order：14
+- method：POST
+- path：/api/computer-use/windows
+- http_reachable_in_static_router：true
+- source_byte_offset：2286088
+- source_pretty_line：72913
+- registered_before_activity_middleware：false
+- activity_middleware_matches_path：false
+- activity_middleware_runs_for_matching_successful_route：false
+- handler：helper-wrapper
+- client_method：windows
+- helper_command：windows
+- errors：helper_error_mapping
+- success_http_status：200
+- success_body：native data returned unchanged
+- input：{"source":"entire body","default_if_falsy":{},"unknown_fields":"passed through","field_validation":"none in this HTTP handler; native command contract validates downstream"}
+- request_timeout_ms：20000
+
+## POST /api/computer-use/snap
+- declaration_order：15
+- method：POST
+- path：/api/computer-use/snap
+- http_reachable_in_static_router：true
+- source_byte_offset：2286170
+- source_pretty_line：72913
+- registered_before_activity_middleware：false
+- activity_middleware_matches_path：false
+- activity_middleware_runs_for_matching_successful_route：false
+- handler：helper-wrapper
+- client_method：snap
+- helper_command：snap
+- errors：helper_error_mapping
+- success_http_status：200
+- success_body：native data returned unchanged
+- input：{"source":"entire body","default_if_falsy":{},"unknown_fields":"passed through","field_validation":"none in this HTTP handler; native command contract validates downstream"}
+- request_timeout_ms：20000
+
+## POST /api/computer-use/get_app_state
+- declaration_order：16
+- method：POST
+- path：/api/computer-use/get_app_state
+- http_reachable_in_static_router：true
+- source_byte_offset：2286246
+- source_pretty_line：72913
+- registered_before_activity_middleware：false
+- activity_middleware_matches_path：true
+- activity_middleware_runs_for_matching_successful_route：true
+- handler：helper-wrapper
+- client_method：getAppState
+- helper_command：get_app_state
+- errors：helper_error_mapping
+- success_http_status：200
+- success_body：native data returned unchanged
+- input：{"source":"entire body","default_if_falsy":{},"unknown_fields":"passed through","field_validation":"none in this HTTP handler; native command contract validates downstream"}
+- request_timeout_ms：30000
+
+## POST /api/computer-use/click
+- declaration_order：17
+- method：POST
+- path：/api/computer-use/click
+- http_reachable_in_static_router：true
+- source_byte_offset：2286338
+- source_pretty_line：72913
+- registered_before_activity_middleware：false
+- activity_middleware_matches_path：true
+- activity_middleware_runs_for_matching_successful_route：true
+- handler：helper-wrapper
+- client_method：click
+- helper_command：click
+- errors：helper_error_mapping
+- success_http_status：200
+- success_body：native data returned unchanged
+- input：{"source":"entire body","default_if_falsy":{},"unknown_fields":"passed through","field_validation":"none in this HTTP handler; native command contract validates downstream"}
+- request_timeout_ms：20000
+
+## POST /api/computer-use/perform_secondary_action
+- declaration_order：18
+- method：POST
+- path：/api/computer-use/perform_secondary_action
+- http_reachable_in_static_router：true
+- source_byte_offset：2286416
+- source_pretty_line：72913
+- registered_before_activity_middleware：false
+- activity_middleware_matches_path：true
+- activity_middleware_runs_for_matching_successful_route：true
+- handler：helper-wrapper
+- client_method：performSecondaryAction
+- helper_command：perform_secondary_action
+- errors：helper_error_mapping
+- success_http_status：200
+- success_body：native data returned unchanged
+- input：{"source":"entire body","default_if_falsy":{},"unknown_fields":"passed through","field_validation":"none in this HTTP handler; native command contract validates downstream"}
+- request_timeout_ms：20000
+
+## POST /api/computer-use/drag
+- declaration_order：19
+- method：POST
+- path：/api/computer-use/drag
+- http_reachable_in_static_router：true
+- source_byte_offset：2286530
+- source_pretty_line：72913
+- registered_before_activity_middleware：false
+- activity_middleware_matches_path：true
+- activity_middleware_runs_for_matching_successful_route：true
+- handler：helper-wrapper
+- client_method：drag
+- helper_command：drag
+- errors：helper_error_mapping
+- success_http_status：200
+- success_body：native data returned unchanged
+- input：{"source":"entire body","default_if_falsy":{},"unknown_fields":"passed through","field_validation":"none in this HTTP handler; native command contract validates downstream"}
+- request_timeout_ms：20000
+
+## POST /api/computer-use/type
+- declaration_order：20
+- method：POST
+- path：/api/computer-use/type
+- http_reachable_in_static_router：true
+- source_byte_offset：2286606
+- source_pretty_line：72913
+- registered_before_activity_middleware：false
+- activity_middleware_matches_path：true
+- activity_middleware_runs_for_matching_successful_route：true
+- handler：helper-wrapper
+- client_method：type
+- helper_command：type
+- errors：helper_error_mapping
+- success_http_status：200
+- success_body：native data returned unchanged
+- input：{"selected_fields":{"ref":{"source":"body.ref"},"text":{"source":"body.text","default_on_null_or_absent":""},"replace":{"source":"body.replace","rule":"false only when exactly boolean false; otherwise true"},"show_cursor":{"source":"body.show_cursor","rule":"false only when exactly boolean false; otherwise true"}},"unknown_fields":"dropped; absence yields undefined properties omitted by JSON.stringify","validation":"no independent HTTP schema/type validation except the stated coercions"}
+- request_timeout_ms：20000
+
+## POST /api/computer-use/type_text
+- declaration_order：21
+- method：POST
+- path：/api/computer-use/type_text
+- http_reachable_in_static_router：true
+- source_byte_offset：2286746
+- source_pretty_line：72913
+- registered_before_activity_middleware：false
+- activity_middleware_matches_path：true
+- activity_middleware_runs_for_matching_successful_route：true
+- handler：helper-wrapper
+- client_method：typeText
+- helper_command：type_text
+- errors：helper_error_mapping
+- success_http_status：200
+- success_body：native data returned unchanged
+- input：{"selected_fields":{"text":{"source":"body.text","default_on_null_or_absent":""},"pid":{"source":"body.pid"},"bundle":{"source":"body.bundle"},"ref":{"source":"body.ref"},"input_method":{"source":"body.input_method"},"show_cursor":{"source":"body.show_cursor","rule":"false only when exactly boolean false; otherwise true"}},"unknown_fields":"dropped; absence yields undefined properties omitted by JSON.stringify","validation":"no independent HTTP schema/type validation except the stated coercions"}
+- request_timeout_ms：20000
+
+## POST /api/computer-use/press
+- declaration_order：22
+- method：POST
+- path：/api/computer-use/press
+- http_reachable_in_static_router：true
+- source_byte_offset：2286969
+- source_pretty_line：72920
+- registered_before_activity_middleware：false
+- activity_middleware_matches_path：true
+- activity_middleware_runs_for_matching_successful_route：true
+- handler：helper-wrapper
+- client_method：press
+- helper_command：press
+- errors：helper_error_mapping
+- success_http_status：200
+- success_body：native data returned unchanged
+- input：{"selected_fields":{"ref":{"source":"body.ref"},"key":{"source":"body.key"},"show_cursor":{"source":"body.show_cursor","rule":"false only when exactly boolean false; otherwise true"}},"unknown_fields":"dropped; absence yields undefined properties omitted by JSON.stringify","validation":"no independent HTTP schema/type validation except the stated coercions"}
+- request_timeout_ms：20000
+
+## POST /api/computer-use/press_key
+- declaration_order：23
+- method：POST
+- path：/api/computer-use/press_key
+- http_reachable_in_static_router：true
+- source_byte_offset：2287085
+- source_pretty_line：72920
+- registered_before_activity_middleware：false
+- activity_middleware_matches_path：true
+- activity_middleware_runs_for_matching_successful_route：true
+- handler：helper-wrapper
+- client_method：pressKey
+- helper_command：press_key
+- errors：helper_error_mapping
+- success_http_status：200
+- success_body：native data returned unchanged
+- input：{"selected_fields":{"key":{"source":"body.key"},"pid":{"source":"body.pid"}},"unknown_fields":"dropped; absence yields undefined properties omitted by JSON.stringify","validation":"no independent HTTP schema/type validation except the stated coercions"}
+- request_timeout_ms：20000
+
+## POST /api/computer-use/set_value
+- declaration_order：24
+- method：POST
+- path：/api/computer-use/set_value
+- http_reachable_in_static_router：true
+- source_byte_offset：2287183
+- source_pretty_line：72920
+- registered_before_activity_middleware：false
+- activity_middleware_matches_path：true
+- activity_middleware_runs_for_matching_successful_route：true
+- handler：helper-wrapper
+- client_method：setValue
+- helper_command：set_value
+- errors：helper_error_mapping
+- success_http_status：200
+- success_body：native data returned unchanged
+- input：{"selected_fields":{"ref":{"source":"body.ref"},"value":{"source":"body.value"}},"unknown_fields":"dropped; absence yields undefined properties omitted by JSON.stringify","validation":"no independent HTTP schema/type validation except the stated coercions"}
+- request_timeout_ms：20000
+
+## POST /api/computer-use/select_text
+- declaration_order：25
+- method：POST
+- path：/api/computer-use/select_text
+- http_reachable_in_static_router：true
+- source_byte_offset：2287283
+- source_pretty_line：72920
+- registered_before_activity_middleware：false
+- activity_middleware_matches_path：false
+- activity_middleware_runs_for_matching_successful_route：false
+- handler：helper-wrapper
+- client_method：selectText
+- helper_command：select_text
+- errors：helper_error_mapping
+- success_http_status：200
+- success_body：native data returned unchanged
+- input：{"selected_fields":{"ref":{"source":"body.ref"},"text":{"source":"body.text","default_on_null_or_absent":""},"prefix":{"source":"body.prefix"},"suffix":{"source":"body.suffix"},"selection_type":{"source":"body.selection_type"}},"unknown_fields":"dropped; absence yields undefined properties omitted by JSON.stringify","validation":"no independent HTTP schema/type validation except the stated coercions"}
+- request_timeout_ms：20000
+
+## POST /api/computer-use/scroll
+- declaration_order：26
+- method：POST
+- path：/api/computer-use/scroll
+- http_reachable_in_static_router：true
+- source_byte_offset：2287483
+- source_pretty_line：72926
+- registered_before_activity_middleware：false
+- activity_middleware_matches_path：true
+- activity_middleware_runs_for_matching_successful_route：true
+- handler：helper-wrapper
+- client_method：scroll
+- helper_command：scroll
+- errors：helper_error_mapping
+- success_http_status：200
+- success_body：native data returned unchanged
+- input：{"selected_fields":{"ref":{"source":"body.ref"},"direction":{"source":"body.direction"},"pages":{"source":"body.pages","default_on_null_or_absent":1},"show_cursor":{"source":"body.show_cursor","rule":"false only when exactly boolean false; otherwise true"}},"unknown_fields":"dropped; absence yields undefined properties omitted by JSON.stringify","validation":"no independent HTTP schema/type validation except the stated coercions"}
+- request_timeout_ms：20000
+
+## POST /api/computer-use/lens
+- declaration_order：27
+- method：POST
+- path：/api/computer-use/lens
+- http_reachable_in_static_router：true
+- source_byte_offset：2287624
+- source_pretty_line：72926
+- registered_before_activity_middleware：false
+- activity_middleware_matches_path：false
+- activity_middleware_runs_for_matching_successful_route：false
+- handler：helper-wrapper
+- client_method：lens
+- helper_command：lens
+- errors：helper_error_mapping
+- success_http_status：200
+- success_body：native data returned unchanged
+- input：{"selected_fields":{"enabled":{"source":"body.enabled","rule":"omitted if undefined; otherwise passed unchanged, including null"}},"unknown_fields":"dropped; absence yields undefined properties omitted by JSON.stringify","validation":"no independent HTTP schema/type validation except the stated coercions"}
+- request_timeout_ms：20000
+
+## POST /api/computer-use/raise
+- declaration_order：28
+- method：POST
+- path：/api/computer-use/raise
+- http_reachable_in_static_router：true
+- source_byte_offset：2287705
+- source_pretty_line：72926
+- registered_before_activity_middleware：false
+- activity_middleware_matches_path：true
+- activity_middleware_runs_for_matching_successful_route：true
+- handler：helper-wrapper
+- client_method：raise
+- helper_command：raise
+- errors：helper_error_mapping
+- success_http_status：200
+- success_body：native data returned unchanged
+- input：{"source":"entire body","default_if_falsy":{},"unknown_fields":"passed through","field_validation":"none in this HTTP handler; native command contract validates downstream"}
+- request_timeout_ms：20000
+
+## POST /api/computer-use/shot
+- declaration_order：29
+- method：POST
+- path：/api/computer-use/shot
+- http_reachable_in_static_router：true
+- source_byte_offset：2287783
+- source_pretty_line：72926
+- registered_before_activity_middleware：false
+- activity_middleware_matches_path：false
+- activity_middleware_runs_for_matching_successful_route：false
+- handler：helper-wrapper
+- client_method：shot
+- helper_command：shot
+- errors：helper_error_mapping
+- success_http_status：200
+- success_body：native data returned unchanged
+- input：{"source":"entire body","default_if_falsy":{},"unknown_fields":"passed through","field_validation":"none in this HTTP handler; native command contract validates downstream"}
+- request_timeout_ms：30000
+
+## POST /api/computer-use/shutdown
+- declaration_order：30
+- method：POST
+- path：/api/computer-use/shutdown
+- http_reachable_in_static_router：true
+- source_byte_offset：2287859
+- source_pretty_line：72926
+- registered_before_activity_middleware：false
+- activity_middleware_matches_path：false
+- activity_middleware_runs_for_matching_successful_route：false
+- handler：helper-wrapper
+- client_method：shutdown
+- helper_command：best-effort shutdown when socket or child exists; teardown always follows that attempt
+- errors：helper_error_mapping
+- success_http_status：200
+- success_body：{"shut_down":true}
+- input：{"body":"ignored"}
+- request_timeout_ms：2000
+- note：Errors from best-effort shutdown request are swallowed inside client.shutdown; no socket/child means immediate success
+
+## 没有同名 HTTP route 的 client 方法
+- {"method":"remoteInput","native_command":"remote_input","other_use":"/ws/screen WebSocket input handler serializes calls via Promise chain","source_pretty_line":82386}
+- {"method":"shotDisplay","native_command":"shot_display","other_use":"/ws/screen frame capture and ActivityRecorder native capture fallback","source_pretty_lines":[65864,82366]}
+- {"method":"appshotMonitorStart","native_command":"appshot_monitor_start","other_use":"Appshot manager via setHotkey/restore/disconnect rearm; narrow preload IPC","source_pretty_lines":[97127,97161]}
+- {"method":"appshotMonitorStop","native_command":"appshot_monitor_stop","other_use":"Appshot manager disarm","source_pretty_line":97144}
+- {"method":"appshotFrontmost","native_command":"appshot_frontmost","other_use":"Appshot manager dispatchCapture, excludes com.yetone.alma","source_pretty_line":97191}
+- {"method":"appshotCapture","native_command":"appshot_capture","other_use":"Appshot manager dispatchCapture; args bundle,pid,window_id,out_dir","source_pretty_line":97210}
+
+## Appshot IPC
+- invoke：["appshot:get-state","appshot:set-hotkey","appshot:capture-now","appshot:prewarm"]
+- events：["appshot-shortcut-starting","appshot-shortcut-fired","appshot-shortcut-failed","appshot-context-update"]
+- http_route_under_computer_use：false
+
+## MCP 压缩 override 核对
+- file：extracted/Alma.app/Contents/Resources/cli/alma-computer-use-mcp.mjs
+- sha256：d157be25e6f87879df47287a727070fd1d223d6e3bfb1addf187eb14bd9fb976
+- scope：Entire latest extracted MCP entrypoint text, not just business-tail excerpts
+- literal_counts：{"alma/outputSafetyMode":0,"alma-output-safety":0,"rawToolResults":0}
+- finding：Zero occurrences of host-recognized metadata key and description marker; no bundled static explicit compaction override found. Runtime plugin hooks or other caller context are separate.
+- inherited_behavior：Generic MCP compact mode unless host rawToolResults true; /api/tools/invoke sets rawToolResults true

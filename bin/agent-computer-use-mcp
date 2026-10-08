@@ -1,0 +1,14 @@
+#!/bin/sh
+# Stable stdio entry point for MCP clients (codex mcp / other harnesses).
+# Pins a node binary since MCP clients may spawn us with a minimal PATH.
+NODE="$(command -v node || true)"
+if [ -z "$NODE" ]; then
+  for c in "$HOME/.nvm/versions/node/"*/bin/node /opt/homebrew/bin/node /usr/local/bin/node; do
+    [ -x "$c" ] && NODE="$c" && break
+  done
+fi
+if [ -z "$NODE" ]; then
+  echo "agent-computer-use-mcp: node not found on PATH" >&2
+  exit 1
+fi
+exec "$NODE" "$(dirname "$0")/../mcp/agent-computer-use-mcp.mjs" "$@"

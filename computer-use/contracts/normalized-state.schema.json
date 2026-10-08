@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Independent internal normalized state design, not native wire schema",
+  "type": "object",
+  "properties": {
+    "snapshotId": {
+      "type": "string"
+    },
+    "generation": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "target": {
+      "type": "object",
+      "properties": {
+        "pid": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "bundle": {
+          "type": "string"
+        },
+        "windowId": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "pid"
+      ],
+      "additionalProperties": false
+    },
+    "fullElements": {
+      "type": "array",
+      "items": {
+        "$ref": "serialized-element.schema.json"
+      }
+    },
+    "mappingId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "capturedAtMonotonicMs": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "outcome": {
+      "enum": [
+        "not_started",
+        "accepted",
+        "effect_unverified",
+        "verified",
+        "unknown"
+      ]
+    }
+  },
+  "required": [
+    "snapshotId",
+    "generation",
+    "target",
+    "fullElements",
+    "outcome"
+  ],
+  "additionalProperties": false,
+  "x-status": "independent-design-not-implemented"
+}

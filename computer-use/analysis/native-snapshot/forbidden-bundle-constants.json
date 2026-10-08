@@ -1,0 +1,146 @@
+[
+  {
+    "index": 0,
+    "slot": "0x1000b03e0",
+    "word0": "0xd00000000000001b",
+    "word1": "0x20080000092fa0",
+    "literalVA": "0x100092fc0",
+    "bundle": "com.apple.systempreferences"
+  },
+  {
+    "index": 1,
+    "slot": "0x1000b03f0",
+    "word0": "0xd00000000000001c",
+    "word1": "0x20080000092fc0",
+    "literalVA": "0x100092fe0",
+    "bundle": "com.apple.security.pluginkit"
+  },
+  {
+    "index": 2,
+    "slot": "0x1000b0400",
+    "word0": "0xd00000000000001f",
+    "word1": "0x20080000092fe0",
+    "literalVA": "0x100093000",
+    "bundle": "com.apple.security-notification"
+  },
+  {
+    "index": 3,
+    "slot": "0x1000b0410",
+    "word0": "0xd00000000000001c",
+    "word1": "0x20080000093000",
+    "literalVA": "0x100093020",
+    "bundle": "com.apple.preference.general"
+  },
+  {
+    "index": 4,
+    "slot": "0x1000b0420",
+    "word0": "0xd000000000000015",
+    "word1": "0x20080000093020",
+    "literalVA": "0x100093040",
+    "bundle": "com.apple.loginwindow"
+  },
+  {
+    "index": 5,
+    "slot": "0x1000b0430",
+    "word0": "0xd000000000000017",
+    "word1": "0x20080000093040",
+    "literalVA": "0x100093060",
+    "bundle": "com.apple.SecurityAgent"
+  },
+  {
+    "index": 6,
+    "slot": "0x1000b0440",
+    "word0": "0xd000000000000019",
+    "word1": "0x20080000093060",
+    "literalVA": "0x100093080",
+    "bundle": "com.apple.PassphraseAgent"
+  },
+  {
+    "index": 7,
+    "slot": "0x1000b0450",
+    "word0": "0xd00000000000001d",
+    "word1": "0x40080000093080",
+    "literalVA": "0x1000930a0",
+    "bundle": "com.apple.PasswordBreachAgent"
+  },
+  {
+    "index": 8,
+    "slot": "0x1000b0460",
+    "word0": "0x6c7070612e6d6f63",
+    "word1": "0xee00646363742e65",
+    "literalVA": null,
+    "bundle": "com.apple.tccd"
+  },
+  {
+    "index": 9,
+    "slot": "0x1000b0470",
+    "word0": "0xd000000000000021",
+    "word1": "0x200800000930a0",
+    "literalVA": "0x1000930c0",
+    "bundle": "com.apple.universalaccessAuthWarn"
+  },
+  {
+    "index": 10,
+    "slot": "0x1000b0480",
+    "word0": "0xd000000000000016",
+    "word1": "0x400800000930d0",
+    "literalVA": "0x1000930f0",
+    "bundle": "com.apple.WindowServer"
+  },
+  {
+    "index": 11,
+    "slot": "0x1000b0490",
+    "word0": "0x6c7070612e6d6f63",
+    "word1": "0xee006b636f642e65",
+    "literalVA": null,
+    "bundle": "com.apple.dock"
+  },
+  {
+    "index": 12,
+    "slot": "0x1000b04a0",
+    "word0": "0xd000000000000013",
+    "word1": "0x200800000930f0",
+    "literalVA": "0x100093110",
+    "bundle": "com.apple.launchpad"
+  },
+  {
+    "index": 13,
+    "slot": "0x1000b04b0",
+    "word0": "0xd00000000000001e",
+    "word1": "0x20080000093110",
+    "literalVA": "0x100093130",
+    "bundle": "com.apple.notificationcenterui"
+  },
+  {
+    "index": 14,
+    "slot": "0x1000b04c0",
+    "word0": "0xd000000000000017",
+    "word1": "0x20080000093130",
+    "literalVA": "0x100093150",
+    "bundle": "com.apple.controlcenter"
+  },
+  {
+    "index": 15,
+    "slot": "0x1000b04d0",
+    "word0": "0xd000000000000013",
+    "word1": "0x20080000093150",
+    "literalVA": "0x100093170",
+    "bundle": "com.apple.spotlight"
+  },
+  {
+    "index": 16,
+    "slot": "0x1000b04e0",
+    "word0": "0xd00000000000001c",
+    "word1": "0x20080000093170",
+    "literalVA": "0x100093190",
+    "bundle": "com.apple.ScreenSaver.Engine"
+  },
+  {
+    "index": 17,
+    "slot": "0x1000b04f0",
+    "word0": "0xd00000000000001b",
+    "word1": "0x1b0080000093190",
+    "literalVA": "0x1000931b0",
+    "bundle": "com.apple.ScreenSaverEngine"
+  }
+]

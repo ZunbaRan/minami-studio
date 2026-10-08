@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Native SerializedElement toDict static keys",
+  "type": "object",
+  "properties": {
+    "ref": {
+      "type": "string"
+    },
+    "role": {
+      "type": "string"
+    },
+    "subrole": {
+      "type": "string"
+    },
+    "role_description": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "value": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "enabled": {
+      "type": "boolean"
+    },
+    "focused": {
+      "type": "boolean"
+    },
+    "selected": {
+      "type": "boolean"
+    },
+    "actions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "children_count": {
+      "type": "integer"
+    },
+    "bounds": {
+      "type": "object",
+      "properties": {
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        },
+        "w": {
+          "type": "number"
+        },
+        "h": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "x",
+        "y",
+        "w",
+        "h"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "ref",
+    "role",
+    "enabled",
+    "focused",
+    "actions",
+    "children_count"
+  ],
+  "additionalProperties": false,
+  "x-evidence": "analysis/native-snapshot/FINDINGS.md sections9-11",
+  "x-note": "Optional missing keys omitted, never inferred null; value string; identifier/parentRoles not emitted"
+}

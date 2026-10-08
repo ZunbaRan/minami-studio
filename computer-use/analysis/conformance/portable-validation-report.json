@@ -1,0 +1,48 @@
+{
+  "status": "PASS_DOCUMENT_VALIDATION_ONLY",
+  "checks": [
+    "all generated JSON parses",
+    "vector JSON Schema validation",
+    "unique case IDs",
+    "all case evidence/requirement IDs resolve",
+    "bidirectional requirement coverage",
+    "schema permutations agree with source-transcribed schemas",
+    "runtime result schema is valid",
+    "evidence index paths exist in distributed tree",
+    "all39 P0 cases match main corpus"
+  ],
+  "counts": {
+    "cases": 734,
+    "by_origin": {
+      "generated_schema_permutation": 453,
+      "individually_authored_contract_scenario": 113,
+      "generated_runtime_matrix_cell": 168
+    },
+    "by_group": {
+      "schema": 453,
+      "transport": 18,
+      "target": 16,
+      "ref": 7,
+      "state": 5,
+      "diff": 8,
+      "screenshots": 14,
+      "cancel": 6,
+      "permissions": 13,
+      "error_propagation": 6,
+      "UI": 188
+    },
+    "by_oracle": {
+      "STATIC_EXPECTATION": 551,
+      "UNKNOWN_REQUIRE_RUNTIME": 183
+    }
+  },
+  "sample_hash_verification": "SKIPPED_NO_SAMPLE_REQUESTED",
+  "product_tests_run": 0,
+  "Alma_code_executed": false,
+  "limitations": [
+    "Schema oracle tests compare against static transcription, not runtime tools/list",
+    "No receiver/OS behavior tested",
+    "Generated matrix cells are coverage obligations, not individually established behavior"
+  ],
+  "corpus_sha256": "439555e92c5b774de56a8c22e320b6605422a0ec049e255f977744c5f19631a2"
+}

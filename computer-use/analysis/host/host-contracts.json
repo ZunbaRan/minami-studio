@@ -1,0 +1,130 @@
+{
+  "document_kind": "Original behavioral reconstruction; not extracted Alma source",
+  "sample": "Alma 0.4.164 macOS arm64",
+  "confidence": "Static branches only; not runtime verified",
+  "daemon_transport": {
+    "encoding": "UTF-8 JSON Lines",
+    "request": {
+      "id": "string",
+      "cmd": "string",
+      "args": "object"
+    },
+    "reply": {
+      "id": "string",
+      "ok": "boolean",
+      "data": "any when ok",
+      "error": {
+        "code": "string",
+        "message": "string",
+        "hint": "optional string"
+      }
+    },
+    "event": {
+      "evt": true,
+      "topic": "appshot.monitor | appshot.update",
+      "payload": "topic-specific"
+    },
+    "timeouts_ms": {
+      "default_request": 20000,
+      "get_app_state": 30000,
+      "shot": 30000,
+      "shot_display": 30000,
+      "appshot_capture": 30000,
+      "shutdown": 2000,
+      "startup_retry_window": 4000,
+      "startup_retry_pause": 100
+    },
+    "startup_arguments": [
+      "daemon",
+      "--socket",
+      "<socket-path>",
+      "--idle-seconds",
+      "900"
+    ],
+    "socket_naming": "userData/computer-use-<first8(SHA1(helper-executable-path))>.sock",
+    "timeout_semantics": "Delete pending local request; reject. No native cancellation message.",
+    "event_compatibility_caveat": "Original fast path requires exact substring double-quote evt double-quote colon true with no whitespace before parsing event."
+  },
+  "mcp_runtime": {
+    "tool_name": "normalized-server__normalized-tool",
+    "call_timeout_ms": 600000,
+    "stdio_connect_race_ms": 60000,
+    "list_tools_race_ms": 15000,
+    "abort_signal_forwarded_by_execute": false,
+    "resolved_isError_used_by_toModelOutput": false
+  },
+  "generic_watchdog": {
+    "default_ms": 300000,
+    "long_task_ms": 14400000,
+    "explicit_timeout_grace_ms": 15000,
+    "explicit_timeout_cap_ms": 1800000,
+    "propagates_child_abort_signal": true,
+    "underlying_MCP_adapter_consumes_signal": false
+  },
+  "authorization_layers": [
+    "active tool exposure",
+    "project MCP allowlist",
+    "optional plugin tool.willExecute hook",
+    "MCP app-approval gate per wrapper path",
+    "OS AX/screen permissions"
+  ],
+  "approval_ledger": {
+    "key": "bundleId",
+    "fields": [
+      "appName",
+      "approvedAt",
+      "revokedAt",
+      "useCount",
+      "lastUsedAt"
+    ],
+    "strict_true_unapproved": "approved=false",
+    "strict_false_unapproved": "auto approve and increment usage",
+    "direct_rest_actions_consult_ledger": false
+  },
+  "model_content_mapping": {
+    "text": "model text",
+    "image": "model file with inline data and MIME",
+    "audio": "model file with inline data and MIME",
+    "resource_text": "model text optionally prefixed URI",
+    "resource_blob": "model file",
+    "resource_link": "text reference",
+    "unknown": "JSON text"
+  },
+  "image_persistence": {
+    "top_level_image_base64": "externalize into inline-<first16SHA256>.<extension>; persist image_cache_file; rehydrate for model",
+    "MCP_content_image": "does not match top-level cache selector",
+    "computer_use_storage_truncation": "explicit tool-computer-use__ exemption"
+  },
+  "proposed_modules": [
+    "HelperLocator",
+    "DaemonTransport",
+    "ComputerUseService",
+    "ApprovalRepository",
+    "ExecutionPolicy",
+    "McpRuntime",
+    "ToolAdapter",
+    "ToolImageStore",
+    "TurnController",
+    "AppshotBridge"
+  ],
+  "proposed_safe_changes": [
+    "Canonicalize target before all-entrypoint authorization",
+    "Fail closed when strict approval cannot be verified",
+    "Forward AbortSignal and native operation cancellation with acknowledgment",
+    "Preserve tool-level error flags",
+    "Gate images by content and model capability",
+    "Unify image persistence across output shapes",
+    "Parse events structurally",
+    "Clear partial frames and increment connection epoch on disconnect"
+  ],
+  "evidence": "evidence.json and host-contract-report.md",
+  "model_compaction": {
+    "MCP_default_mode": "compact unless explicit metadata/description override",
+    "serialized_target_chars": 2600,
+    "default_string_chars": 1000,
+    "text_field_chars": 600,
+    "binary_fields": "preserved even if serialized target exceeded",
+    "PTC_api_tools_invoke": "rawToolResults=true bypasses compaction",
+    "storage_exemption_does_not_disable_model_compaction": true
+  }
+}

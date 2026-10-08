@@ -1,0 +1,438 @@
+{
+  "format": 1,
+  "sample_version": "0.4.164",
+  "product_tests_run": 0,
+  "raw_target_code_included": false,
+  "files": [
+    {
+      "path": "README.zh-CN.md",
+      "bytes": 2291,
+      "sha256": "1308e9e9d3efabc2a7e17ddb414d913e42495622fc55adb125c19067a91b9353"
+    },
+    {
+      "path": "REVISION_LOG.zh-CN.md",
+      "bytes": 888,
+      "sha256": "106e3a4b7bfb8ddec4f7032b8c53caba6e410937025c5924fb23a3f2421caabe"
+    },
+    {
+      "path": "analysis/audit/edge-contract-audit.md",
+      "bytes": 9910,
+      "sha256": "2b725f1e78d87f012130229af6c2360f3e6c1bca9c164d2b2fec504a3e7f7048"
+    },
+    {
+      "path": "analysis/conformance/P0.zh-CN.md",
+      "bytes": 3967,
+      "sha256": "613519a17a792b8fc53145fc0aa86b8a7f1072f569f23f47905c89bf7c147df7"
+    },
+    {
+      "path": "analysis/conformance/README.zh-CN.md",
+      "bytes": 10410,
+      "sha256": "c966e3101546158bf63faa747ac3775fd7a913050010fefc92bfe6c1d7564086"
+    },
+    {
+      "path": "analysis/conformance/build_conformance.py",
+      "bytes": 29890,
+      "sha256": "3b76730f8050f9659f387199a74654ef75f87e5a46302a6a81d8d08c7515fc5d"
+    },
+    {
+      "path": "analysis/conformance/build_p0.py",
+      "bytes": 1779,
+      "sha256": "acc5a4fc111fe34bde77c502730f9c24e179d1663b79608186e21f6a668c51a1"
+    },
+    {
+      "path": "analysis/conformance/build_supporting.py",
+      "bytes": 11157,
+      "sha256": "af16e7dceda6b11e03b621e09836ee5e1b4dc702acc88129fa988348fb15cbe4"
+    },
+    {
+      "path": "analysis/conformance/check_p0_observations.py",
+      "bytes": 1541,
+      "sha256": "30ed070941ca5247c8a87af153d1d6bf4ab7b2863bcd68faa8e3fd9ba9aceb75"
+    },
+    {
+      "path": "analysis/conformance/contract-vectors.json",
+      "bytes": 637178,
+      "sha256": "4d8a881ec46eb9d26327c047cba99f00beb42fa2ee7851182c28617cad1b5c85"
+    },
+    {
+      "path": "analysis/conformance/contract-vectors.schema.json",
+      "bytes": 2175,
+      "sha256": "fcbeabfa7e2bfd8a45f05842814e16078e8cb3d1ec1ba8ade93f1e29144b7fea"
+    },
+    {
+      "path": "analysis/conformance/evidence-registry.json",
+      "bytes": 23695,
+      "sha256": "f7a2943a1e0c587e64cd4a05afb8a06c3cbd8e6d1a55cb590b4bca3c93623a3c"
+    },
+    {
+      "path": "analysis/conformance/fixture-specifications.json",
+      "bytes": 14949,
+      "sha256": "b55c8db5c1cb843aa08c1ae6918d61392e10621ceaf254916eb23f3363166a93"
+    },
+    {
+      "path": "analysis/conformance/module-handoffs.json",
+      "bytes": 18726,
+      "sha256": "a65e4ddd52b6ec62c50e3678fc62c674d9db306935ddfc3364be0b03cacbb613"
+    },
+    {
+      "path": "analysis/conformance/oracle-selftest.json",
+      "bytes": 289,
+      "sha256": "799b363099d436a856b1429417cc2831cf522b795a732f371a07e32cd4d39a30"
+    },
+    {
+      "path": "analysis/conformance/p0-critical-subset.json",
+      "bytes": 30781,
+      "sha256": "f20858e9375b7d082ca08500738867963d60d6bab9817cd8fbf3a34bf5016533"
+    },
+    {
+      "path": "analysis/conformance/portable-validation-report.json",
+      "bytes": 1537,
+      "sha256": "c242b065f0f61e7de4d0066e2d9e5fb21c62a24ad187e055f85e0044e1a5d299"
+    },
+    {
+      "path": "analysis/conformance/requirements-traceability.json",
+      "bytes": 36019,
+      "sha256": "74e57f003f59e6a83a9d03adfe176a5602ebe47740a8bd9fd9c919a69646428a"
+    },
+    {
+      "path": "analysis/conformance/requirements.txt",
+      "bytes": 101,
+      "sha256": "e56091b7a16f6f09e88e5c67afc0cc71ee0fdf266ec9e0205da33ff3d9418e83"
+    },
+    {
+      "path": "analysis/conformance/runtime-result.schema.json",
+      "bytes": 1491,
+      "sha256": "e24ebaea32d002ff4a11db09e414a947792657a9eb7fbddddbcc14345660454f"
+    },
+    {
+      "path": "analysis/conformance/staged-plan.json",
+      "bytes": 2590,
+      "sha256": "18134dc6e258891c261b9beb2a214f60ca6d3a4f7f13ba488d9bd3285d7e6b43"
+    },
+    {
+      "path": "analysis/conformance/validate_conformance.py",
+      "bytes": 3357,
+      "sha256": "909009e0928fca0cf972cf5276302bbfec821772b0ae513c8b9de22a4b0f230f"
+    },
+    {
+      "path": "analysis/conformance/validation-report.json",
+      "bytes": 1425,
+      "sha256": "48a891cf8e5e1ec774cc61b6312c69bdd1e8afbfabca17bba3c8c4be71519feb"
+    },
+    {
+      "path": "analysis/host/evidence.json",
+      "bytes": 3112,
+      "sha256": "04eb28da6c0c89ff6513393c70c08734ec99b44add45b66abe3a0bc1283e9432"
+    },
+    {
+      "path": "analysis/host/host-contract-report.md",
+      "bytes": 20338,
+      "sha256": "2a02db8d38fb6015abe1822440a77dca4c5e73f49da1198136245794591d2e8e"
+    },
+    {
+      "path": "analysis/host/host-contracts.json",
+      "bytes": 4346,
+      "sha256": "820455b1cc2962dbd7ad4bf7f9e2797576455ad274a97da61a579ffe5e7dcd11"
+    },
+    {
+      "path": "analysis/host/host-http-routes.json",
+      "bytes": 35193,
+      "sha256": "65b20e1fa701183fa85b8ac15cdee2975ac91d580b33394c646b0a1b4bed1472"
+    },
+    {
+      "path": "analysis/host/host-replication-recipe.zh.md",
+      "bytes": 10382,
+      "sha256": "a3ecaf528b2eac2bc865f64541d7e32f08a0da2f91dff91afc8a7a31080f59a0"
+    },
+    {
+      "path": "analysis/mcp/REPORT.zh-CN.md",
+      "bytes": 18839,
+      "sha256": "48142212c09a9322c4c2829ad55a93f7761ee5f56ed00883eea7e12a51f571ef"
+    },
+    {
+      "path": "analysis/mcp/cli-command-catalog.json",
+      "bytes": 30439,
+      "sha256": "c440d2b03c21dd78b072d2798142516512478366f9830c46009369c036aa2a8c"
+    },
+    {
+      "path": "analysis/mcp/protocol-catalog.json",
+      "bytes": 31676,
+      "sha256": "99b5c1f11f5cca2aed83e6b6905376d2e1db7715fd10b9f6871fa98b484d707d"
+    },
+    {
+      "path": "analysis/mcp/source-locators.json",
+      "bytes": 15321,
+      "sha256": "74dfd2aefed04eb1757a6a81fec1972939a1331cc7e36fb062dff1e4b6900627"
+    },
+    {
+      "path": "analysis/mcp/synthetic-conformance-vectors.json",
+      "bytes": 6990,
+      "sha256": "ed32889d98eb8c7de46464e00a1b330dcbcd0d70aae32bb3f9888f434e22a17b"
+    },
+    {
+      "path": "analysis/mcp/tool-inventory.json",
+      "bytes": 1255,
+      "sha256": "ac4a669fe4633cf9c98d654e85a5ce83f518e64b7ed1bff0b7483aeb76b676bb"
+    },
+    {
+      "path": "analysis/mirror-ui/behavioral-contract.md",
+      "bytes": 18152,
+      "sha256": "0987dbe5713195393b4a1f9723c44e5e6ad269a58dabe606cb1e3b3dea259c35"
+    },
+    {
+      "path": "analysis/mirror-ui/evidence-index.json",
+      "bytes": 7124,
+      "sha256": "8156dd6b5ed31e8ea093a96616da033b97dea0bb3047a9760c072c28f36b67ff"
+    },
+    {
+      "path": "analysis/mirror-ui/implementation-plan.md",
+      "bytes": 12681,
+      "sha256": "9adac2490c08aa6fcf06dbbbac9443d655a576e98a6df7dced65cd29f34025b1"
+    },
+    {
+      "path": "analysis/mirror-ui/native-cursor-contract.md",
+      "bytes": 11608,
+      "sha256": "986593ccc38d89b0ba185645174a60d01520208f06c6917e49516c923e97a121"
+    },
+    {
+      "path": "analysis/mirror-ui/native-evidence.json",
+      "bytes": 1799,
+      "sha256": "121408b747df5ed3867444976faa9b5083ab88045cda4046d0027776c5c95119"
+    },
+    {
+      "path": "analysis/native/ALGORITHMS.zh-CN.md",
+      "bytes": 35589,
+      "sha256": "8d17305b4bb8a73d1e282ccf9d611d2da74d670b8348b66b0861a442710c5ba9"
+    },
+    {
+      "path": "analysis/native/FINDINGS.md",
+      "bytes": 12447,
+      "sha256": "0f6cfe92c03dfa134db77371bc3f7e24df9b0866f5b0db9d38c8fb80d4ffe612"
+    },
+    {
+      "path": "analysis/native/keycode-contract.json",
+      "bytes": 1798,
+      "sha256": "e716e995e65407618afa1cf7d71df58e99e5bea44fa15131531fa6b53817ba10"
+    },
+    {
+      "path": "analysis/native/native-contract.json",
+      "bytes": 13319,
+      "sha256": "818f0c2b973bbdc245217c31fa185ee9b18cfb648e9a5a9f8c76a9ab4e876306"
+    },
+    {
+      "path": "analysis/native/native-test-plan.json",
+      "bytes": 11472,
+      "sha256": "08cd16ccc3dbb75b2c28679e4331a6d4c1d5df957d143ee17712e825165347b5"
+    },
+    {
+      "path": "analysis/native-snapshot/APPSHOT_EXTRA_CONTRACTS.md",
+      "bytes": 19738,
+      "sha256": "cc0c7d38e852617eedb9fc367e79758f508a996fdd97afa0210df842c384b5b7"
+    },
+    {
+      "path": "analysis/native-snapshot/APP_INTENTS_METADATA.md",
+      "bytes": 10179,
+      "sha256": "fb565814c4326ac15d38d414cfe560f770e37f484360d7d304f0ef38f96e367f"
+    },
+    {
+      "path": "analysis/native-snapshot/APP_USAGE_CONTRACT.md",
+      "bytes": 18337,
+      "sha256": "513c1d2bbc818ad1a97a9dc784c48e2c7748e5b9f25e4af038dd6f538785ec42"
+    },
+    {
+      "path": "analysis/native-snapshot/DISPATCH_INVENTORY.md",
+      "bytes": 17981,
+      "sha256": "1ae2a4684fa565f66b83cd5e11fcad2e0434115a3a92a54c3324fcee6f65cd30"
+    },
+    {
+      "path": "analysis/native-snapshot/FINDINGS.md",
+      "bytes": 25078,
+      "sha256": "862a209ef9a83e49eade0b4eb30b4da6e03dc1918463eb36ee65e82290738066"
+    },
+    {
+      "path": "analysis/native-snapshot/FORBIDDEN_TARGETS_CONTRACT.md",
+      "bytes": 6290,
+      "sha256": "e0d81bc189ef6b8d61a8b6ad9e180b305286efa6868ee190ea5e2d4acb3f114f"
+    },
+    {
+      "path": "analysis/native-snapshot/MCP_CONTROL_EXTRA_CONTRACTS.md",
+      "bytes": 11425,
+      "sha256": "a8560c4e860124ba726ac1b8e32ca638cd4b6bd04609df0c182ef97840a676bb"
+    },
+    {
+      "path": "analysis/native-snapshot/PARITY_SURFACE.md",
+      "bytes": 5013,
+      "sha256": "45784ca2ec41ed4178cb6894da209e08f2ba33aa30e1002a52b0d23e42e40871"
+    },
+    {
+      "path": "analysis/native-snapshot/PIP_EXTRA_CONTRACTS.md",
+      "bytes": 20068,
+      "sha256": "f0be9c431ba0815146323bb1d997b7ef249ae43eeb56cfc4f367f618f98adfcf"
+    },
+    {
+      "path": "analysis/native-snapshot/REMOTE_LENS_EXTRA_CONTRACTS.md",
+      "bytes": 10814,
+      "sha256": "f5c6cd5ceb762b92d901d0dc1192844ddc9daa6d369acbbc7e82a7853951e4d7"
+    },
+    {
+      "path": "analysis/native-snapshot/UTILITY_COMMANDS.md",
+      "bytes": 11829,
+      "sha256": "51f350fea34a0a58b02e4daf776c713e4082fb6a6bbc1cd0cadd09d9f095bcc2"
+    },
+    {
+      "path": "analysis/native-snapshot/WIRE_SCHEMA.md",
+      "bytes": 8490,
+      "sha256": "d9535af11aca24493a51120e1cc4c59c8866485eb095f71d9b9304cbc381f71b"
+    },
+    {
+      "path": "analysis/native-snapshot/dispatch-inventory.json",
+      "bytes": 34552,
+      "sha256": "9d9fe55d55d5d004762ea5db26c96cb07d7ec3b7a48f1139f97ae26ee27d92a6"
+    },
+    {
+      "path": "analysis/native-snapshot/forbidden-bundle-constants.json",
+      "bytes": 3481,
+      "sha256": "5f438b35cee1701493cd3c056b385619546f997a69d005893c1aa957ef2481c9"
+    },
+    {
+      "path": "chapters/01_范围证据与阅读路线.md",
+      "bytes": 8733,
+      "sha256": "a969c3e309708a4c2f4cf83f27b86a5dec2d21529d71c020f7ba4acb2587f0e2"
+    },
+    {
+      "path": "chapters/02_协议包装与CLI.md",
+      "bytes": 14882,
+      "sha256": "753340d2dd4556bee2cb94b142be308f150890b73aceab422be08da39e4a7518"
+    },
+    {
+      "path": "chapters/03_原生快照捕获与守护进程.md",
+      "bytes": 25682,
+      "sha256": "8d5eb374614577ce363453fbe8336fc5ad47633e9c68570970b121f4d06ebf93"
+    },
+    {
+      "path": "chapters/04_原生输入引用与差分.md",
+      "bytes": 35589,
+      "sha256": "8d17305b4bb8a73d1e282ccf9d611d2da74d670b8348b66b0861a442710c5ba9"
+    },
+    {
+      "path": "chapters/05_宿主工具与模型接入.md",
+      "bytes": 10994,
+      "sha256": "2772f1d0766c73a5a2b511f5d819f9d0b783db4f3e59339fa1aec2a8f998f628"
+    },
+    {
+      "path": "chapters/06_镜像光标与Appshot.md",
+      "bytes": 14626,
+      "sha256": "e26f30cc98445eaf99ea80d054354a7d9187222083e25686640c29ecdd3e1bbc"
+    },
+    {
+      "path": "chapters/07_覆盖程度与未闭合项.md",
+      "bytes": 8169,
+      "sha256": "12895b7355e3925b26b6181a723d439b27cdc901f0fd5db7bd3fb064f9481bdd"
+    },
+    {
+      "path": "chapters/08_独立实现工程手册.md",
+      "bytes": 31879,
+      "sha256": "cc35e72642964d88a54bd74f99298f0b70706efb1f1ec375695308e8b2d1e46b"
+    },
+    {
+      "path": "chapters/09_合成测试与验收.md",
+      "bytes": 14375,
+      "sha256": "24a89253fb49c96c9145fbd8c676a2b9a9df3bf62a175413abcf5b01ec076516"
+    },
+    {
+      "path": "chapters/10_附录MCP全契约.md",
+      "bytes": 15330,
+      "sha256": "41291417c0a8add9adb9fc1e0559d5e66648ecb790476a002cd786c6010d897e"
+    },
+    {
+      "path": "chapters/11_附录CLI全契约.md",
+      "bytes": 17947,
+      "sha256": "00d97500f0abbdf631b9d1afd61a35546c71a56ec4c440849dad2255a15dea06"
+    },
+    {
+      "path": "chapters/12_附录原生命令清单.md",
+      "bytes": 3597,
+      "sha256": "485fa04788e4b10de153607c67c79ea5c511a1d311e74f3552eaf9d0910929d5"
+    },
+    {
+      "path": "chapters/13_附录原生扩展契约.md",
+      "bytes": 114573,
+      "sha256": "ad890b66d761eb222774d7fcba774ab5a7d6ab10d15daf6aab436008acde9cd5"
+    },
+    {
+      "path": "chapters/14_附录宿主HTTP契约.md",
+      "bytes": 28385,
+      "sha256": "c8fa73422cbda1e11966e86c3109427098814570aa53ec58b3566f6359b5addc"
+    },
+    {
+      "path": "contracts/app-usage-row.schema.json",
+      "bytes": 1783,
+      "sha256": "2241b8259bd7760e9a3d5c8c6583b65d0e6267c8f82d7c19f5cad2f9c7e5097e"
+    },
+    {
+      "path": "contracts/coverage-matrix.json",
+      "bytes": 9932,
+      "sha256": "4ec856534a2c12198d34e0fc3b84352c7ab9568d75c768ced4aa7c6a2f0af06d"
+    },
+    {
+      "path": "contracts/intent-metadata.json",
+      "bytes": 3975,
+      "sha256": "3ad9444279c7756559ac050656ac47db54f66b2ad5bc021f1c567a5fea9a4631"
+    },
+    {
+      "path": "contracts/native-envelope.schema.json",
+      "bytes": 3043,
+      "sha256": "6650e75fe7278b7e8f702016dcfdfb55d4a22904f20a55f7ae1a988ce2932f20"
+    },
+    {
+      "path": "contracts/normalized-state.schema.json",
+      "bytes": 1363,
+      "sha256": "dcbc266c9b1b7d80a4503d8ee909747f6b13098d106b8908f955d08b45fa91ac"
+    },
+    {
+      "path": "contracts/reference-dependencies.json",
+      "bytes": 830,
+      "sha256": "9159d9a4bc49ffae0d745a35d56ddd8304353b8173a56187d5c634abf971e94d"
+    },
+    {
+      "path": "contracts/safe-policy.json",
+      "bytes": 750,
+      "sha256": "38c0c4c281a81ec47f13d8bb13261643fb548135b24eb5f8e4f370588941a819"
+    },
+    {
+      "path": "contracts/serialized-element.schema.json",
+      "bytes": 1525,
+      "sha256": "1a597029c25d8a441121479cec8a96f84a353e325489df63695689a78cc3045d"
+    },
+    {
+      "path": "contracts/version-comparison.json",
+      "bytes": 1196,
+      "sha256": "04849350bc9c49474e993d276ca9227583947ac89f35fe4da290e7780749bb72"
+    },
+    {
+      "path": "evidence/asar-integrity-check.json",
+      "bytes": 1058,
+      "sha256": "3eafee4c96950156d7159e77c294ed1dfd8046c9d198953d63407b258bfe5bb2"
+    },
+    {
+      "path": "evidence/component-hashes.json",
+      "bytes": 919,
+      "sha256": "6ef29602776c892cdcda41c945f77dea58cb297d778db282b8686b8459ba7e4d"
+    },
+    {
+      "path": "evidence/sample-manifest.json",
+      "bytes": 373,
+      "sha256": "e00d1214bb22670e13f7bb31ece4ed894f32e14da57970b643da8c52da9b39b0"
+    },
+    {
+      "path": "validate_bundle.py",
+      "bytes": 1943,
+      "sha256": "71d1dafb1d43ce4751655f92c07bc1d7ed49e578429e874855e467348731bc55"
+    },
+    {
+      "path": "完整实现手册.md",
+      "bytes": 344787,
+      "sha256": "dfee53b7f2ecc8521efbfa5a65b0852290c40ed284b457eb3175ad66b85d1f57"
+    }
+  ]
+}

@@ -1,0 +1,151 @@
+{
+  "kind": "independent-functional-metadata-transcription",
+  "sample_version": "0.4.164",
+  "bundle_count": 7,
+  "intent_count": 15,
+  "description_is_verbatim": false,
+  "entries": [
+    {
+      "bundle": "com.netease.163music",
+      "index": 0,
+      "name": "launch",
+      "required_params": [],
+      "optional_params": [],
+      "description_paraphrase": "Start NetEase Music quietly"
+    },
+    {
+      "bundle": "com.netease.163music",
+      "index": 1,
+      "name": "play_song",
+      "required_params": [
+        "song_id"
+      ],
+      "optional_params": [],
+      "description_paraphrase": "Select a NetEase song by numeric identifier"
+    },
+    {
+      "bundle": "com.netease.163music",
+      "index": 2,
+      "name": "open_playlist",
+      "required_params": [
+        "playlist_id"
+      ],
+      "optional_params": [],
+      "description_paraphrase": "Navigate to a NetEase playlist by numeric identifier"
+    },
+    {
+      "bundle": "com.netease.163music",
+      "index": 3,
+      "name": "play_daily_recommendation",
+      "required_params": [],
+      "optional_params": [],
+      "description_paraphrase": "Navigate to daily recommendations"
+    },
+    {
+      "bundle": "com.netease.163music",
+      "index": 4,
+      "name": "open_history_recommend",
+      "required_params": [],
+      "optional_params": [],
+      "description_paraphrase": "Navigate to past recommendations"
+    },
+    {
+      "bundle": "com.netease.163music",
+      "index": 5,
+      "name": "open_route",
+      "required_params": [
+        "route"
+      ],
+      "optional_params": [],
+      "description_paraphrase": "Navigate through the app's route bridge; metadata describes multiple route candidates"
+    },
+    {
+      "bundle": "com.apple.Music",
+      "index": 0,
+      "name": "launch",
+      "required_params": [],
+      "optional_params": [],
+      "description_paraphrase": "Start Music in the background"
+    },
+    {
+      "bundle": "com.apple.Music",
+      "index": 1,
+      "name": "open_url",
+      "required_params": [
+        "url"
+      ],
+      "optional_params": [],
+      "description_paraphrase": "Open an Apple Music link"
+    },
+    {
+      "bundle": "com.spotify.client",
+      "index": 0,
+      "name": "launch",
+      "required_params": [],
+      "optional_params": [],
+      "description_paraphrase": "Start Spotify in the background"
+    },
+    {
+      "bundle": "com.spotify.client",
+      "index": 1,
+      "name": "play_uri",
+      "required_params": [
+        "uri"
+      ],
+      "optional_params": [],
+      "description_paraphrase": "Play content identified by a Spotify URI"
+    },
+    {
+      "bundle": "com.apple.mail",
+      "index": 0,
+      "name": "compose",
+      "required_params": [],
+      "optional_params": [
+        "to",
+        "subject",
+        "body",
+        "cc",
+        "bcc"
+      ],
+      "description_paraphrase": "Prepare a mail composition with optional addressing and content"
+    },
+    {
+      "bundle": "com.apple.Safari",
+      "index": 0,
+      "name": "open_url",
+      "required_params": [
+        "url"
+      ],
+      "optional_params": [],
+      "description_paraphrase": "Open a full HTTP/HTTPS address in Safari"
+    },
+    {
+      "bundle": "com.tencent.xinWeChat",
+      "index": 0,
+      "name": "launch",
+      "required_params": [],
+      "optional_params": [],
+      "description_paraphrase": "Start WeChat"
+    },
+    {
+      "bundle": "com.tinyspeck.slackmacgap",
+      "index": 0,
+      "name": "launch",
+      "required_params": [],
+      "optional_params": [],
+      "description_paraphrase": "Start Slack"
+    },
+    {
+      "bundle": "com.tinyspeck.slackmacgap",
+      "index": 1,
+      "name": "open_channel",
+      "required_params": [
+        "team_id",
+        "channel_id"
+      ],
+      "optional_params": [],
+      "description_paraphrase": "Navigate to a Slack channel or direct-message conversation"
+    }
+  ],
+  "source": "analysis/native-snapshot/APP_INTENTS_METADATA.md"
+}

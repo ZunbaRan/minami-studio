@@ -1,0 +1,402 @@
+{
+  "schema_version": 1,
+  "sample_version": "0.4.164",
+  "sample_sha256": "453d60872ac801f44497b34d2f68edf7d0fee497420ac44c5d05d785c62b8551",
+  "architecture": "arm64",
+  "address_kind": "unslid virtual address",
+  "evidence": "static instructions and retained symbols; not runtime verified",
+  "limits": {
+    "descriptor_refetch_nodes": 200,
+    "descriptor_refetch_depth": 12,
+    "descriptor_ancestor_suffix_max": 3,
+    "unicode_chunk_scalars": 20,
+    "physical_text_inter_key_us": 4000,
+    "multi_click_inter_pair_us": 40000,
+    "drag_default_steps": 12,
+    "drag_min_steps": 2,
+    "drag_inter_motion_us": 8000,
+    "focus_guard_prelude_s": 0.001,
+    "focus_guard_tail_s": 5.0,
+    "layout_keycode_candidates": 128,
+    "layout_output_utf16_capacity": 8
+  },
+  "element_entry": {
+    "element": "AXUIElementRef",
+    "snapshotId": "String",
+    "pid": "Int32",
+    "descriptor": "ElementDescriptor?",
+    "invalidated": "Bool"
+  },
+  "element_descriptor": {
+    "role": "String",
+    "subrole": "String?",
+    "title": "String?",
+    "identifier": "String?",
+    "roleDescription": "String?",
+    "parentRoles": "[String]"
+  },
+  "element_store": {
+    "reference_format": "e + decimal counter",
+    "counter_initial": 0,
+    "counter_reset_on_clear": true,
+    "snapshot_format": "s_ + Foundation formatted current date with colons removed",
+    "reference_reuse": [
+      "same pid",
+      "CFEqual element",
+      "not already used in current snapshot"
+    ],
+    "begin_snapshot": [
+      "clear currentSnapshotRefs",
+      "prune AXRole reads returning -25202",
+      "retain other cached entries"
+    ],
+    "destroy_notification": "mark matching entries invalidated, do not delete immediately",
+    "refetch_acceptance": "exactly one descriptor match within bounded DFS",
+    "refetch_does_not_prove": "whole-application uniqueness or cross-window identity"
+  },
+  "diff": {
+    "key_format": "decimal pid + colon + (decimal windowId or hyphen)",
+    "fields": [
+      "role",
+      "subrole",
+      "title",
+      "value",
+      "description",
+      "role_description",
+      "enabled",
+      "focused",
+      "children_count",
+      "actions"
+    ],
+    "bounds_fields": [
+      "x",
+      "y",
+      "w",
+      "h"
+    ],
+    "bounds_rounding": "nearest integer, ties away from zero (ARM64 FRINTA)",
+    "disabled_updates_baseline": true,
+    "changed_elements_order": "input order",
+    "removed_refs_order": "lexicographic sorted",
+    "output_fields": [
+      "elements",
+      "elements_are_diff",
+      "unchanged_element_count",
+      "removed_refs"
+    ],
+    "value_serialization": "Swift String(describing:actual unwrapped Any value), not JSON",
+    "nil_fields": "skip",
+    "bounds_number": "Double cast else Int cast converted to Double else0"
+  },
+  "coordinate_mapping": {
+    "key": "pid only",
+    "x": "originX + screenshotX * pointWidth / pixelWidth",
+    "y": "originY + screenshotY * pointHeight / pixelHeight",
+    "translator_checks_age": false,
+    "translator_clamps": false,
+    "translator_miss": "nil",
+    "warning": "cache invalidation, write paths and caller policies documented by snapshot analyst"
+  },
+  "ref_click": {
+    "entrypoint": "0x100013f24",
+    "target": "cached/refetched entry pid and element, ignores external app metadata by signature",
+    "ax_order": [
+      "AXPress",
+      "AXPick",
+      "AXConfirm"
+    ],
+    "ax_eligible": "!forceSynth && strategy!=physical && left button && count<=1",
+    "ax_failure": "throw; no automatic physical retry",
+    "missing_actions": "strategy ax throws; auto uses physical center if bounds exist",
+    "synth_override": "forceSynth, non-left or multi-click bypass AX branch even under strategy ax",
+    "strategy_raw_values": {
+      "0": "auto",
+      "1": "physical",
+      "2": "ax"
+    },
+    "invalid_strategy": "daemon defaults to auto",
+    "invalid_button": "daemon defaults to left"
+  },
+  "key_delivery": {
+    "entrypoint": "0x1000203c4",
+    "hasKeyWindow": "AXFocusedWindow success && nonnil && app.isActive",
+    "direct_event_predicate": "sequential hasKeyWindow(pid) OR second app.isActive check",
+    "status_by_enum": {
+      "0": "key_window",
+      "1": "active_app",
+      "2": "menu_ax_press",
+      "3": "suppressed"
+    },
+    "menu_match_modifier_mask": 1966080,
+    "menu_enabled_only": true,
+    "paired_events": true,
+    "foreground_status_not_atomic": true
+  },
+  "event_factory": {
+    "button_index": {
+      "left": 0,
+      "right": 1,
+      "other": 2
+    },
+    "nsevent_types": {
+      "left": {
+        "down": 1,
+        "up": 2,
+        "drag": 6
+      },
+      "right": {
+        "down": 3,
+        "up": 4,
+        "drag": 7
+      },
+      "other": {
+        "down": 25,
+        "up": 26,
+        "drag": 27
+      }
+    },
+    "integer_fields": {
+      "3": "button index",
+      "7": 3,
+      "42": "0x414c4d414e4f464c",
+      "91": "window ID if found",
+      "92": "window ID if found"
+    },
+    "nonactive_mouse_flags_or": 1048576,
+    "window_local_coordinate": "global CGEvent location minus selected window origin",
+    "window_selection": "first containing point from WindowList.windows(pid), else first window",
+    "set_window_location_missing": "no-op fallback",
+    "post_function": "dlsym CGEventPostToPid"
+  },
+  "text_routes": {
+    "ref_replace": "set AXFocused=true then AXValue=text",
+    "ref_insert": "AXSelectedText if settable else append existing AXValue; AXSelectedText failure throws",
+    "auto_no_ref": [
+      "try focused AXSelectedText then AXValue append",
+      "translate entire text via current keyboard layout",
+      "translation failure -> Unicode entire text",
+      "translation success -> physical key pairs; event failure does not trigger full Unicode retry"
+    ],
+    "unicode": "max20 Unicode scalars per chunk; set identical UTF16 on code0 down/up",
+    "layout_modifier_candidates": [
+      {
+        "carbon": 0,
+        "cg_flags": 0
+      },
+      {
+        "carbon": 2,
+        "cg_flags": 131072
+      },
+      {
+        "carbon": 8,
+        "cg_flags": 524288
+      },
+      {
+        "carbon": 10,
+        "cg_flags": 655360
+      }
+    ],
+    "verification": "same baseline AX element value changed, not exact typed text verification"
+  },
+  "focus_guard": {
+    "tap_create": {
+      "location": 2,
+      "placement": 0,
+      "options": 0,
+      "event_mask": 24576
+    },
+    "bypass_sentinel": "0x414c4d414e4f464c",
+    "activation_filter": "NSEvent type13 OR (type14 && subtype8), target PID=data1",
+    "drop_precedence": [
+      "unexpired temporary allowance -> allow",
+      "target in disallowed -> drop",
+      "onlyAllow set and target differs -> drop",
+      "otherwise allow"
+    ],
+    "failure_mode": "arm failure increments health/logs; no mandatory fail-closed observed",
+    "helper_match": "same bundle prefix with dot suffix containing helper, .xpc, or service (case-insensitive suffix)",
+    "pid_observer": "CGEventTapCreateForPid listen-only options1; stats, returns original event",
+    "end_delay_s": 5
+  },
+  "cancellation": {
+    "socket_dispatch": "synchronous within peer recv loop",
+    "peer_close_cancels_inflight_dispatch": false,
+    "teardown": "mark not alive, unsubscribe appshot events, close fd after current dispatch returns",
+    "scope_note": "does not assert there is no separate cancellation path elsewhere"
+  },
+  "concurrency": {
+    "per_peer_dispatch": "sequential sync",
+    "across_peers": "concurrent handler queue",
+    "store_method_lock": "yes",
+    "whole_snapshot_transaction_lock": "not established",
+    "shared_state_warning": "ElementStore.currentSnapshotRefs and global focus onlyAllow/disallowed may interleave"
+  },
+  "evidence_addresses": {
+    "store_begin": "0x10000a898",
+    "store_register": "0x10000ad9c",
+    "store_destroy": "0x10000b734",
+    "store_refetch": "0x10000bb3c",
+    "store_clear": "0x10000cb64",
+    "resolve_ref": "0x100019db4",
+    "diff_apply": "0x10002a63c",
+    "click_body": "0x10001ba60",
+    "drag": "0x10001efa4",
+    "scroll": "0x10001e440",
+    "keypress": "0x1000203c4",
+    "type_auto": "0x10002102c",
+    "type_focused_ax": "0x100023b60",
+    "layout_translate": "0x100023ea8",
+    "focus_begin": "0x100027f78",
+    "focus_should_drop": "0x100029848",
+    "has_key_window": "0x10002d6b0",
+    "type_check": "0x10002d590",
+    "coordinate_translate": "0x100082890"
+  },
+  "not_proven": [
+    "actual delivery in every target app",
+    "private SPI availability across macOS versions",
+    "absolute no-focus-steal guarantee",
+    "unconditional key/button-up on hard interruption",
+    "global uniqueness of descriptor refetch",
+    "exact typed substring landed",
+    "whole-snapshot isolation",
+    "user permission/TCC runtime status"
+  ],
+  "recommended_improvements_not_observed": [
+    "pressed-state cleanup finally",
+    "explicit cancel token protocol",
+    "per-action target identity validation",
+    "per-PID serialized transactions",
+    "mapping epoch/window/age checks",
+    "fail-closed or disclosed degradation on tap/SPI failure"
+  ],
+  "wire_error_codes": [
+    "invalid_arg",
+    "internal",
+    "ax_not_granted",
+    "sc_not_granted",
+    "app_not_found",
+    "element_not_found",
+    "ref_stale",
+    "action_unsupported",
+    "ax_failure"
+  ],
+  "ax_error_map": {
+    "0": "success",
+    "-25202": "ref_stale",
+    "-25205": "action_unsupported",
+    "-25206": "action_unsupported",
+    "-25211": "ax_not_granted",
+    "other_nonzero": "ax_failure"
+  },
+  "feature_flags": {
+    "ALMA_CU_FORCE_SYNTH": {
+      "default": false,
+      "true_lowercase_values": [
+        "1",
+        "true",
+        "yes",
+        "on"
+      ],
+      "evaluation": "lazy once per process"
+    },
+    "ALMA_CU_LOG_DLSYM": {
+      "default": false,
+      "true_lowercase_values": [
+        "1",
+        "true",
+        "yes",
+        "on"
+      ],
+      "evaluation": "lazy once per process"
+    }
+  },
+  "set_value": {
+    "entrypoint": "0x100014a08",
+    "settable_check": "AXValue must be settable with successful query; otherwise action_unsupported",
+    "coercion_order": [
+      "String -> NSString",
+      "NSNumber -> pass through",
+      "Bool -> NSNumber",
+      "other -> NSString(String(describing:value))"
+    ],
+    "attribute": "AXValue",
+    "focus_change": false,
+    "write_failure": "shared AX error mapping"
+  },
+  "select_text": {
+    "entrypoint": "0x100014cb4",
+    "readable_types": [
+      "String",
+      "NSAttributedString.string"
+    ],
+    "search": "first Foundation range of (prefix ?? empty)+text+(suffix ?? empty), options0, no explicit locale",
+    "ambiguity": "not rejected; first occurrence wins",
+    "range_unit": "UTF16 code units",
+    "start": "utf16 distance to match.start + prefix.utf16.count",
+    "length": "text.utf16.count",
+    "cursor_before": "same start,length0",
+    "cursor_after": "start+=length,length0",
+    "other_selection_type": "select full text range",
+    "focus": "if AXFocused not true attempt set true, ignore error",
+    "attribute": "AXSelectedTextRange",
+    "range_value_type": 4,
+    "no_readable_text": "action_unsupported",
+    "needle_absent": "internal",
+    "AXValueCreate_failure": "internal",
+    "write_failure": "shared AX error mapping"
+  },
+  "ref_press_action_aliases": {
+    "enter": "AXConfirm",
+    "return": "AXConfirm",
+    "escape": "AXCancel",
+    "esc": "AXCancel",
+    "space": "AXPress",
+    "increment": "AXIncrement",
+    "up": "AXIncrement",
+    "decrement": "AXDecrement",
+    "down": "AXDecrement",
+    "showmenu": "AXShowMenu",
+    "menu": "AXShowMenu"
+  },
+  "spi_abi": {
+    "CGEventPostToPid": "@convention(c) (Int32, CGEvent) -> Void",
+    "CGEventSetWindowLocation": "@convention(c) (CGEvent, CGPoint) -> Void",
+    "library": "/System/Library/Frameworks/CoreGraphics.framework/CoreGraphics",
+    "dlopen_flags": 9,
+    "missing_post_to_pid": "Swift fatalError/assertionFailure, no CGEventPost fallback",
+    "missing_set_window_location": "no-op stub"
+  },
+  "text_verification": {
+    "baseline": "same AXFocusedUIElement and its readable AXValue String",
+    "typed_empty": "landed",
+    "baseline_element_or_value_missing": "unverifiable(reason)",
+    "after_value_missing": "unverifiable(reason)",
+    "after_equals_before": "failed",
+    "after_differs": "landed",
+    "exact_typed_content_check": false
+  },
+  "key_parser": {
+    "split": "+",
+    "omit_empty_subsequences_before_trim": true,
+    "trim": "Foundation CharacterSet.whitespaces",
+    "modifiers": "all parts except last, lowercase",
+    "main_key": "last; if Character count1 lowercase ANSI first, then lowercase named",
+    "uppercase_implies_shift": false,
+    "errors": "invalid_arg"
+  },
+  "ax_enablement_assertion": {
+    "attributes": [
+      "AXEnhancedUserInterface",
+      "AXManualAccessibility"
+    ],
+    "enter": "save previous bool (read failure false); set both true",
+    "deinit": "restore saved bool",
+    "writes_fail_closed": false
+  },
+  "snapshot_command_distinction": {
+    "native_snap": "plain snapToDict, no AppStateDiff",
+    "mcp_post_action": "get_app_state(depth0,interactive_only true,include_screenshot true), no disable_diff, so get_app_state Diff+capture",
+    "side_effect": "post-action may replace PID/window diff baseline with shallow elements, as well as touching shared ElementStore"
+  }
+}

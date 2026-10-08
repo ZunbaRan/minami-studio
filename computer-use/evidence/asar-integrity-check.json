@@ -1,0 +1,26 @@
+{
+  "files": [
+    {
+      "path": "out/main/index.js",
+      "sha256": "df95c2d383730265f251660761a480938989351d2278235366e55366a72c0175",
+      "asar_integrity_hash": "df95c2d383730265f251660761a480938989351d2278235366e55366a72c0175",
+      "match": true
+    },
+    {
+      "path": "out/preload/index.js",
+      "sha256": "41d68ca7d15ec9bf421527015b435fcd236810c3f716f30d7965832880d11ef6",
+      "asar_integrity_hash": "41d68ca7d15ec9bf421527015b435fcd236810c3f716f30d7965832880d11ef6",
+      "match": true
+    },
+    {
+      "path": "package.json",
+      "sha256": "03c2995dc2d04884eb4e323cec0113a164a0d45cbaec85a7be91da81c3728229",
+      "asar_integrity_hash": "03c2995dc2d04884eb4e323cec0113a164a0d45cbaec85a7be91da81c3728229",
+      "match": true
+    }
+  ],
+  "asar_header_sha256": "6b421efa8ddf526d11d833f95ae98f34c875473ffb0be76630f2615e5d1a8e11",
+  "plist_header_hash": "6b421efa8ddf526d11d833f95ae98f34c875473ffb0be76630f2615e5d1a8e11",
+  "match": true,
+  "note": "Integrity consistency only; Apple signature verification not performed on Linux."
+}
