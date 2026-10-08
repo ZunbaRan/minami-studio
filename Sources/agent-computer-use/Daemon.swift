@@ -12,24 +12,33 @@ final class ConnectionContext {
     private let writeLock = NSLock()
     var subscriptions = Set<String>()
     var readBuffer = Data()
+    /// Queued responses are suppressed once the peer tore down [DISASM].
+    private(set) var alive = true
 
     init(fd: Int32) { self.fd = fd }
 
     func send(_ line: String) {
         writeLock.lock()
         defer { writeLock.unlock() }
+        guard alive else { return }
         let bytes = (line + "\n").data(using: .utf8)!
         bytes.withUnsafeBytes { ptr in
             var written = 0
             while written < bytes.count {
                 let n = Darwin.send(fd, ptr.baseAddress!.advanced(by: written), bytes.count - written, 0)
+                if n < 0 && errno == EINTR { continue }
                 if n <= 0 { return }
                 written += n
             }
         }
     }
 
-    func close() { Darwin.close(fd) }
+    func close() {
+        writeLock.lock()
+        alive = false
+        writeLock.unlock()
+        Darwin.close(fd)
+    }
 }
 
 final class Daemon {
@@ -40,9 +49,14 @@ final class Daemon {
     private var listenFD: Int32 = -1
     private let connectionsLock = NSLock()
     private var connections = Set<ConnectionContextBox>()
+    /// [DISASM] idle shutdown polls every 30s against lastActivity, which is
+    /// refreshed before EVERY frame decode — including malformed requests.
+    private var lastActivity = Date()
     private var idleTimer: DispatchSourceTimer?
     private let connQueue = DispatchQueue(label: "agent-cu.conn", attributes: .concurrent)
-    private let workQueue = DispatchQueue(label: "agent-cu.work", attributes: .concurrent)
+    /// [DISASM] self.workQueue.async — serial: requests serialize so that
+    /// concurrent get_app_state/click frames can't interleave mid-snapshot.
+    private let workQueue = DispatchQueue(label: "agent-cu.work")
 
     let elementStore = ElementStore()
     let appState = AppStateStore()
@@ -71,6 +85,12 @@ final class Daemon {
         signal(SIGPIPE, SIG_IGN)
         unlink(socketPath)
 
+        // Create the socket's parent directory (Alma creates it
+        // unconditionally before bind).
+        let parent = (socketPath as NSString).deletingLastPathComponent
+        try? FileManager.default.createDirectory(atPath: parent,
+            withIntermediateDirectories: true)
+
         listenFD = socket(AF_UNIX, SOCK_STREAM, 0)
         guard listenFD >= 0 else {
             FileHandle.standardError.write("failed to create socket\n".data(using: .utf8)!)
@@ -96,13 +116,14 @@ final class Daemon {
                 Darwin.bind(listenFD, sp, addrLen)
             }
         }
-        guard bindResult == 0, listen(listenFD, 16) == 0 else {
+        guard bindResult == 0, listen(listenFD, 4) == 0 else { // [DISASM] backlog=4
             FileHandle.standardError.write("bind/listen failed on \(socketPath): \(errno)\n".data(using: .utf8)!)
             exit(1)
         }
         chmod(socketPath, 0o600)
 
         armIdleTimer()
+        Capture.probeScreenRecording()
         let acceptQ = DispatchQueue(label: "agent-cu.accept")
         acceptQ.async { self.acceptLoop() }
         // NSApp.run() pumps the main runloop AND drains DispatchQueue.main —
@@ -113,16 +134,30 @@ final class Daemon {
     }
 
     private func armIdleTimer() {
-        connectionsLock.lock()
-        defer { connectionsLock.unlock() }
-        idleTimer?.cancel()
-        guard connections.isEmpty, idleSeconds > 0 else { return }
+        guard idleSeconds > 0, idleTimer == nil else { return }
         let t = DispatchSource.makeTimerSource(queue: DispatchQueue.global())
-        t.schedule(deadline: .now() + idleSeconds)
-        t.setEventHandler { exit(0) }
+        t.schedule(deadline: .now() + 30, repeating: 30)
+        t.setEventHandler { [weak self] in
+            guard let self else { return }
+            if Date().timeIntervalSince(self.lastActivity) >= self.idleSeconds {
+                FileHandle.standardError.write(
+                    "idle timeout reached; exiting\n".data(using: .utf8)!)
+                self.initiateShutdown()
+            }
+        }
         idleTimer = t
         t.resume()
     }
+
+    /// shutdown — main-queue flag, restore EnhancedUI, close the listen fd,
+    /// unlink the socket, exit. Also used by the idle path.
+    func initiateShutdown() {
+        shutdownRequested = true
+        if listenFD >= 0 { Darwin.close(listenFD); listenFD = -1 }
+        unlink(socketPath)
+        exit(0)
+    }
+    private var shutdownRequested = false
 
     private func acceptLoop() {
         while true {
@@ -131,7 +166,6 @@ final class Daemon {
             let ctx = ConnectionContext(fd: fd)
             connectionsLock.lock()
             connections.insert(ConnectionContextBox(ctx))
-            idleTimer?.cancel()
             connectionsLock.unlock()
             connQueue.async { self.readLoop(ctx) }
         }
@@ -142,13 +176,13 @@ final class Daemon {
         connections.remove(ConnectionContextBox(ctx))
         connectionsLock.unlock()
         ctx.close()
-        armIdleTimer()
     }
 
     private func readLoop(_ ctx: ConnectionContext) {
-        var buf = [UInt8](repeating: 0, count: 65536)
+        var buf = [UInt8](repeating: 0, count: 8192) // [DISASM] 0x2000 recv buffer
         while true {
             let n = recv(ctx.fd, &buf, buf.count, 0)
+            if n < 0 && errno == EINTR { continue }
             if n <= 0 { break }
             ctx.readBuffer.append(buf, count: n)
             while let nl = ctx.readBuffer.firstIndex(of: 0x0A) {
@@ -166,8 +200,13 @@ final class Daemon {
     }
 
     private func handleLine(_ line: String, on ctx: ConnectionContext) {
-        guard let req = WireRequest.parse(line) else {
-            ctx.send(WireResponse.fail(id: "", DaemonError("invalid_arg", "malformed request frame")))
+        lastActivity = Date() // refreshed before every decode, malformed too
+        let req: WireRequest
+        switch WireRequest.parse(line) {
+        case .success(let r): req = r
+        case .failure(let m):
+            // Alma replies id "?" + invalid_arg + "malformed JSON: <desc>".
+            ctx.send(WireResponse.fail(id: "?", DaemonError("invalid_arg", "malformed JSON: \(m.message)")))
             return
         }
         do {
@@ -200,7 +239,8 @@ final class Daemon {
         case "click": return try cmdClick(args)
         case "perform_secondary_action": return try cmdSecondaryAction(args)
         case "drag": return try cmdDrag(args)
-        case "type", "type_text": return try cmdTypeText(args)
+        case "type": return try cmdType(args)
+        case "type_text": return try cmdTypeText(args)
         case "press": return try cmdPress(args)
         case "press_key": return try cmdPressKey(args)
         case "set_value": return try cmdSetValue(args)

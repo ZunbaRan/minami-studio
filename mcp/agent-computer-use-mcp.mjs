@@ -272,6 +272,9 @@ const posIntOr = (v, defaultVal) => {
 };
 
 async function screenshotTarget(target) {
+  // [ALMA] ref-only / no-target actions return null — the original action
+  // content ships alone, without a doomed get_app_state({}) screenshot.
+  if (!target?.bundle && !target?.pid) return null;
   try {
     const state = await daemon.call(
       "get_app_state",
@@ -711,7 +714,7 @@ defTool(
   "Directly set AXValue on an element (sliders, steppers, text fields). Skips keystroke simulation. Value can be a string, number, or boolean.",
   {
     ref: { type: "string" },
-    value: { description: "string, number, or boolean" },
+    value: { anyOf: [{ type: "string" }, { type: "number" }, { type: "boolean" }], description: "string, number, or boolean" },
     ...targetShape
   },
   ["ref", "value"],
@@ -999,10 +1002,16 @@ function writeMessage(msg) {
 function rpcResult(id, result) { writeMessage({ jsonrpc: "2.0", id, result }); }
 function rpcError(id, code, message) { writeMessage({ jsonrpc: "2.0", id, error: { code, message } }); }
 
+// [ALMA] notifications/cancelled suppresses the eventual response — the
+// aborted request never emits a late result frame.
+const cancelledRequests = new Set();
+
 async function handleMessage(msg) {
   const { id, method, params } = msg;
   if (id === void 0 || id === null) {
-    // notification — nothing to answer
+    if (method === "notifications/cancelled" && params?.requestId !== void 0) {
+      cancelledRequests.add(params.requestId);
+    }
     return;
   }
   try {
@@ -1037,9 +1046,11 @@ async function handleMessage(msg) {
         }
         try {
           const result = await tool.handler(params?.arguments ?? {});
-          rpcResult(id, result);
+          if (!cancelledRequests.delete(id)) rpcResult(id, result);
         } catch (e) {
-          rpcResult(id, { isError: true, content: [textBlock(e instanceof Error ? e.message : String(e))] });
+          if (!cancelledRequests.delete(id)) {
+            rpcResult(id, { isError: true, content: [textBlock(e instanceof Error ? e.message : String(e))] });
+          }
         }
         return;
       }

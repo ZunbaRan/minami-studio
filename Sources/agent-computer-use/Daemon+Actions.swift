@@ -1,654 +1,1214 @@
+// Command handlers + shared resolution — rebuilt against the .153/.164
+// disassembly contracts. All wire shapes and error literals are verbatim
+// where the binary's string table pins them.
 import AppKit
 import ApplicationServices
+import CoreGraphics
 import Foundation
 
-// Command handlers. Wire shapes and error texts per live-probe evidence and
-// the .164 contract chapters; branch behavior per .153 disasm.
+// MARK: - Shared resolvers [DISASM]
 
 extension Daemon {
-    private static let startedAt = Date()
 
-    // MARK: - target resolution
-
-    /// Resolve pid from args: explicit pid, else bundle → running app.
-    /// Error text verbatim: No running app matched pid=X.
-    func resolvePid(_ a: JSONDict, requireRunning: Bool = true) throws -> pid_t {
-        if let pid = a.int("pid"), pid > 0 {
-            if requireRunning, AXBridge.runningApp(pid: pid_t(pid)) == nil {
-                throw DaemonError("app_not_found", "No running app matched pid=\(pid).")
-            }
-            return pid_t(pid)
+    /// resolveApp — PID → live NSRunningApplication; falls back to bundle,
+    /// then exact localizedName. Total failure → app_not_found with the
+    /// label `pid=<n>` / `bundle <b>` (pid=0 when neither was supplied).
+    func resolveApp(_ a: JSONDict) throws -> NSRunningApplication {
+        let pid = a.int("pid")
+        if let pid = pid, pid > 0,
+           let app = NSRunningApplication(processIdentifier: pid_t(pid)) {
+            return app
         }
-        if let bundle = a.string("bundle") {
-            guard let app = AXBridge.runningApp(bundle: bundle) else {
-                throw DaemonError("app_not_found", "No running app matched bundle \(bundle).")
-            }
+        if let bundle = a.str("bundle"),
+           let app = NSRunningApplication
+               .runningApplications(withBundleIdentifier: bundle).first {
+            return app
+        }
+        if let name = a.str("name"),
+           let app = NSWorkspace.shared.runningApplications
+               .first(where: { $0.localizedName == name }) {
+            return app
+        }
+        let label: String
+        if let pid = pid, pid > 0 { label = "pid=\(pid)" }
+        else if let bundle = a.str("bundle") { label = "bundle \(bundle)" }
+        else { label = "pid=0" }
+        throw DaemonError("app_not_found",
+                          "No running app matched \(label).")
+    }
+
+    /// resolveApp for state/snapshot commands — a bundle that is not running
+    /// is cold-launched with focus preserved, then waited on.
+    func resolveAppForState(_ a: JSONDict) throws -> NSRunningApplication {
+        do { return try resolveApp(a) }
+        catch let e as DaemonError where e.code == "app_not_found" {
+            guard let bundle = a.str("bundle") else { throw e }
+            let launched = try launchWithFrontmostPreserved(bundle: bundle)
+            EventDispatch.waitUntilReady(pid: launched.processIdentifier)
+            return launched
+        }
+    }
+
+    /// resolveActionPid — positive `pid` passes through without a liveness
+    /// check; nonpositive/missing pid falls back to bundle resolve, then a
+    /// cold launch. nil means "no target supplied" — the caller decides.
+    func resolveActionPid(_ a: JSONDict) -> pid_t? {
+        if let pid = a.int("pid"), pid > 0 { return pid_t(clamping: pid) }
+        guard let bundle = a.str("bundle") else { return nil }
+        if let app = NSRunningApplication
+            .runningApplications(withBundleIdentifier: bundle).first {
             return app.processIdentifier
         }
-        throw DaemonError("invalid_arg", "missing \"bundle\"")
+        return try? launchWithFrontmostPreserved(bundle: bundle)
+            .processIdentifier
     }
 
-    /// Shared preflight for the action command set
-    /// (click/secondary/drag/type*/press*/scroll/set_value):
-    /// ForbiddenTargets.check on the resolved pid/bundle unless force_forbidden.
-    func actionPreflight(_ a: JSONDict) throws {
-        let allowOverride = a.bool("force_forbidden") == true
-        if let pid = a.int("pid") {
-            try ForbiddenTargets.check(pid: pid_t(pid), allowOverride: allowOverride)
-        } else if let bundle = a.string("bundle") {
-            try ForbiddenTargets.check(bundleId: bundle, allowOverride: allowOverride)
+    /// actionPreflight — resolveActionPid, then the forbidden-target gate.
+    /// A nil target passes the gate (ref-only actions carry no args target).
+    func actionPreflight(_ a: JSONDict) throws -> pid_t? {
+        let pid = resolveActionPid(a)
+        try ForbiddenTargets.check(pid: pid,
+            allowOverride: a.bool("force_forbidden") ?? false)
+        return pid
+    }
+
+    /// Require a positive-integer numeric arg: `missing "<key>"`.
+    func requireNum(_ a: JSONDict, _ key: String) throws -> Int {
+        guard let v = a[key] as? Int else {
+            throw DaemonError("invalid_arg", "missing \"\(key)\"")
+        }
+        return v
+    }
+    func requireNumD(_ a: JSONDict, _ key: String) throws -> Double {
+        guard let v = a[key] as? Double ?? (a[key] as? Int).map(Double.init)
+        else {
+            throw DaemonError("invalid_arg", "missing \"\(key)\"")
+        }
+        return v
+    }
+
+    /// Resolve an element ref through the store (descriptor recovery on dead
+    /// elements). nil → element_not_found.
+    func resolveEntry(_ ref: String, store: ElementStore) throws
+        -> ElementStore.Entry {
+        try store.resolve(ref: ref)
+    }
+
+    /// Live action names for an entry's element.
+    func actions(of el: AXUIElement) -> [String] {
+        var names: CFArray?
+        return (AXUIElementCopyActionNames(el, &names) == .success
+                ? (names as? [String]) : nil) ?? []
+    }
+    /// Live bounds first (elements move); snapshot descriptor fallback.
+    func bounds(of e: ElementStore.Entry) -> CGRect? {
+        AXBridge.axBounds(e.element) ?? e.descriptor.bounds
+    }
+    /// Live window id for pointer-event window-local metadata.
+    func windowID(of e: ElementStore.Entry) -> CGWindowID? {
+        AXBridge.windowIDNumber(of: e.element)
+    }
+
+    /// Common settle prelude/postlude driver. settle_ms arg, default 600ms.
+    func settlePrelude(pid: pid_t) -> UInt32 {
+        Settle.hash(pid: pid)
+    }
+    func settlePostlude(pid: pid_t, baseline: UInt32, a: JSONDict) {
+        guard baseline != 0 else { return }
+        let budget = (a["settle_ms"] as? Int)
+            ?? (a["settle_ms"] as? Double).map(Int.init) ?? 600
+        Settle.wait(pid: pid, baseline: baseline, budgetMs: budget)
+    }
+}
+
+// MARK: - Settle — window-content hash settle [DISASM]
+
+/// UInt32 sampled-byte hash over the cached mapping's window image:
+/// seed 0xdeadbeef, per byte h = (h &* 0x01000193) ^ b, stride
+/// max(1, byteCount/64). Postlude polls every 40ms until the hash returns
+/// to baseline or the per-command budget (default 600ms) expires.
+enum Settle {
+    static func hash(pid: pid_t) -> UInt32 {
+        guard let wid = Capture.mapping(for: pid)?.wid
+                    ?? WindowList.frontWindowID(pid: pid),
+              let data = Capture.rgbaBytes(of: wid)
+        else { return 0 }
+        var h: UInt32 = 0xdeadbeef
+        let stride = max(1, data.count / 64)
+        var i = 0
+        while i < data.count {
+            h = (h &* 0x01000193) ^ UInt32(data[i])
+            i += stride
+        }
+        return h
+    }
+
+    static func wait(pid: pid_t, baseline: UInt32, budgetMs: Int) {
+        let deadline = Date().addingTimeInterval(Double(budgetMs) / 1000.0)
+        while Date() < deadline {
+            usleep(40_000)
+            if hash(pid: pid) == baseline { return }
         }
     }
+}
 
-    // MARK: - infra
+// MARK: - Utility commands
+
+extension Daemon {
 
     func cmdPing(_ a: JSONDict) throws -> JSONDict {
-        ["version": HELPER_VERSION, "uptime_s": Date().timeIntervalSince(Self.startedAt)]
+        ["pong": true, "version": "0.1.0",
+         "uptime_s": Int(ProcessInfo.processInfo.systemUptime)]
     }
 
     func cmdPermissions(_ a: JSONDict) throws -> JSONDict {
+        // screen_recording comes from the cached SCShareableContent probe,
+        // not CGPreflight (Alma caches the probe result).
         [
             "accessibility": AXIsProcessTrusted(),
-            "screen_recording": CGPreflightScreenCaptureAccess(),
-            "focus_guard": FocusStealPreventer.shared.status,
+            "screen_recording": Capture.screenRecordingCached(),
+            "focus_guard": [
+                "armed": FocusStealPreventer.shared.armed,
+                "arm_failures": FocusStealPreventer.shared.armFailures,
+                "tap_disables_recovered": FocusStealPreventer.shared
+                    .tapDisablesRecovered,
+            ],
         ]
     }
 
+    /// grant — AX trust prompt only. {accessibility, prompted:true}.
     func cmdGrant(_ a: JSONDict) throws -> JSONDict {
-        // The ONLY command that may prompt. Others fail-fast ax_not_granted.
-        let opts = [kAXTrustedCheckOptionPrompt.takeRetainedValue() as String: true] as CFDictionary
+        let opts = [kAXTrustedCheckOptionPrompt.takeUnretainedValue()
+            as String: true] as CFDictionary
         let trusted = AXIsProcessTrustedWithOptions(opts)
-        let screen = CGRequestScreenCaptureAccess()
-        return ["accessibility": trusted, "screen_recording": screen]
+        return ["accessibility": trusted, "prompted": true]
     }
 
-    func cmdShutdown(_ a: JSONDict) throws -> JSONDict {
-        DispatchQueue.global().asyncAfter(deadline: .now() + 0.1) { exit(0) }
-        return ["shutting_down": true]
-    }
-
-    // MARK: - inventory
-
+    /// apps — activationPolicy .regular apps; always four fields.
     func cmdApps(_ a: JSONDict) throws -> JSONDict {
-        // Live-probe wire: {"apps":[{pid,name,bundle,active}]} — no "running".
-        let apps = AXBridge.allRunningRegular()
-            .map { app -> JSONDict in
-                var d: JSONDict = ["pid": app.processIdentifier]
-                if let b = app.bundleIdentifier { d["bundle"] = b }
-                if let n = app.localizedName { d["name"] = n }
-                d["active"] = app.isActive
-                return d
+        let frontPID = NSWorkspace.shared.frontmostApplication?
+            .processIdentifier ?? 0
+        let rows: [JSONDict] = NSWorkspace.shared.runningApplications
+            .filter { $0.activationPolicy == .regular }
+            .sorted { ($0.localizedName ?? "").lowercased()
+                    < ($1.localizedName ?? "").lowercased() }
+            .map { app in
+                [
+                    "bundle": app.bundleIdentifier as Any? ?? NSNull(),
+                    "name": app.localizedName ?? "(unknown)",
+                    "pid": Int(app.processIdentifier),
+                    "active": app.processIdentifier == frontPID,
+                ]
             }
-        return ["apps": apps]
+        return ["apps": rows]
     }
+
+    /// windows — app{bundle,pid} + complete records (id=0 / title="" / zero
+    /// geometry preserved). focused = CFEqual vs AXFocusedWindow.
+    func cmdWindows(_ a: JSONDict) throws -> JSONDict {
+        let app = try resolveApp(a)
+        let appEl = AXUIElementCreateApplication(app.processIdentifier)
+        var axWins: [AXUIElement] = []
+        var wv: CFTypeRef?
+        let werr = AXUIElementCopyAttributeValue(appEl,
+            kAXWindowsAttribute as CFString, &wv)
+        if werr == .success, let arr = wv as? [AXUIElement] {
+            axWins = arr
+        } else if werr != .success {
+            try mapAXError(werr, context: "reading AXWindows")
+        }
+        var focused: AXUIElement?
+        var fv: CFTypeRef?
+        if AXUIElementCopyAttributeValue(appEl,
+                "AXFocusedWindow" as CFString, &fv) == .success,
+           let f = fv, CFGetTypeID(f) == AXUIElementGetTypeID() {
+            focused = unsafeDowncast(f, to: AXUIElement.self)
+        }
+        let wins: [JSONDict] = axWins.map { w in
+            var wid = CGWindowID(0)
+            _AXUIElementGetWindow(w, &wid)
+            var pos = CGPoint.zero, size = CGSize.zero
+            var pv: CFTypeRef?, sv: CFTypeRef?
+            if AXUIElementCopyAttributeValue(w,
+                    kAXPositionAttribute as CFString, &pv) == .success,
+               let p = pv {
+                AXValueGetValue(p as! AXValue,
+                                .cgPoint, &pos)
+            }
+            if AXUIElementCopyAttributeValue(w,
+                    kAXSizeAttribute as CFString, &sv) == .success,
+               let s = sv {
+                AXValueGetValue(s as! AXValue,
+                                .cgSize, &size)
+            }
+            return [
+                "id": Int(wid),
+                "title": AXBridge.copyString(w, kAXTitleAttribute) ?? "",
+                "bounds": [
+                    "x": Double(pos.x), "y": Double(pos.y),
+                    "w": Double(size.width), "h": Double(size.height),
+                ],
+                "minimized": AXBridge.copyBool(w, "AXMinimized") ?? false,
+                "focused": focused.map { CFEqual($0, w) } ?? false,
+            ]
+        }
+        return [
+            "app": [
+                "bundle": app.bundleIdentifier as Any? ?? NSNull(),
+                "pid": Int(app.processIdentifier),
+            ],
+            "windows": wins,
+        ]
+    }
+
+    /// launch_app — launchWithFrontmostPreserved; response echoes request.
+    func cmdLaunchApp(_ a: JSONDict) throws -> JSONDict {
+        let bundle = try requireStr(a, "bundle")
+        let activates = a.bool("activates") ?? false
+        let app = try launchWithFrontmostPreserved(bundle: bundle,
+                                                   activates: activates)
+        EventDispatch.waitUntilReady(pid: app.processIdentifier)
+        return [
+            "launched": true,
+            "activates": activates,
+            "app": [
+                "bundle": app.bundleIdentifier as Any? ?? NSNull(),
+                "name": app.localizedName as Any? ?? NSNull(),
+                "pid": Int(app.processIdentifier),
+            ],
+        ]
+    }
+
+    /// Shared launcher — openApplication without activating; throws plain
+    /// `internal` on failure (no launch_error code).
+    @discardableResult
+    func launchWithFrontmostPreserved(bundle: String,
+                                      activates: Bool = false) throws
+        -> NSRunningApplication {
+        guard let url = NSWorkspace.shared
+                .urlForApplication(withBundleIdentifier: bundle) else {
+            throw DaemonError("app_not_found",
+                "No running app matched bundle \(bundle).")
+        }
+        let cfg = NSWorkspace.OpenConfiguration()
+        cfg.activates = activates
+        var result: NSRunningApplication?
+        var err: Error?
+        let sem = DispatchSemaphore(value: 0)
+        NSWorkspace.shared.openApplication(at: url,
+            configuration: cfg) { app, e in
+            result = app; err = e; sem.signal()
+        }
+        sem.wait()
+        if let e = err { throw DaemonError.wrap(e) }
+        guard let app = result else {
+            throw DaemonError("internal",
+                "launch \(bundle) returned no application")
+        }
+        return app
+    }
+}
+
+// MARK: - list_apps (AppUsage — Spotlight merge)
+
+extension Daemon {
 
     func cmdListApps(_ a: JSONDict) throws -> JSONDict {
-        // Live-probe wire (distinct from `apps`): adds path/running/use_count/
-        // last_used_at/intents. AppUsage not implemented → usage keys omitted
-        // per the normalized-state schema (absent key, not null).
-        let apps = AXBridge.allRunningRegular()
-            .map { app -> JSONDict in
-                var d: JSONDict = ["pid": app.processIdentifier]
-                if let b = app.bundleIdentifier { d["bundle"] = b }
-                if let n = app.localizedName { d["name"] = n }
-                if let p = app.bundleURL?.path { d["path"] = p }
-                d["running"] = true
-                d["active"] = app.isActive
-                d["intents"] = [JSONDict]() // AppCommandRegistry surface not implemented
-                return d
+        let days = a.int("days") ?? 14
+        return ["apps": AppUsage.list(days: days)]
+    }
+}
+
+enum AppUsage {
+    /// Nine-key rows: bundle, name, pid, path, running, active, use_count,
+    /// last_used_at, intents.
+    static func list(days: Int) -> [JSONDict] {
+        struct Row {
+            var bundle: String?; var name: String; var pid: Int?
+            var path: String?; var running = false; var active = false
+            var useCount: Int?; var lastUsed: Date?
+        }
+        var rows: [Row] = []
+        let frontPID = NSWorkspace.shared.frontmostApplication?
+            .processIdentifier ?? 0
+        for app in NSWorkspace.shared.runningApplications
+        where app.activationPolicy == .regular {
+            rows.append(Row(
+                bundle: app.bundleIdentifier,
+                name: app.localizedName ?? "(unknown)",
+                pid: Int(app.processIdentifier),
+                path: app.bundleURL?.path,
+                running: true,
+                active: app.processIdentifier == frontPID,
+                useCount: nil, lastUsed: nil))
+        }
+        // NSMetadataQuery — application bundles used within `days`.
+        let cutoff = Date().addingTimeInterval(-86400 * Double(days))
+        let q = NSMetadataQuery()
+        q.searchScopes = [NSMetadataQueryLocalComputerScope]
+        q.predicate = NSPredicate(format:
+            "kMDItemContentType == 'com.apple.application-bundle' "
+            + "AND kMDItemLastUsedDate >= %@", cutoff as NSDate)
+        q.valueListAttributes = [
+            NSMetadataItemDisplayNameKey,
+            NSMetadataItemCFBundleIdentifierKey,
+            NSMetadataItemLastUsedDateKey,
+            "kMDItemUseCount",
+            NSMetadataItemPathKey,
+        ]
+        let sem = DispatchSemaphore(value: 0)
+        var metaRows: [Row] = []
+        let obs = NotificationCenter.default.addObserver(
+            forName: .NSMetadataQueryDidFinishGathering,
+            object: q, queue: nil) { _ in
+            q.disableUpdates()
+            for i in 0..<q.resultCount {
+                guard let it = q.result(at: i) as? NSMetadataItem
+                else { continue }
+                metaRows.append(Row(
+                    bundle: it.value(
+                        forAttribute: NSMetadataItemCFBundleIdentifierKey)
+                        as? String,
+                    name: (it.value(
+                        forAttribute: NSMetadataItemDisplayNameKey)
+                        as? String) ?? "(unknown)",
+                    pid: nil,
+                    path: it.value(
+                        forAttribute: NSMetadataItemPathKey) as? String,
+                    running: false, active: false,
+                    useCount: it.value(
+                        forAttribute: "kMDItemUseCount") as? Int,
+                    lastUsed: it.value(
+                        forAttribute: NSMetadataItemLastUsedDateKey)
+                        as? Date))
             }
-        return ["apps": apps]
-    }
-
-    func cmdWindows(_ a: JSONDict) throws -> JSONDict {
-        // Live-probe wire: {"app":{bundle,pid}, "windows":[{focused,id,title,
-        // bounds,minimized}]}. focused/minimized come from the AX window
-        // elements; bounds from CGWindowList.
-        let pid = try resolvePid(a)
-        var appD: JSONDict = ["pid": pid]
-        if let ra = AXBridge.runningApp(pid: pid) {
-            if let b = ra.bundleIdentifier { appD["bundle"] = b }
-            if let n = ra.localizedName { appD["name"] = n }
+            sem.signal()
         }
-        let cgWindows = WindowList.windows(pid: pid)
-        var wins: [JSONDict] = []
-        for w in AXBridge.windows(of: pid) {
-            var d: JSONDict = [:]
-            if let wid = AXBridge.windowIDNumber(of: w) {
-                d["id"] = wid
-                if let cg = cgWindows.first(where: {
-                    ($0[kCGWindowNumber as String] as? NSNumber)?.uint32Value == wid
-                }) {
-                    if let b = cg[kCGWindowBounds as String] as? [String: Any] {
-                        d["bounds"] = [
-                            "x": b["X"] as? Double ?? 0, "y": b["Y"] as? Double ?? 0,
-                            "w": b["Width"] as? Double ?? 0, "h": b["Height"] as? Double ?? 0,
-                        ]
-                    }
-                }
+        q.start()
+        _ = sem.wait(timeout: .now() + 2.0)
+        q.stop()
+        NotificationCenter.default.removeObserver(obs)
+        // Merge: bundle rows dedupe by exact bundle id (later wins);
+        // running row keeps name/pid/flags, metadata fills path/count/date.
+        for m in metaRows.sorted(by: {
+            ($0.lastUsed ?? .distantPast) > ($1.lastUsed ?? .distantPast)
+        }) {
+            if let b = m.bundle,
+               let idx = rows.firstIndex(where: { $0.bundle == b }) {
+                if rows[idx].path == nil { rows[idx].path = m.path }
+                if let uc = m.useCount { rows[idx].useCount = uc }
+                if let lu = m.lastUsed { rows[idx].lastUsed = lu }
+            } else {
+                rows.append(m)
             }
-            if let t = AXBridge.copyString(w, kAXTitleAttribute), !t.isEmpty { d["title"] = t }
-            d["focused"] = AXBridge.copyBool(w, kAXFocusedAttribute) ?? false
-            d["minimized"] = AXBridge.copyBool(w, "AXMinimized") ?? false
-            wins.append(d)
         }
-        return ["app": appD, "windows": wins]
+        let fmt = ISO8601DateFormatter()
+        return rows.sorted { lhs, rhs in
+            if lhs.active != rhs.active { return lhs.active }
+            if lhs.running != rhs.running { return lhs.running }
+            if (lhs.useCount ?? -1) != (rhs.useCount ?? -1) {
+                return (lhs.useCount ?? -1) > (rhs.useCount ?? -1)
+            }
+            return lhs.name.lowercased() < rhs.name.lowercased()
+        }.map { r in
+            [
+                "bundle": r.bundle as Any? ?? NSNull(),
+                "name": r.name,
+                "pid": r.pid as Any? ?? NSNull(),
+                "path": r.path as Any? ?? NSNull(),
+                "running": r.running,
+                "active": r.active,
+                "use_count": r.useCount as Any? ?? NSNull(),
+                "last_used_at": r.lastUsed.map { fmt.string(from: $0) }
+                    as Any? ?? NSNull(),
+                "intents": IntentRegistry.intents(for: r.bundle ?? ""),
+            ]
+        }
+    }
+}
+
+/// Registered app-native intents (Layer-1 registry; currently none).
+enum IntentRegistry {
+    static func intents(for bundle: String) -> [String] { [] }
+}
+
+// MARK: - Snapshot commands (snap / get_app_state)
+
+extension Daemon {
+
+    /// snap — plain AX projection: no diff, no capture, wakeup default 0.
+    func cmdSnap(_ a: JSONDict) throws -> JSONDict {
+        let app = try resolveAppForState(a)
+        let store = elementStore
+        let snap = AXBridge.snapshot(
+            pid: app.processIdentifier,
+            windowId: a.int("window_id").map(CGWindowID.init),
+            depth: a.int("depth") ?? 6,
+            interactiveOnly: a.bool("interactive_only") ?? true,
+            wakeupSeconds: a.double("wakeup_seconds") ?? 0,
+            snapshotId: appState.nextSnapshotId(), store: store)
+        return snapToDict(snap, app: app)
     }
 
-    // MARK: - snapshot (snap == get_app_state path minus screenshot args)
-
-    private func requireTrusted() throws {
-        guard AXIsProcessTrusted() else {
-            throw DaemonError("ax_not_granted", "accessibility permission not granted — call grant first")
-        }
-    }
-
-    func snapshotResponse(pid: pid_t, a: JSONDict, includeScreenshot: Bool, screenshotMaxWidth: Int) throws -> JSONDict {
-        try requireTrusted()
-        let depth = a.int("depth") ?? 6
-        let interactiveOnly = a.bool("interactive_only") ?? true
-        let disableDiff = a.bool("disable_diff") ?? false
-        let windowId = a.int("window_id").map { CGWindowID($0) }
-
+    /// get_app_state — snapshot(1.5s wakeup) → unminimize+re-snapshot →
+    /// AppStateDiff → optional capture (skipped without snapshot.windowId)
+    /// → OCR fallback when the AX tree was empty.
+    func cmdGetAppState(_ a: JSONDict) throws -> JSONDict {
+        let app = try resolveAppForState(a)
+        let store = elementStore
         var snap = AXBridge.snapshot(
-            pid: pid, windowId: windowId, depth: depth,
-            interactiveOnly: interactiveOnly, store: elementStore
-        )
-        snap.snapshotId = appState.nextSnapshotId()
+            pid: app.processIdentifier,
+            windowId: a.int("window_id").map(CGWindowID.init),
+            depth: a.int("depth") ?? 6,
+            interactiveOnly: a.bool("interactive_only") ?? true,
+            wakeupSeconds: a.double("wakeup_seconds") ?? 1.5,
+            snapshotId: appState.nextSnapshotId(), store: store)
+        if let el = snap.windowElement,
+           AXBridge.unminimizeIfNeeded(el) {
+            snap = AXBridge.snapshot(
+                pid: app.processIdentifier,
+                windowId: a.int("window_id").map(CGWindowID.init),
+                depth: a.int("depth") ?? 6,
+                interactiveOnly: a.bool("interactive_only") ?? true,
+                wakeupSeconds: 0,
+                snapshotId: appState.nextSnapshotId(), store: store)
+        }
+        let disableDiff = a.bool("disable_diff") ?? false
+        let (diffComputed, emitted, removed, unchanged) =
+            appState.diff(
+                pid: snap.pid, wid: snap.windowId,
+                elements: snap.elements, disableDiff: disableDiff)
+        var resp = snapToDict(snap, app: app, elements: emitted)
+        if diffComputed {
+            resp["elements_are_diff"] = true
+            resp["unchanged_element_count"] = unchanged
+            if !removed.isEmpty { resp["removed_refs"] = removed }
+        }
+        // screenshot — only when the snapshot produced a window id.
+        if (a["include_screenshot"] as? Bool ?? true),
+           let wid = snap.windowId, wid != 0 {
+            do {
+                let maxW = a.int("screenshot_max_width") ?? 1600
+                let out = a.str("screenshot_path")
+                    ?? Capture.defaultOutPath()
+                let (w, h) = try Capture.windowShotToFile(
+                    wid: wid, out: out, maxWidth: maxW, quality: 0.85)
+                resp["screenshot"] = [
+                    "path": out, "width": w, "height": h,
+                ]
+                // publish mapping ONLY on successful gas capture
+                if let b = snap.windowBounds {
+                    Capture.registerMapping(pid: snap.pid, wid: wid,
+                        windowRect: b, imageW: w, imageH: h, path: out)
+                }
+                // OCR fallback: empty AX tree → Vision visual regions
+                if snap.elements.count <= 1,
+                   let regions = Capture.ocrRegions(
+                       imagePath: out, pid: snap.pid),
+                   !regions.isEmpty {
+                    resp["visual_regions"] = regions
+                }
+            } catch let e as DaemonError {
+                resp["screenshot_error"] = e.message
+            } catch {
+                resp["screenshot_error"] = error.localizedDescription
+            }
+        }
+        return resp
+    }
 
-        let (diffComputed, _, emitted, removed, unchanged) = appState.diff(
-            pid: pid, wid: snap.windowId, elements: snap.elements, disableDiff: disableDiff
-        )
-
-        var resp: JSONDict = [
+    private func snapToDict(_ snap: SnapshotResult,
+                            app: NSRunningApplication,
+                            elements: [SerializedElement]? = nil) -> JSONDict {
+        var d: JSONDict = [
             "snapshot_id": snap.snapshotId,
             "ax_status": snap.axStatus,
             "wakeup_attempts": snap.wakeupAttempts,
             "wakeup_duration_ms": snap.wakeupDurationMs,
-            "elements": emitted.map { $0.toDict() },
+            "app": [
+                "bundle": app.bundleIdentifier as Any? ?? NSNull(),
+                "name": app.localizedName as Any? ?? NSNull(),
+                "pid": Int(app.processIdentifier),
+            ],
+            "elements": (elements ?? snap.elements).map { $0.toDict() },
+            "menu_shortcuts": MenuShortcuts.wireEntries(
+                pid: app.processIdentifier),
         ]
-        // Diff keys exist only when a diff actually ran (verified wire:
-        // absent on first snapshot and with disable_diff).
-        if diffComputed {
-            resp["elements_are_diff"] = true
-            resp["unchanged_element_count"] = unchanged
-            resp["removed_refs"] = removed
-        }
-
-        var app: JSONDict = ["pid": snap.pid]
-        if let b = snap.bundle { app["bundle"] = b }
-        if let n = snap.appName { app["name"] = n }
-        resp["app"] = app
-
-        // Live-probe wire: window is its own nested dict, not flattened
-        // into app: {"id","title","bounds":{x,y,w,h}}.
         if let wid = snap.windowId {
-            var w: JSONDict = ["id": wid]
-            if let t = snap.windowTitle { w["title"] = t }
-            if let wb = snap.windowBounds {
-                w["bounds"] = [
-                    "x": Double(wb.origin.x), "y": Double(wb.origin.y),
-                    "w": Double(wb.size.width), "h": Double(wb.size.height),
-                ]
-            }
-            resp["window"] = w
+            d["window"] = [
+                "id": Int(wid),
+                "title": snap.windowTitle ?? "",
+                "bounds": [
+                    "x": Double(snap.windowBounds?.origin.x ?? 0),
+                    "y": Double(snap.windowBounds?.origin.y ?? 0),
+                    "w": Double(snap.windowBounds?.width ?? 0),
+                    "h": Double(snap.windowBounds?.height ?? 0),
+                ],
+            ]
         }
-
-        // menu_shortcuts key is always present ([] when disabled/none).
-        // Elements: [{combo,title,path}] — symbol-confirmed key names.
-        if a.bool("menu_shortcuts") ?? true {
-            resp["menu_shortcuts"] = MenuShortcuts.wireEntries(pid: pid)
-        } else {
-            resp["menu_shortcuts"] = [JSONDict]()
-        }
-
-        if includeScreenshot {
-            do {
-                let shot = try Capture.windowShot(
-                    pid: pid, wid: snap.windowId,
-                    maxWidth: screenshotMaxWidth
-                )
-                resp["screenshot"] = ["path": shot.path, "width": shot.width, "height": shot.height]
-            } catch let e as DaemonError {
-                resp["screenshot_error"] = e.message
-            }
-        }
-        return resp
+        return d
     }
+}
 
-    func cmdSnap(_ a: JSONDict) throws -> JSONDict {
-        let pid = try resolvePid(a)
-        return try snapshotResponse(pid: pid, a: a, includeScreenshot: a.bool("include_screenshot") ?? false,
-                                    screenshotMaxWidth: a.int("screenshot_max_width") ?? 1280)
-    }
+// MARK: - Action commands
 
-    func cmdGetAppState(_ a: JSONDict) throws -> JSONDict {
-        try actionPreflight(a)
-        // AUTO-LAUNCH: bundle given + not running → background launch then resolve.
-        var pid: pid_t
-        if let bundle = a.string("bundle"),
-           AXBridge.runningApp(bundle: bundle) == nil {
-            if a.bool("auto_launch") ?? true {
-                _ = try AXBridge.launchWithFrontmostPreserved(bundle: bundle)
-            } else {
-                throw DaemonError("app_not_found", "No running app matched bundle \(bundle).")
-            }
-        }
-        pid = try resolvePid(a)
-        // waitUntilReady lives only on the click auto-launch path (single
-        // call site in the binary); get_app_state relies on the snapshot
-        // walker's own wakeup loop.
-        return try snapshotResponse(
-            pid: pid, a: a,
-            includeScreenshot: a.bool("include_screenshot") ?? true,
-            screenshotMaxWidth: a.int("screenshot_max_width") ?? 1280
-        )
-    }
+extension Daemon {
 
-    // MARK: - launch
-
-    func cmdLaunchApp(_ a: JSONDict) throws -> JSONDict {
-        // Thin command: direct AXBridge.launchApp — NO waitUntilReady,
-        // NO unminimize (those live on the click auto-launch path).
-        guard let bundle = a.string("bundle") else {
-            throw DaemonError("invalid_arg", "missing \"bundle\"")
-        }
-        let activates = a.bool("activates") ?? false
-        let app = try AXBridge.launchApp(bundle: bundle, activates: activates)
-        // Live-probe wire: {"launched":true,"activates":false,"bundle":"…","app":{…}}
-        var appD: JSONDict = ["pid": app.processIdentifier]
-        if let b = app.bundleIdentifier { appD["bundle"] = b }
-        if let n = app.localizedName { appD["name"] = n }
-        return ["launched": true, "activates": activates, "bundle": bundle, "app": appD]
-    }
-
-    // MARK: - element resolution
-
-    func resolveElement(_ a: JSONDict) throws -> (AXUIElement, pid_t) {
-        guard let ref = a.string("ref") else {
-            throw DaemonError("invalid_arg", "missing \"ref\"")
-        }
-        guard let (el, _) = elementStore.element(forRef: ref) else {
-            throw DaemonError("element_not_found", "No element known for ref \(ref). Run `snap` first.")
-        }
-        var pid = pid_t(0)
-        AXUIElementGetPid(el, &pid)
-        return (el, pid)
-    }
-
-    // MARK: - click
+    // MARK: click
 
     func cmdClick(_ a: JSONDict) throws -> JSONDict {
         try actionPreflight(a)
-        let button = a.string("button") ?? "left"
-        let clickCount = max(1, a.int("click_count") ?? 1)
-        let strategy = a.string("strategy") ?? "auto"
+        if a["x"] != nil { return try clickPixel(a) }
+        return try clickRef(a)
+    }
 
-        var point: CGPoint
-        var pid: pid_t
-
-        if let _ = a.string("ref") {
-            let (el, ep) = try resolveElement(a)
-            pid = ep
-            if strategy == "ax" {
-                // AX press path — no pixel dispatch at all.
-                if AXUIElementPerformAction(el, kAXPressAction as CFString) == .success {
-                    return ["clicked": true, "clicks": clickCount, "button": button, "via": "ax_press"]
-                }
-                throw DaemonError("action_unsupported", "Element does not support AXPress")
-            }
-            guard let b = AXBridge.axBounds(el) else {
-                throw DaemonError("element_not_found", "Element has no on-screen bounds")
-            }
-            point = CGPoint(x: b.midX, y: b.midY)
+    private func clickPixel(_ a: JSONDict) throws -> JSONDict {
+        guard let pid = resolveActionPid(a) else {
+            throw DaemonError("invalid_arg",
+                "click by pixel requires either `pid` or `bundle` of a "
+                + "running app "
+                + " without a target we'd have to post globally and move "
+                + "the real cursor.")
+        }
+        let x = a.double("x") ?? Double(a["x"] as? Int ?? 0)
+        guard let y = a.double("y") else {
+            throw DaemonError("invalid_arg",
+                "click --pixel requires both x and y")
+        }
+        let button = MouseButtonTag.parse(a.str("button"))
+        let clicks = a.int("click_count") ?? 1
+        let space = a.str("coord_space") ?? "screenshot"
+        // screenshot coords translate through the cached mapping; when no
+        // mapping exists Alma falls back to the supplied coordinates.
+        let pt: CGPoint
+        if space == "screenshot",
+           let m = Capture.mapping(for: pid) {
+            pt = m.point(forX: x, y: y)
         } else {
-            // pixel path — verified chain: requires pid|bundle; if app not
-            // running and bundle given → launchWithFrontmostPreserved →
-            // waitUntilReady → snapshot → window match → unminimize →
-            // re-snapshot(wakeup=0) if it moved → settle → clickAtPoint.
-            guard let x = a.double("x"), let y = a.double("y") else {
-                throw DaemonError("invalid_arg", "click requires either `ref` or both `x` and `y`")
-            }
-            if a.int("pid") == nil && a.string("bundle") == nil {
-                throw DaemonError("invalid_arg",
-                    "click by pixel requires either `pid` or `bundle` of a running app — without a target we'd have to post globally and move the real cursor.")
-            }
-            if let bundle = a.string("bundle"), AXBridge.runningApp(bundle: bundle) == nil {
-                _ = try AXBridge.launchWithFrontmostPreserved(bundle: bundle)
-            }
-            pid = try resolvePid(a)
-            AXBridge.waitUntilReady(pid: pid)
-
-            let wins = AXBridge.windows(of: pid)
-            if let w = wins.first {
-                if AXBridge.unminimizeIfNeeded(w) {
-                    // window moved on un-minimize — re-read geometry
-                    _ = AXBridge.axBounds(w)
-                }
-            }
-
-            let coordSpace = a.string("coord_space") ?? "screenshot"
-            point = coordSpace == "screen"
-                ? CGPoint(x: x, y: y)
-                : try Capture.translateScreenshotCoord(pid: pid, x: x, y: y)
+            pt = CGPoint(x: x, y: y)
         }
-
-        let token = EventDispatch.settlePrelude(pid: pid, point: point)
-        try EventDispatch.withFocusPreserved(pid: pid) {
-            try EventDispatch.clickAtPoint(point, pid: pid, button: button, clickCount: clickCount)
+        // wait→snapshot→select window→unminimize→re-snapshot→settle→click
+        EventDispatch.waitUntilReady(pid: pid)
+        let store = elementStore
+        var snap = AXBridge.snapshot(pid: pid, depth: 1,
+            interactiveOnly: false, wakeupSeconds: 0,
+            snapshotId: appState.nextSnapshotId(), store: store)
+        if let el = snap.windowElement,
+           AXBridge.unminimizeIfNeeded(el) {
+            snap = AXBridge.snapshot(pid: pid, depth: 1,
+                interactiveOnly: false, wakeupSeconds: 0,
+                snapshotId: appState.nextSnapshotId(), store: store)
         }
-        EventDispatch.settlePostlude(token, pid: pid)
+        let baseline = settlePrelude(pid: pid)
+        try EventDispatch.click(at: pt, button: button,
+            clickCount: clicks, pid: pid)
 
+        settlePostlude(pid: pid, baseline: baseline, a: a)
         return [
-            "clicked": true, "clicks": clickCount, "button": button,
-            "coord_space": a.string("coord_space") ?? "screenshot",
+            "clicked_at": ["x": Double(pt.x), "y": Double(pt.y)],
+            "button": button.name,
+            "clicks": clicks,
+            "coord_space": space,
         ]
     }
 
+    private func clickRef(_ a: JSONDict) throws -> JSONDict {
+        let ref = try requireStr(a, "ref")
+        // visual refs (v*) — pixel center through the target's mapping
+        if ref.hasPrefix("v") {
+            guard let pid = resolveActionPid(a) else {
+                throw DaemonError("invalid_arg",
+                    "visual refs (v*) require `pid` or `bundle`")
+            }
+            guard Capture.mapping(for: pid) != nil else {
+                throw DaemonError("element_not_found",
+                    "no screenshot mapping for pid \(pid)"
+                    + "; run get_app_state first")
+            }
+            guard let pt = Capture.visualRef(pid: pid, ref: ref) else {
+                throw DaemonError("element_not_found",
+                    "No element known for ref \(ref). Run `snap` first.")
+            }
+            let button = MouseButtonTag.parse(a.str("button"))
+            let clicks = a.int("click_count") ?? 1
+            let baseline = settlePrelude(pid: pid)
+            try EventDispatch.click(at: pt, button: button,
+                clickCount: clicks, pid: pid)
+            settlePostlude(pid: pid, baseline: baseline, a: a)
+            return [
+                "clicked": ref, "strategy": "physical",
+                "button": button.name, "clicks": clicks,
+            ]
+        }
+        let store = elementStore
+        let entry = try resolveEntry(ref, store: store)
+        let strategy = ClickStrategy(
+            rawValue: a.str("strategy") ?? "auto") ?? .auto
+        let button = MouseButtonTag.parse(a.str("button"))
+        let clicks = a.int("click_count") ?? 1
+        let forceSynth = ProcessInfo.processInfo
+            .environment["ALMA_CU_FORCE_SYNTH"] != nil
+        let axEligible = strategy == .ax
+            || (strategy == .auto && button == .left
+                && clicks == 1 && !forceSynth)
+        if axEligible {
+            let action = ["AXPress", "AXPick", "AXConfirm"]
+                .first { actions(of: entry.element).contains($0) }
+            if let action = action {
+                let baseline = settlePrelude(pid: entry.pid)
+                let err = AXUIElementPerformAction(entry.element,
+                    action as CFString)
+                try mapAXError(err, context: "performing \(action)")
+                if a.bool("show_cursor") ?? true,
+                   let b = bounds(of: entry) {
+                    let c = CGPoint(x: b.midX, y: b.midY)
+                    ActionCursor.record(c)
+                    LensBus.postMove(c); LensBus.postClick()
+                }
+                settlePostlude(pid: entry.pid, baseline: baseline, a: a)
+                return [
+                    "clicked": ref,
+                    "strategy": strategy.rawValue,
+                    "button": button.name,
+                    "clicks": clicks,
+                ]
+            }
+            if strategy == .ax {
+                throw DaemonError("action_unsupported",
+                    "Element does not support action click with "
+                    + "strategy=ax: no AXPress/AXPick/AXConfirm "
+                    + "on element.")
+            }
+        }
+        // physical synthesis — requires bounds
+        guard let b = bounds(of: entry) else {
+            throw DaemonError("action_unsupported",
+                "Element does not support action click: element has no "
+                + "AX action and no screen bounds for a physical click.")
+        }
+        let pt = CGPoint(x: b.midX, y: b.midY)
+        let baseline = settlePrelude(pid: entry.pid)
+        try EventDispatch.click(at: pt, button: button,
+            clickCount: clicks, pid: entry.pid)
+        settlePostlude(pid: entry.pid, baseline: baseline, a: a)
+        return [
+            "clicked": ref,
+            "strategy": "physical",
+            "button": button.name,
+            "clicks": clicks,
+        ]
+    }
+
+    // MARK: perform_secondary_action
+
     func cmdSecondaryAction(_ a: JSONDict) throws -> JSONDict {
         try actionPreflight(a)
-        if let _ = a.string("ref") {
-            let (el, _) = try resolveElement(a)
-            if let action = a.string("action") {
-                if AXUIElementPerformAction(el, action as CFString) == .success {
-                    return ["performed": true, "action": action]
-                }
-                throw DaemonError("action_unsupported",
-                    "Element does not support action \(action) → AX action not available.")
+        if a["x"] != nil {
+            guard let pid = resolveActionPid(a) else {
+                throw DaemonError("invalid_arg",
+                    "perform_secondary_action by pixel requires "
+                    + "`pid` or `bundle`.")
             }
-            if AXUIElementPerformAction(el, kAXShowMenuAction as CFString) == .success {
-                return ["performed": true, "action": "AXShowMenu"]
+            _ = try requireNumD(a, "x")
+            guard let y = a.double("y") else {
+                throw DaemonError("invalid_arg",
+                    "perform_secondary_action --pixel requires "
+                    + "both x and y")
             }
-            throw DaemonError("action_unsupported", "Element does not support AXShowMenu")
+            let x = a.double("x")!
+            let space = a.str("coord_space") ?? "screenshot"
+            let pt: CGPoint
+            if space == "screenshot",
+               let m = Capture.mapping(for: pid) {
+                pt = m.point(forX: x, y: y)
+            } else {
+                pt = CGPoint(x: x, y: y)
+            }
+            let baseline = settlePrelude(pid: pid)
+            try EventDispatch.click(at: pt, button: .right,
+                clickCount: 1, pid: pid)
+            settlePostlude(pid: pid, baseline: baseline, a: a)
+            return [
+                "opened_menu_at": ["x": Double(pt.x), "y": Double(pt.y)]
+            ]
         }
-        // pixel variant = right click
-        guard let x = a.double("x"), let y = a.double("y") else {
-            throw DaemonError("invalid_arg", "perform_secondary_action requires either `ref` or both `x` and `y`")
+        let ref = try requireStr(a, "ref")
+        let store = elementStore
+        let entry = try resolveEntry(ref, store: store)
+        if actions(of: entry.element).contains("AXShowMenu") {
+            let baseline = settlePrelude(pid: entry.pid)
+            let err = AXUIElementPerformAction(entry.element,
+                "AXShowMenu" as CFString)
+            try mapAXError(err, context: "performing AXShowMenu")
+            settlePostlude(pid: entry.pid, baseline: baseline, a: a)
+            return ["opened_menu": ref]
         }
-        let pid = try resolvePid(a)
-        let coordSpace = a.string("coord_space") ?? "screenshot"
-        let point = coordSpace == "screen" ? CGPoint(x: x, y: y)
-            : try Capture.translateScreenshotCoord(pid: pid, x: x, y: y)
-        try EventDispatch.withFocusPreserved(pid: pid) {
-            try EventDispatch.clickAtPoint(point, pid: pid, button: "right", clickCount: 1)
+        // bounds-based right-click fallback
+        guard let b = bounds(of: entry) else {
+            throw DaemonError("action_unsupported",
+                "Element does not support action "
+                + "perform_secondary_action (no AXShowMenu "
+                + "and no bounds).")
         }
-        return ["performed": true]
+        let pt = CGPoint(x: b.midX, y: b.midY)
+        let baseline = settlePrelude(pid: entry.pid)
+        try EventDispatch.click(at: pt, button: .right,
+            clickCount: 1, pid: entry.pid)
+        settlePostlude(pid: entry.pid, baseline: baseline, a: a)
+        return ["opened_menu": ref]
     }
 
-    // MARK: - drag
+    // MARK: drag
 
     func cmdDrag(_ a: JSONDict) throws -> JSONDict {
-        try actionPreflight(a)
-        for k in ["start_x", "start_y", "end_x", "end_y"] where a.double(k) == nil {
-            throw DaemonError("invalid_arg", "missing \"\(k)\"")
+        guard let pid = resolveActionPid(a) else {
+            throw DaemonError("invalid_arg",
+                "drag requires `pid` or `bundle` of a running app.")
         }
-        let pid = try resolvePid(a)
-        let coordSpace = a.string("coord_space") ?? "screenshot"
-        func pt(_ x: Double, _ y: Double) throws -> CGPoint {
-            coordSpace == "screen" ? CGPoint(x: x, y: y)
-                : try Capture.translateScreenshotCoord(pid: pid, x: x, y: y)
+        try ForbiddenTargets.check(pid: pid,
+            allowOverride: a.bool("force_forbidden") ?? false)
+        let sx = try requireNumD(a, "start_x")
+        let sy = try requireNumD(a, "start_y")
+        let ex = try requireNumD(a, "end_x")
+        let ey = try requireNumD(a, "end_y")
+        let button = MouseButtonTag.parse(a.str("button"))
+        let space = a.str("coord_space") ?? "screenshot"
+        let m = Capture.mapping(for: pid)
+        func tr(_ x: Double, _ y: Double) -> CGPoint {
+            if space == "screenshot", let m = m {
+                return m.point(forX: x, y: y)
+            }
+            return CGPoint(x: x, y: y)
         }
-        let from = try pt(a.double("start_x")!, a.double("start_y")!)
-        let to = try pt(a.double("end_x")!, a.double("end_y")!)
-        let token = EventDispatch.settlePrelude(pid: pid, point: to)
-        try EventDispatch.withFocusPreserved(pid: pid) {
-            EventDispatch.dragToPid(from: from, to: to, pid: pid)
-        }
-        EventDispatch.settlePostlude(token, pid: pid)
-        return ["dragged": true]
+        let from = tr(sx, sy), to = tr(ex, ey)
+        let baseline = settlePrelude(pid: pid)
+        try EventDispatch.drag(from: from, to: to,
+            button: button, pid: pid)
+
+        settlePostlude(pid: pid, baseline: baseline, a: a)
+        return [
+            "dragged": [
+                "from": ["x": sx, "y": sy],
+                "to": ["x": ex, "y": ey],
+                "button": button.name,
+                "coord_space": space,
+            ]
+        ]
     }
 
-    // MARK: - text
+    // MARK: type (ref text insertion)
+
+    /// Shared ref-insert: focused write → AXSelectedText (throw on failed
+    /// writable insert) → append to String-or-empty AXValue.
+    private func axInsert(element: AXUIElement, ref: String,
+                          text: String, replace: Bool) throws {
+        _ = try? AXUIElementSetAttributeValue(element,
+            kAXFocusedAttribute as CFString, true as CFTypeRef)
+        if replace {
+            let err = AXUIElementSetAttributeValue(element,
+                kAXValueAttribute as CFString, text as CFTypeRef)
+            try mapAXError(err, context: "setting AXValue")
+            return
+        }
+        var settable = DarwinBoolean(false)
+        _ = AXUIElementIsAttributeSettable(element,
+            "AXSelectedText" as CFString, &settable)
+        if settable.boolValue {
+            let err = AXUIElementSetAttributeValue(element,
+                "AXSelectedText" as CFString, text as CFTypeRef)
+            try mapAXError(err, context: "inserting at selection")
+            return
+        }
+        _ = AXUIElementIsAttributeSettable(element,
+            kAXValueAttribute as CFString, &settable)
+        guard settable.boolValue else {
+            throw DaemonError("action_unsupported",
+                "Element does not support action type (AXValue not "
+                + "settable on this element).")
+        }
+        var cur: CFTypeRef?
+        _ = AXUIElementCopyAttributeValue(element,
+            kAXValueAttribute as CFString, &cur)
+        let err = AXUIElementSetAttributeValue(element,
+            kAXValueAttribute as CFString,
+            ((cur as? String ?? "") + text) as CFTypeRef)
+        try mapAXError(err, context: "appending to AXValue")
+    }
+
+    func cmdType(_ a: JSONDict) throws -> JSONDict {
+        try actionPreflight(a)
+        let ref = try requireStr(a, "ref")
+        let text = try requireStr(a, "text")
+        let store = elementStore
+        let entry = try resolveEntry(ref, store: store)
+        let baseline = settlePrelude(pid: entry.pid)
+        try axInsert(element: entry.element, ref: ref, text: text,
+                     replace: a.bool("replace") ?? false)
+        settlePostlude(pid: entry.pid, baseline: baseline, a: a)
+        return ["typed": ref, "length": text.count]
+    }
+
+    // MARK: type_text
 
     func cmdTypeText(_ a: JSONDict) throws -> JSONDict {
         try actionPreflight(a)
-        guard let text = a.string("text") else {
-            throw DaemonError("invalid_arg", "missing \"text\"")
+        let text = try requireStr(a, "text")
+        let method = a.str("input_method") ?? "auto"
+        guard ["auto", "physical", "unicode", "ax"].contains(method) else {
+            throw DaemonError("invalid_arg",
+                "input_method must be auto|physical|unicode|ax")
         }
-        // ref + (auto|ax) → AX insertion on the referenced element:
-        // AXSelectedText insert first, else AXValue append. physical/unicode
-        // bypass AX entirely even with a ref (event path by pid).
-        let method = a.string("input_method") ?? "auto"
-        if let _ = a.string("ref"), method == "ax" || method == "auto" {
-            let (el, _) = try resolveElement(a)
-            if AXUIElementSetAttributeValue(el, "AXSelectedText" as CFString, text as CFTypeRef) == .success {
-                return ["typed": true, "via": "ax"]
+        let ref = a.str("ref")
+        if method == "ax", ref == nil {
+            throw DaemonError("invalid_arg",
+                "input_method=ax requires `ref`.")
+        }
+        var pid: pid_t
+        var refEntry: ElementStore.Entry?
+        if let ref = ref {
+            let store = elementStore
+            let e = try resolveEntry(ref, store: store)
+            pid = e.pid; refEntry = e
+        } else {
+            guard let p = resolveActionPid(a) else {
+                throw DaemonError("invalid_arg",
+                    "type_text requires `pid`, `bundle`, or `ref`.")
             }
-            if let cur = AXBridge.copyString(el, kAXValueAttribute),
-               AXUIElementSetAttributeValue(el, kAXValueAttribute as CFString, (cur + text) as CFTypeRef) == .success {
-                return ["typed": true, "via": "ax"]
+            pid = p
+        }
+        let baseline = settlePrelude(pid: pid)
+        switch method {
+        case "ax":
+            try axInsert(element: refEntry!.element, ref: ref!,
+                         text: text, replace: false)
+            settlePostlude(pid: pid, baseline: baseline, a: a)
+            return ["typed": true, "method": "ax_ref",
+                    "length": text.count]
+        case "auto":
+            if try EventDispatch.typeTextViaFocusedAXElement(
+                text, pid: pid) {
+                settlePostlude(pid: pid, baseline: baseline, a: a)
+                return ["typed": true, "method": "ax",
+                        "length": text.count]
             }
-            if method == "ax" {
-                throw DaemonError("action_unsupported", "Element does not support action setting AXValue.")
+            // physical (try?) → unicode fallback
+            if let presses = try? KeyboardLayoutTranslator
+                    .keyPresses(for: text) {
+                return try finishTypeEvents(a: a, pid: pid,
+                    baseline: baseline, text: text,
+                    method: "physical_key_events") {
+                    try EventDispatch.typeKeyPresses(presses, pid: pid)
+                }
+            }
+            return try finishTypeEvents(a: a, pid: pid,
+                baseline: baseline, text: text,
+                method: "unicode_events") {
+                try EventDispatch.typeUnicodeText(text, pid: pid)
+            }
+        case "physical":
+            let presses = try KeyboardLayoutTranslator.keyPresses(for: text)
+            return try finishTypeEvents(a: a, pid: pid,
+                baseline: baseline, text: text,
+                method: "physical_key_events") {
+                try EventDispatch.typeKeyPresses(presses, pid: pid)
+            }
+        default: // unicode
+            return try finishTypeEvents(a: a, pid: pid,
+                baseline: baseline, text: text,
+                method: "unicode_events") {
+                try EventDispatch.typeUnicodeText(text, pid: pid)
             }
         }
-        let pid = try resolvePid(a)
-        try EventDispatch.typeText(text, pid: pid, method: method)
-        return ["typed": true, "chars": text.count]
     }
 
-    // MARK: - press / press_key
-
-    /// `press` — AX action on a ref. Only Enter/Escape/Space/Increment/
-    /// Decrement/ShowMenu are supported over AX (verbatim error text).
-    func cmdPress(_ a: JSONDict) throws -> JSONDict {
-        try actionPreflight(a)
-        guard let key = a.string("key") else {
-            throw DaemonError("invalid_arg", "missing \"key\"")
+    private func finishTypeEvents(a: JSONDict, pid: pid_t,
+                                  baseline: UInt32, text: String,
+                                  method: String,
+                                  _ deliver: () throws -> Void) throws
+        -> JSONDict {
+        let tb = TypeVerification.baseline(pid: pid)
+        try deliver()
+        let outcome = TypeVerification.check(baseline: tb, typed: text, pid: pid)
+        var resp: JSONDict = [
+            "typed": true, "method": method, "length": text.count,
+        ]
+        switch outcome {
+        case .verified:
+            resp["verified"] = true
+        case .unchanged:
+            // the long "keystrokes were discarded" advisory
+            throw DaemonError("internal",
+                "type_text delivered no text: the target app has no "
+                + "key window, so the keystrokes were discarded (its "
+                + "AX element still reports focused=true "
+                + " that only means it is the app's first responder). "
+                + "Use set_value with the element's ref to write the "
+                + "field directly. Do NOT bring the app forward to "
+                + "make typing land "
+                + " Alma never takes the user's foreground.")
+        case .unverifiable(let reason):
+            resp["verified"] = false
+            resp["verification_note"] =
+                "sent, but could not confirm it landed \(reason)"
         }
-        let supported = ["Enter": "AXConfirm", "Escape": "AXCancel",
-                         "Space": "AXPress", "Increment": "AXIncrement",
-                         "Decrement": "AXDecrement", "ShowMenu": "AXShowMenu"]
-        guard let axAction = supported[key] else {
-            throw DaemonError("action_unsupported",
-                "Element does not support action press \(key) (only Enter/Escape/Space/Increment/Decrement/ShowMenu are supported over AX in v1).")
-        }
-        let (el, _) = try resolveElement(a)
-        guard AXUIElementPerformAction(el, axAction as CFString) == .success else {
-            throw DaemonError("action_unsupported",
-                "Element does not support action press \(key) → \(axAction) not on element.")
-        }
-        return ["pressed": true, "via": "ax"]
-    }
-
-    /// `press_key` — chord → menu fallback (menu_ax_press) else CGEvent to pid.
-    func cmdPressKey(_ a: JSONDict) throws -> JSONDict {
-        try actionPreflight(a)
-        guard let key = a.string("key") else {
-            throw DaemonError("invalid_arg", "missing \"key\"")
-        }
-        let pid = try resolvePid(a)
-        let result = try EventDispatch.withFocusPreserved(pid: pid) {
-            try EventDispatch.pressKey(key, pid: pid)
-        }
-        var resp: JSONDict = ["delivered": result.delivered]
-        if let via = result.via { resp["via"] = via }
-        if let note = result.note { resp["delivery_note"] = note }
+        settlePostlude(pid: pid, baseline: baseline, a: a)
         return resp
     }
 
-    // MARK: - set_value / select_text
+    // MARK: press (ref-based AX action press)
+
+    func cmdPress(_ a: JSONDict) throws -> JSONDict {
+        try actionPreflight(a)
+        let ref = try requireStr(a, "ref")
+        let key = try requireStr(a, "key")
+        let store = elementStore
+        let entry = try resolveEntry(ref, store: store)
+        let lower = key.lowercased()
+        let action: String
+        switch lower {
+        case "enter", "return": action = "AXConfirm"
+        case "escape", "esc": action = "AXCancel"
+        case "space": action = "AXPress"
+        case "increment", "up": action = "AXIncrement"
+        case "decrement", "down": action = "AXDecrement"
+        case "showmenu", "menu": action = "AXShowMenu"
+        default:
+            throw DaemonError("action_unsupported",
+                "Element does not support action press \(key) "
+                + "(only Enter/Escape/Space/Increment/Decrement/"
+                + "ShowMenu are supported over AX in v1).")
+        }
+        guard actions(of: entry.element).contains(action) else {
+            throw DaemonError("action_unsupported",
+                "Element does not support action press \(key) → "
+                + "\(action) not on element.")
+        }
+        let baseline = settlePrelude(pid: entry.pid)
+        let err = AXUIElementPerformAction(entry.element,
+            action as CFString)
+        try mapAXError(err, context: "performing \(action)")
+        settlePostlude(pid: entry.pid, baseline: baseline, a: a)
+        return ["pressed": key]
+    }
+
+    // MARK: press_key (chord delivery)
+
+    func cmdPressKey(_ a: JSONDict) throws -> JSONDict {
+        try actionPreflight(a)
+        let key = try requireStr(a, "key")
+        guard let pid = resolveActionPid(a) else {
+            throw DaemonError("invalid_arg",
+                "press_key requires `pid` or `bundle` of a running app.")
+        }
+        let baseline = settlePrelude(pid: pid)
+        let delivery = try EventDispatch.pressKey(key, pid: pid)
+        var resp: JSONDict = [
+            "pressed": key,
+            "delivered": delivery != .suppressed,
+            "via": delivery.rawValue,
+        ]
+        if delivery == .suppressed {
+            resp["delivery_note"] =
+                "the target app is in the background and no ENABLED "
+                + "menu item owns this chord, so nothing was posted "
+                + " a background app is not listening to the keyboard "
+                + "and macOS would have answered with the system alert "
+                + "beep. Often the command is simply unavailable right "
+                + "now (macOS greys out window-scoped commands when the "
+                + "app has no usable window). Act on the element "
+                + "directly (click or set_value with a ref) or report "
+                + "this to the user. NEVER bring the app to the "
+                + "foreground to force a keypress through "
+                + " Alma absolutely must not steal the user's focus."
+        }
+        settlePostlude(pid: pid, baseline: baseline, a: a)
+        return resp
+    }
+
+    // MARK: set_value
 
     func cmdSetValue(_ a: JSONDict) throws -> JSONDict {
         try actionPreflight(a)
-        guard let value = a.string("value") ?? a.string("text") else {
+        let ref = try requireStr(a, "ref")
+        guard let raw = a["value"], !(raw is NSNull) else {
             throw DaemonError("invalid_arg", "missing \"value\"")
         }
-        let (el, _) = try resolveElement(a)
-        guard AXUIElementSetAttributeValue(el, kAXValueAttribute as CFString, value as CFTypeRef) == .success else {
-            throw DaemonError("action_unsupported", "Element does not support action setting AXValue.")
+        let store = elementStore
+        let entry = try resolveEntry(ref, store: store)
+        var settable = DarwinBoolean(false)
+        let serr = AXUIElementIsAttributeSettable(entry.element,
+            kAXValueAttribute as CFString, &settable)
+        guard serr == .success, settable.boolValue else {
+            throw DaemonError("action_unsupported",
+                "Element does not support action set_value (AXValue "
+                + "not settable on this element).")
         }
-        return ["set": true]
+        let cf: CFTypeRef
+        if let s = raw as? String { cf = s as NSString }
+        else if let b = raw as? Bool { cf = b as NSNumber }
+        else if let n = raw as? NSNumber { cf = n }
+        else { cf = String(describing: raw) as NSString }
+        let baseline = settlePrelude(pid: entry.pid)
+        let err = AXUIElementSetAttributeValue(entry.element,
+            kAXValueAttribute as CFString, cf)
+        try mapAXError(err, context: "setting AXValue")
+        settlePostlude(pid: entry.pid, baseline: baseline, a: a)
+        return ["set": ref]
     }
+
+    // MARK: select_text (no forbidden gate — dispatcher excludes it)
 
     func cmdSelectText(_ a: JSONDict) throws -> JSONDict {
-        try actionPreflight(a)
-        guard let text = a.string("text") else {
-            throw DaemonError("invalid_arg", "missing \"text\"")
+        let ref = try requireStr(a, "ref")
+        let text = try requireStr(a, "text")
+        let selType = a.str("selection_type") ?? "text"
+        let store = elementStore
+        let entry = try resolveEntry(ref, store: store)
+        var v: CFTypeRef?
+        _ = AXUIElementCopyAttributeValue(entry.element,
+            kAXValueAttribute as CFString, &v)
+        let content: String
+        if let s = v as? String { content = s }
+        else if let at = v as? NSAttributedString {
+            content = at.string
+        } else {
+            throw DaemonError("action_unsupported",
+                "Element does not support action select_text "
+                + "(element has no readable AXValue text).")
         }
-        let (el, _) = try resolveElement(a)
-        // Verified: AXFocused=true is written BEFORE the selection.
-        AXUIElementSetAttributeValue(el, kAXFocusedAttribute as CFString, true as CFTypeRef)
-
-        let haystack = AXBridge.copyString(el, kAXValueAttribute)
-            ?? AXBridge.copyString(el, kAXTitleAttribute) ?? ""
-        let prefix = a.string("prefix")
-        let suffix = a.string("suffix")
-        let selectionType = a.string("selection_type") ?? "" // non-optional; "" → whole match
-
-        var range: NSRange?
-        var searchFrom = haystack.startIndex
-        while let found = haystack.range(of: text, options: [.caseInsensitive], range: searchFrom..<haystack.endIndex) {
-            let beforeOK = prefix.map { haystack[..<found.lowerBound].hasSuffix($0) } ?? true
-            let afterOK = suffix.map { haystack[found.upperBound...].hasPrefix($0) } ?? true
-            if beforeOK && afterOK {
-                range = NSRange(found, in: haystack)
-                break
-            }
-            searchFrom = found.upperBound
+        let prefix = a.str("prefix") ?? ""
+        let suffix = a.str("suffix") ?? ""
+        guard let match = content.range(of: prefix + text + suffix)
+        else {
+            throw DaemonError("internal",
+                "select_text: text not found in this element")
         }
-        guard let match = range else {
-            throw DaemonError("element_not_found", "text not found in element")
+        var start = content.utf16.distance(
+            from: content.utf16.startIndex,
+            to: match.lowerBound.samePosition(in: content.utf16)!)
+            + prefix.utf16.count
+        var length = text.utf16.count
+        if selType == "cursor_before" { length = 0 }
+        else if selType == "cursor_after" {
+            start += length; length = 0
         }
-
-        var sel = match
-        switch selectionType {
-        case "cursor_before": sel = NSRange(location: match.location, length: 0)
-        case "cursor_after": sel = NSRange(location: match.location + match.length, length: 0)
-        default: break // "text" / "" → select the whole match
+        var focusedV: CFTypeRef?
+        let focused = AXUIElementCopyAttributeValue(entry.element,
+            kAXFocusedAttribute as CFString, &focusedV) == .success
+            && (focusedV as? Bool == true)
+        if !focused {
+            _ = AXUIElementSetAttributeValue(entry.element,
+                kAXFocusedAttribute as CFString, true as CFTypeRef)
         }
-
-        var cfRange = CFRange(location: sel.location, length: sel.length)
-        guard let rangeValue = AXValueCreate(.cfRange, &cfRange) else {
-            throw DaemonError("action_unsupported", "could not build selection range")
+        var range = CFRange(location: start, length: length)
+        guard let axv = AXValueCreate(.cfRange, &range) else {
+            throw DaemonError("internal",
+                "select_text: could not build an AX range")
         }
-        guard AXUIElementSetAttributeValue(el, "AXSelectedTextRange" as CFString, rangeValue) == .success else {
-            throw DaemonError("action_unsupported", "Element does not support action selecting text.")
-        }
-        return ["selected": true]
+        let baseline = settlePrelude(pid: entry.pid)
+        let err = AXUIElementSetAttributeValue(entry.element,
+            "AXSelectedTextRange" as CFString, axv)
+        try mapAXError(err, context: "setting AXSelectedTextRange")
+        settlePostlude(pid: entry.pid, baseline: baseline, a: a)
+        return ["selected": text, "selection_type": selType]
     }
 
-    // MARK: - scroll
+    // MARK: scroll
 
     func cmdScroll(_ a: JSONDict) throws -> JSONDict {
         try actionPreflight(a)
-        guard let direction = a.string("direction") else {
-            throw DaemonError("invalid_arg", "missing \"direction\"")
-        }
-        let pages = max(1, a.int("pages") ?? 1)
-        let actionName: String
-        switch direction {
-        case "up": actionName = "AXScrollUpByPage"
-        case "down": actionName = "AXScrollDownByPage"
-        case "left": actionName = "AXScrollLeftByPage"
-        case "right": actionName = "AXScrollRightByPage"
+        let ref = try requireStr(a, "ref")
+        let dir = try requireStr(a, "direction")
+        let action: String
+        switch dir {
+        case "up": action = "AXScrollUpByPage"
+        case "down": action = "AXScrollDownByPage"
+        case "left": action = "AXScrollLeftByPage"
+        case "right": action = "AXScrollRightByPage"
         default:
-            throw DaemonError("invalid_arg", "unknown direction \"\(direction)\"")
-        }
-        LensBus.postScroll(direction: direction)
-        let (el, _) = try resolveElement(a)
-        for _ in 0..<pages {
-            guard AXUIElementPerformAction(el, actionName as CFString) == .success else {
-                throw DaemonError("action_unsupported",
-                    "\(actionName) not available on element (ref points at an unscrollable element — snap the parent ScrollArea).")
-            }
-            usleep(50_000)
-        }
-        return ["scrolled": true, "direction": direction, "pages": pages]
-    }
-
-    // MARK: - shot
-
-    func cmdShot(_ a: JSONDict) throws -> JSONDict {
-        // Live-probe: shot {"bundle":…} without out → invalid_arg missing "out".
-        guard let out = a.string("out") else {
-            throw DaemonError("invalid_arg", "missing \"out\"")
-        }
-        let pid = try resolvePid(a)
-        let wid = a.int("window_id").map { CGWindowID($0) }
-        let shot = try Capture.windowShot(pid: pid, wid: wid,
-                                          maxWidth: a.int("max_width") ?? 2000,
-                                          outPath: out)
-        return ["path": shot.path, "width": shot.width, "height": shot.height]
-    }
-
-    func cmdShotDisplay(_ a: JSONDict) throws -> JSONDict {
-        guard let out = a.string("out") else {
-            throw DaemonError("invalid_arg", "missing \"out\"")
-        }
-        let shot = try Capture.displayShot(maxWidth: a.int("max_width") ?? 2000,
-                                           outPath: out)
-        return ["path": shot.path, "width": shot.width, "height": shot.height]
-    }
-
-    // MARK: - picture-in-picture
-    // [LIVE] pip_open{window_id,title?,width?,height?} →
-    //   {"opened":true,"session":{window_id,pid,title,floater_frame:{x,y,w,h},
-    //    has_first_frame,last_frame_age_ms}}
-    // pip_status{} → {"sessions":[…],"armed":[…]}
-    // pip_arm{window_id,pid,title} → {"armed":[…]}
-    // pip_close/pip_disarm {window_id} | {"all":true}
-
-    func cmdPipOpen(_ a: JSONDict) throws -> JSONDict {
-        guard let wid = a.int("window_id").map({ CGWindowID($0) }) else {
-            throw DaemonError("invalid_arg", "missing \"window_id\"")
-        }
-        // Verbatim: partial preferred size is rejected.
-        let w = a.int("width"), h = a.int("height")
-        if (w == nil) != (h == nil) {
             throw DaemonError("invalid_arg",
-                "\"width\" and \"height\" are required when pip_open " +
-                "carries a preferred size")
+                "direction must be up|down|left|right")
         }
-        let size = w.flatMap { wv in h.map { CGSize(width: wv, height: $0) } }
-        return try PIPManager.shared.open(windowId: wid,
-            pid: a.int("pid").map { pid_t($0) }, title: a.string("title"),
-            preferredSize: size)
-    }
-
-    func cmdPipClose(_ a: JSONDict) throws -> JSONDict {
-        try PIPManager.shared.close(
-            windowId: a.int("window_id").map { CGWindowID($0) },
-            all: a.bool("all") ?? false)
-    }
-
-    func cmdPipStatus(_ a: JSONDict) throws -> JSONDict {
-        try PIPManager.shared.status()
-    }
-
-    func cmdPipArm(_ a: JSONDict) throws -> JSONDict {
-        var pid = a.int("pid").map { pid_t($0) }
-        if pid == nil, let w = a.string("bundle") {
-            pid = NSRunningApplication
-                .runningApplications(withBundleIdentifier: w)
-                .first?.processIdentifier
+        let pages = a.int("pages") ?? 1
+        let store = elementStore
+        let entry = try resolveEntry(ref, store: store)
+        guard actions(of: entry.element).contains(action) else {
+            throw DaemonError("action_unsupported",
+                "Element does not support action scroll \(dir) "
+                + "\(action) not available on element (ref points at "
+                + "an unscrollable element — snap the parent "
+                + "ScrollArea).")
         }
-        guard let pid else {
-            throw DaemonError("invalid_arg", "missing \"pid\"")
+        let baseline = settlePrelude(pid: entry.pid)
+        for _ in 0..<pages {
+            let err = AXUIElementPerformAction(entry.element,
+                action as CFString)
+            try mapAXError(err, context: "performing \(action)")
         }
-        // Resolve the CGWindowID: explicit arg, else the app's first window —
-        // miss → "App has no windows to arm."
-        var wid = a.int("window_id").map { CGWindowID($0) }
-        if wid == nil {
-            wid = AXBridge.windows(of: pid).compactMap {
-                AXBridge.windowIDNumber(of: $0)
-            }.first
-            if wid == nil {
-                throw DaemonError("invalid_arg",
-                    "App has no windows to arm.")
+        LensBus.postScroll(direction: dir)
+        settlePostlude(pid: entry.pid, baseline: baseline, a: a)
+        return ["scrolled": ref, "pages": pages]
+    }
+}
+
+// MARK: - Small enums
+
+enum ClickStrategy: String {
+    case auto, physical, ax
+}
+
+
+// MARK: - shot / shot_display / shutdown
+
+extension Daemon {
+
+    /// shot — requires `out`; optional `window_id` bypasses app resolution
+    /// entirely; otherwise the app's FIRST AX window (focused-first order
+    /// is a snapshot concern — shot picks windows.first).
+    func cmdShot(_ a: JSONDict) throws -> JSONDict {
+        let out = try requireStr(a, "out")
+        let maxW = a.int("max_width")
+        var wid: CGWindowID
+        if let w = a.int("window_id") {
+            wid = CGWindowID(w)
+        } else {
+            let app = try resolveApp(a)
+            let wins = AXBridge.windows(of: app.processIdentifier)
+            guard let first = wins.first,
+                  let w = AXBridge.windowIDNumber(of: first)
+            else {
+                throw DaemonError("internal",
+                    "App has no windows to capture.")
             }
+            wid = w
         }
-        try PIPMinimizeArmer.shared.arm(windowId: wid!, pid: pid,
-                                        title: a.string("title"))
-        return ["armed": PIPMinimizeArmer.shared.statusList()]
+        let (w, h) = try Capture.windowShotToFile(
+            wid: wid, out: out, maxWidth: maxW ?? 0, quality: 0.85)
+        var resp: JSONDict = ["path": out, "width": w, "height": h]
+        if let c = Capture.cursorForShot(wid: wid) {
+            resp["cursor"] = c
+        }
+        return resp
     }
 
-    func cmdPipDisarm(_ a: JSONDict) throws -> JSONDict {
-        if a.bool("all") == true {
-            PIPMinimizeArmer.shared.disarmAll()
-        } else if let wid = a.int("window_id") {
-            _ = PIPMinimizeArmer.shared.disarm(windowId: CGWindowID(wid))
+    /// shot_display — optional `display_id`; default `out` when absent is
+    /// the /tmp pattern (spec'd). quality 0.6.
+    func cmdShotDisplay(_ a: JSONDict) throws -> JSONDict {
+        let out = a.str("out") ?? Capture.defaultOutPath()
+        let maxW = a.int("max_width") ?? 0
+        let (w, h, displayID) = try Capture.displayShotToFile(
+            displayID: a.int("display_id").map(CGDirectDisplayID.init),
+            out: out, maxWidth: maxW, quality: 0.6)
+        var resp: JSONDict = ["path": out, "width": w, "height": h]
+        if let c = Capture.cursorForDisplay(displayID) {
+            resp["cursor"] = c
         }
-        return ["armed": PIPMinimizeArmer.shared.statusList()]
+        return resp
+    }
+
+    /// shutdown — flag on main, restore EnhancedUI, close listen fd, exit.
+    func cmdShutdown(_ a: JSONDict) throws -> JSONDict {
+        DispatchQueue.main.async { self.initiateShutdown() }
+        return ["shutdown": true]
     }
 }

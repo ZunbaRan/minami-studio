@@ -22,6 +22,7 @@ final class FocusStealPreventer {
 
     private(set) var armed = false
     private(set) var armFailures = 0
+    private(set) var tapDisablesRecovered = 0
     private var disallowed = Set<pid_t>()
     private var onlyAllow: pid_t?
     private var observer: NSObjectProtocol?
@@ -85,7 +86,8 @@ final class FocusStealPreventer {
 
     var status: JSONDict {
         lock.lock(); defer { lock.unlock() }
-        return ["armed": armed, "arm_failures": armFailures]
+        return ["armed": armed, "arm_failures": armFailures,
+                "tap_disables_recovered": tapDisablesRecovered]
     }
 
     /// Re-key the app's front window without activating it (AXMain write;
