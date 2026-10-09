@@ -788,7 +788,9 @@ for side, path in paths.items():
 > **Round-5 修复(同日,已验证)**：R5-01 `snapshot` 对 per-app `AXWindows` 失败 `try?` 吞成空列表(Chrome 等拒 AX 的 app 不再整体报 ax_not_granted,CG 元数据照样填 window);R5-02 `snapToDict` 无窗也发 `window:{id,title,bounds}` 三 null;R5-03 `typeTextViaFocusedAXElement` 按 0x10002102c 还原——auto 无 ref 的 deliver 内先试 `AXFocusedUIElement` 插入(AXSelectedText→AXValue append),label 恒 `auto_key_events`,且**必须在 TypeVerification baseline 之后**执行(否则 verifier 读到已写入态误判 unchanged)。三项均双 socket 逐字节复验。
 
 
-run_id=`r5`，2026-10-09；按[R5-TASK.md](R5-TASK.md)完成A→G，完整覆盖与哨兵见[R5-VERIFY.md](R5-VERIFY.md)。确认 **3类差异（1 major、2 minor）**；均已双socket同请求对照，ref仅在前置AX操作按本端重绑。无产品代码修改、无daemon重启。原始证据 `/tmp/cu-r5`，817条请求记录另加2条初始ping。
+run_id=`r5`，2026-10-09；按[R5-TASK.md](R5-TASK.md)完成A→G，完整覆盖与哨兵见[R5-VERIFY.md](R5-VERIFY.md)。确认 **3类差异（1 major、2 minor）**；均已双socket同请求对照，ref仅在前置AX操作按本端重绑。无产品代码修改、无daemon重启。原始证据 `/tmp/cu-r5`，859条请求记录（主序列817、补充42）另加2条初始ping。
+
+> 归属说明：顶部“Round-5修复、已验证”段由15:50:22的并发提交`9d5e745`加入，予以保留。本节r5证据采集止于15:48:17，三条是c5ccba7旧二进制上的测试发现；此测试会话未修改产品代码或执行新提交的修复复验。环境分界详见R5-VERIFY末节。
 
 ### BUG-R5-01 — Chrome AX不可读时，get_app_state 的成功/错误分支不同
 
@@ -876,7 +878,7 @@ Alma（2026-10-09T15:30:52.715963+08:00）：
 ### OBS-R5 — 保留观察，不计确认实现bug
 
 - **枚举偶发项**：Maps/TextEdit bundle+实时pid各20对windows，四组均0/20 app_not_found。本轮另有A-color-scan（TextEdit snap无pid）ours app_not_found/Alma成功；不能用不同请求参数的连发结果宣布旧OBS已消失。
-- **焦点候选**：有效连续哨兵1851点，28次前台转换、495次光标变化；初始49条查询错误与7条混合身份monitor样本不计有效前台证据。15:29:12.815和15:34:57.816两个转换落在请求完成后1s内：前者双方Finder gas均有候选，后者27条PiP调用覆盖两端。完整具体case/时间/光标见R5-VERIFY及`sentinel-transitions.json`。没有已证实的单端focus steal。
+- **焦点候选**：有效连续哨兵1851点，28次前台转换、495次光标变化；初始49条查询错误与7条混合身份monitor样本不计有效前台证据。15:29:12.815和15:34:57.816两个转换落在请求完成后1s内：前者双方Finder gas均有候选，后者27条PiP调用覆盖两端。出稿补测另210条原子哨兵、5次转换；15:47:24.704 Chrome→Electron/44599为第三组候选：Alma D2 snap后677ms、ours D2 gas后385ms，两端均在候选窗口内。完整具体case/时间/光标见R5-VERIFY、`sentinel-transitions.json`及`sentinel-native-summary.json`。没有已证实的单端focus steal。
 - **中树ref顺序**：D的removed_refs两端各自排序、成员一致，跨端ref分配历史不同使重绑后的数组顺序不同；不当作算法差异。原始数组未删除。
 - **PiP瞬态/顺序**：两个arm的数组顺序相反；最小化0.4s时ours短暂session/armed重叠，1s后双端同状态；无稳定错误结论。历史cascade差15次，经校准后0/负/4000尺寸完整frame一致，不误报位置。
 - **事件窗口标记**：F移动后两个相同click的实际坐标及响应均431,352，但event tap窗口字段ours235981/Alma230637；关闭后均230637。保存为内部事件差异，未仅凭这些字段确认协议缺陷。

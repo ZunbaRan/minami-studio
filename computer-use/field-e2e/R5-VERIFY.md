@@ -1,17 +1,17 @@
 # Round-5 收口验证
 
-run_id=`r5`；2026-10-09 **15:21:13–15:36:51 +08:00**（socket/GUI 测试与清理）；连续哨兵至15:38:07，最终原子读取15:39:10。按 [R5-TASK.md](R5-TASK.md) 先 ping，再 **R5-A→B→C→D→E→F→G**，最后清理。已先读 [R3-VERIFY.md](R3-VERIFY.md) 与 [BUGS.md](BUGS.md)，未重复报告已修复的六项。
+run_id=`r5`；2026-10-09 **15:21:13–15:36:51 +08:00**（主序列socket/GUI测试与清理）；出稿补充D后置检查15:47:15–15:48:17，再次清理；最终原子哨兵15:48:56。按 [R5-TASK.md](R5-TASK.md) 先 ping，再 **R5-A→B→C→D→E→F→G**，最后清理。已先读 [R3-VERIFY.md](R3-VERIFY.md) 与 [BUGS.md](BUGS.md)，未重复报告已修复的六项。
 
-**确认3类新差异：1 major、2 minor**，见 [BUGS.md Round-5 收口新发现](BUGS.md#round-5-收口新发现)。全部来自相同请求的双 socket 响应及逐字 diff；没有改产品源码、wrapper、脚本或配置，没有构建/重启被测 daemon。临时测试客户端和只读监视器在 `/tmp/cu-r5`，仓库只新增/追加本轮三份文档。
+**确认3类新差异：1 major、2 minor**，见 [BUGS.md Round-5 收口新发现](BUGS.md#round-5-收口新发现)。全部来自相同请求的双 socket 响应及逐字 diff；本测试没有改产品源码、wrapper、脚本或配置，也没有构建/重启被测daemon；测试结束后的并发更新见文末。临时测试客户端和只读监视器在 `/tmp/cu-r5`，仓库只新增/追加本轮三份文档。
 
 ## 环境与对照规则
 
-- 我们：`/Users/lu/Library/Application Support/Alma/computer-use-72097929.sock`，PID31242；Alma：`/Users/lu/Library/Application Support/Alma/computer-use-9bd08bc1.sock`，PID37196。全程两个原进程存活，无崩溃/恢复。
+- 我们：`/Users/lu/Library/Application Support/Alma/computer-use-72097929.sock`，PID31242；Alma：`/Users/lu/Library/Application Support/Alma/computer-use-9bd08bc1.sock`，PID37196。正式测试请求阶段使用这两个进程，无被测崩溃/本测试恢复；结束后外部更新了ours，见文末。
 - macOS **26.6.2 (25G83)**；HEAD `c5ccba7110f9867a478717aabffbec3124699e07`。
 - ours SHA256：`16a7b03b962de99d50907a7f7a9b203aacbec7c59c805d07f9325e43aadad0ac`；Alma SHA256：`b4d8e4257c025650c60d8b173ca51080905ed2f38018c439e1f6bc2a7d7801a3`。
 - 15:21:13 两端相同字符串 id `r5-preflight-ping` 均 `ok:true,pong:true,version:"0.1.0",uptime_s:2104677`。最初ping之前没有哨兵点；预检仅发只读请求，首个GUI行为测试在有效哨兵启动之后。
 - 基线两端 accessibility/screen_recording=true、sessions/armed为空。focus_guard 基线及E后 ours `armed:false`、Alma `armed:true`，arm_failures均0；保留此现场条件，不擅自把它当作输入差异的已证实根因。
-- **817条**正式请求记录（ours431、Alma386；其中2条为主动断连，只保存已发送请求），另2条最初ping。没有非预期 transport_error。`requests.jsonl` 保存请求、原始响应 `raw`、起止时间和耗时；`comparisons.jsonl` 保存 JSON 对象键排序后的逐字 diff。
+- **859条**正式请求记录（ours454、Alma405；主序列817条、出稿补充42条；其中2条为主动断连，只保存已发送请求），另2条最初ping。没有非预期 transport_error。`requests.jsonl` 保存请求、原始响应 `raw`、起止时间和耗时；`comparisons.jsonl` 保存 JSON 对象键排序后的逐字 diff。
 - 同一 case 使用相同 id/cmd/args；ref仅由本端快照重绑。每次有状态写入前恢复相同前置值。GUI建窗、共用源窗最小化/关闭属于共享现场准备，一次事件同时供两端观察；没有在源窗已被关闭后重复“关闭”作为不等价对照。
 - `snapshot_id`、帧龄、历史PiP计数等差异均原样保留，只有在明确标注的派生比较中归一化。没有把对象键序不同算缺陷；没有把所有数组任意排序后宣称原始wire一致。
 
@@ -22,7 +22,7 @@ run_id=`r5`；2026-10-09 **15:21:13–15:36:51 +08:00**（socket/GUI 测试与�
 |R5-A|PASS（有样本的3类）；其余5类无样本|6个真实控件，42对有效动作。`A-results.jsonl`（另1条错拼命令不计覆盖）。|
 |R5-B|菜单集合PASS；附带异常路径FAIL；扩展vk样本无样本|11个可读app集合一致；Chrome连续两次 ours错误/Alma空树成功，BUG-R5-01。|
 |R5-C|并发/断连PASS；无窗封套FAIL；微预算次数OBS|第二连接在wakeup未结束时完成；无窗window缺失，BUG-R5-02。|
-|R5-D|PASS|Finder中树；原生snap与实际有diff的get_app_state各8对。|
+|R5-D|PASS|Finder中树；snap/gas各8对，另补空diff后原生snap的明确后置检查。|
 |R5-E|FAIL（输入）；枚举样本PASS；焦点候选OBS|Maps/TextEdit各20对全成功；auto无ref两种settle各5对，ours0/10落字、Alma10/10，BUG-R5-03。|
 |R5-F|回声/实际点PASS；事件窗口标记OBS|移动、关闭后均沿用旧点；5种shot_display参数对照。|
 |R5-G|状态/尺寸/首帧PASS；armed顺序与过渡时点OBS|同app双arm、消费后再最小化、三种尺寸；计数校准后frame完全相同。|
@@ -107,6 +107,12 @@ Finder测试窗W236036，depth5有98节点、depth3有27节点。顺序 `5(true)
 
 表内双端相同，所有响应都没有独立`diff`键。唯一派生逐字diff来自第1次removed_refs：两端都按各自ref递增，早先遍历历史不同导致逻辑元素的顺序不同；**71个逻辑成员完全相同**。报告保留原始数组，并分别验证本端排序；只在`D-semantic-results.jsonl`的成员对照中按描述符排序。其余15对只去snapshot_id、重绑ref即相等。证据：`D-responses.json/D-summary.json/D-refmaps.json/D-results.jsonl/D-semantic-results.jsonl`。
 
+### 出稿补充：空diff之后的原生命令snap
+
+主A→G序列完成后，另建Finder W236285/W236294，只补这一条字面命令检查（15:47:15–15:48:17）。首次D2准备时ours还有2个AXGroup更新，Alma已空diff，前置条件没有同时成立；保存全部响应，未用它宣称“双方空diff后snap”。D3改为每次检查双端均`elements:[]、elements_are_diff:true、unchanged_element_count:98`才继续；断言通过后，**literal snap双端均98个全量节点，所有diff相关键省略**，再gas双端仍空diff。稳定snap逐元素重绑ref并去snapshot_id后逐字一致。
+
+初始D3全量有97/98节点瞬态（窗口按钮区域的AXGroup），循环等待后的正式检查已稳定；此瞬态保留，不新增确定bug。两个补测窗都即时关闭，最后Finder仅桌面wid0、PiP空、双端ping正常。证据：`D2-responses.json`、`D3-responses.json`、`D3-results.jsonl`（以末条stable-literal-snap为该断言证据）、`D2/D3-final-windows.json`。补测全程采用每0.5秒的单NSRunningApplication实例读取，见哨兵补充节。
+
 ## R5-E — OBS归因复现
 
 ### 枚举连发
@@ -171,9 +177,9 @@ TextEdit W235981初始bounds `(181,102,586,488)`，稳定等待2.6秒后双端ga
 
 ## 前台/光标哨兵与1秒候选
 
-所有GUI批次前后采样，另独立进程按monotonic时钟每0.5秒采样。前台来自System Events，光标来自只读CGEventGetLocation；没有注入恢复鼠标/激活应用。末次以**单个NSRunningApplication实例**额外读取，结果Paseo/20400/sh.paseo.desktop、光标873,475。
+所有GUI批次前后采样，另独立进程按monotonic时钟每0.5秒采样。前台来自System Events，光标来自只读CGEventGetLocation；没有注入恢复鼠标/激活应用。主序列后以**单个NSRunningApplication实例**额外读取，15:39:10为Paseo/20400、光标873,475；补测最终15:48:56为Chrome/52445、光标1177.6796875,279.4609375。
 
-共1993条哨兵；最初49条查询语法错误（含2个baseline端点），发生在首个GUI测试前，**不计有效样本**。修正后连续monitor有1858个返回成功的样本，其中7条在切换期间混合了name/pid/bundle，另存`sentinel-mixed-samples.json`并剔除前台归因。有效一致monitor **1851点**，15:22:38.796–15:38:07.316；间隔中位数0.500024s，剔除混合样本后最大1.502142s。实际原始调度最大0.763906s，不声称恰好每500ms或可排除采样间瞬态。
+主序列共1993条哨兵；最初49条查询语法错误（含2个baseline端点），发生在首个GUI测试前，**不计有效样本**。修正后连续monitor有1858个返回成功的样本，其中7条在切换期间混合了name/pid/bundle，另存`sentinel-mixed-samples.json`并剔除前台归因。有效一致monitor **1851点**，15:22:38.796–15:38:07.316；间隔中位数0.500024s，剔除混合样本后最大1.502142s。实际原始调度最大0.763906s，不声称恰好每500ms或可排除采样间瞬态。
 
 44组前后配对中43组前台可用，24组前台或光标有变化；有效连续样本中495次光标变化。28次前台转换见下表；没有采到TextEdit/Finder/被测helper成为前台。变化只保留观察，用户/其他进程是否操作未隔离，不能认定focus steal。
 
@@ -215,13 +221,27 @@ TextEdit W235981初始bounds `(181,102,586,488)`，稳定等待2.6秒后双端ga
 
 另3个转换采样处于尚未结束的请求内（A系统设置Alma snap两次、A-combo-rebind ours snap一次），单独保存在`in_flight`，没有伪称“请求完成后1s”。完整候选明细与光标坐标在`sentinel-transitions.json`；所有44组前后点在`sentinel-batches.json`，可追至原始`sentinel.jsonl`。
 
+### 补测的原子哨兵
+
+`sentinel-native.jsonl`另有**210条**原子读取（206个连续monitor、2组前后点），15:47:14.247–15:48:56.663；间隔中位数0.499982s、最大0.505715s，无错误/混合身份样本。5次前台转换、38次光标变化；合计本轮2203条哨兵记录，两个监控时段之间仅整理文档，没有GUI测试动作。
+
+|补测采样时刻(+08:00)|前台转换|候选|
+|---|---|---|
+|15:47:14.668|Paseo→Chrome|无；早于新建测试窗|
+|15:47:24.704|Chrome→Electron/44599|Alma D2-literal-snap-after-empty完成后677ms、ours D2-gas-after-snap后385ms|
+|15:47:26.667|Electron→Chrome|无完成后1s候选|
+|15:47:35.753|Chrome→Ghostty|无|
+|15:47:37.658|Ghostty→Chrome|无|
+
+**第三组候选归因：15:47:24.704**。请求目标为Finder，前台变成Electron；候选同时包含两端读取，且用户/其他进程未隔离，仍为OBS，未指认为任一端focus steal。D3正式稳定检查期间前台始终Chrome。补充明细在`sentinel-native-summary.json`，结束时Chrome/52445、光标1177.6796875,279.4609375。
+
 ## 清理与测试工具偏差
 
-- 本轮3个TextEdit文稿 **235981、236168、236170** 全部关闭；首个修改文稿仅在其自己的保存表单点“删除”丢弃，无新保存文件。新Finder窗 **236036** 已关闭，最终Finder只剩原桌面wid0。
+- 本轮3个TextEdit文稿 **235981、236168、236170** 全部关闭；首个修改文稿仅在其自己的保存表单点“删除”丢弃，无新保存文件。新Finder窗 **236036、236285、236294** 已关闭，最终Finder只剩原桌面wid0。
 - 原TextEdit W230637的bounds `(0,33,1512,897)` 和内容均与A基线一致，双端最终读回；原Maps W235174保留，Preview仍无窗。基线TextEdit另有35×28的无标题AXDialog W235512，后续清单中不再出现；未专门操作该窗口，消失原因未确定，也未为恢复瞬态UI而额外操作。因此不宣称所有临时系统窗口id都与基线相同。
 - Font/Color菜单恢复“显示字体/显示颜色”；Finder大小24/图标视图已复原后再关闭测试窗。未创建/删除Notes笔记、修改系统设置或打印。
-- 所有本轮PiP逐窗关闭/解除；最终两个socket均 `{sessions:[],armed:[]}`、ping成功。原daemon PID31242/37196未变。
-- 只读event tap与连续monitor已停止；最终独立原子哨兵Paseo/20400、(873,475)。未重置用户前台/光标掩盖变化。
+- 所有本轮PiP逐窗关闭/解除；最终两个socket均 `{sessions:[],armed:[]}`、ping成功。这是15:48:17前的测试收尾状态；随后外部重启了ours，见文末。
+- 只读event tap与连续monitor已停止；最终独立原子哨兵Chrome/52445、(1177.6796875,279.4609375)。未重置用户前台/光标掩盖变化。
 - 临时测试脚本有四类已记录的工具偏差：前台查询初始语法错误、secondary命令拼写错误、E脚本起跑前SyntaxError以及F的Path拼接错误。E语法修正前未发E请求；F从未发出的步骤续跑。均未当成被测产品bug。
 
 原始证据与可复用探针保留在 `/tmp/cu-r5`，不删除证据截图。`manifest.json`记录证据SHA256；`environment.json`记录OS、进程、二进制。报告中的PASS仅限实测范围：5类控件、非方向键vk fallback、微预算统一尝试数及所有焦点因果均未被虚构为通过。
@@ -239,3 +259,9 @@ for line in p.read_text().splitlines():
 ```
 
 需要复放时重新创建自有文稿并从本端snap取ref/window_id；本报告测试窗口均已销毁，不向原用户文稿重放写入。
+
+## 收尾并发更新（不混入本轮测试结论）
+
+本轮最后GUI/socket检查于**15:48:17**完成。之后收尾核验发现另一个并发提交 `9d5e74501bb50e44fe2fa9e5d7d3105c91042139`（15:50:22，提交信息署名Devin）修改了三项实现并纳入了此前已写出的R5文档；磁盘二进制于15:49:58更新，SHA256现为`8e23a0377e69de31167edda9b6cf063a3805be34479c07c88770126fa40156ce`，ours新daemon PID61573于15:49:59启动，Alma仍37196。
+
+这些代码/构建/重启/提交**不是本测试执行的操作**。BUGS顶部新增的“Round-5修复、已验证”段来自该并发提交，已保留；本报告859条正式请求仍对应上文c5ccba7/旧二进制测试时段，不自动为9d5e745背书，也不把三条基线失败误写为新版本仍未修复。新版本复验声明的来源是该提交；本轮未再重放写入测试。证据：`environment-after-concurrent-update.json`。

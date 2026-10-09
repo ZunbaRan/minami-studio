@@ -471,16 +471,18 @@ CX17 socket evidence: `{"time": "2026-10-09T12:36:57.059+08:00", "case": "P7-fin
 
 ## run_id=r5 — Round-5 收口（2026-10-09）
 
-执行15:21:13–15:36:51 +08:00，按[R5-TASK.md](R5-TASK.md)先ping、再A→G、最后清理。完整结果与精确证据见[R5-VERIFY.md](R5-VERIFY.md)，三类新差异追加[BUGS.md](BUGS.md#round-5-收口新发现)。只写这三份测试文档，没有改产品代码/配置、构建、重启或提交。
+主序列执行15:21:13–15:36:51 +08:00；出稿补充D后置检查15:47:15–15:48:17并再次清理，按[R5-TASK.md](R5-TASK.md)先ping、再A→G、最后清理。完整结果与精确证据见[R5-VERIFY.md](R5-VERIFY.md)，三类新差异追加[BUGS.md](BUGS.md#round-5-收口新发现)。只写这三份测试文档，没有改产品代码/配置、构建、重启或提交。
 
 - **环境**：macOS26.6.2(25G83)，HEAD c5ccba7110f9867a478717aabffbec3124699e07；ours PID31242、Alma37196。72097929/9bd08bc1两个socket初始ping成功，最终ping仍成功。两端权限true，ours guard未armed/Alma已armed的现场条件原样保留。
 - **A**：扫描运行app和Font/Color面板；TextEdit组合框、Finder滑块和4个segmented radio共42对有效动作完全一致。AXStepper/DateField/Incrementor/DisclosureTriangle/AXTab无样本，未虚报覆盖。
 - **B**：TextEdit84、Notes103、Calculator41、Finder118、Preview106、Maps64、Calendar68、Music71、Settings41、Mail125、Ghostty61，两端combo差集空；只命中方向键命名。Chrome连续两次我们ax_not_granted/Alma空树成功，确认BUG-R5-01（minor）。
 - **C**：wakeup挂起期间第二连接ping/windows均提前完成；主动断连后即时与延时请求正常。无窗/死pid/0,-1,.001,1000000均对照。无窗响应我们省略window、Alma三字段null，snap与gas各复验2对，BUG-R5-02（minor）。微预算尝试数按耗时OBS保留。
-- **D**：Finder98节点中树，snap与gas各8对；depth5→3移除71个，恢复返回71个，空diff后仍空；disable_diff切换形状一致。removed_refs本端排序与跨端逻辑成员单独核对，不把ref分配顺序算bug。
+- **D**：Finder98节点中树，snap与gas各8对；depth5→3移除71个，恢复返回71个，空diff后仍空；disable_diff切换形状一致。removed_refs本端排序与跨端逻辑成员单独核对，不把ref分配顺序算bug。出稿时补原生命令snap：等待双端真正空diff后，snap全量98节点，再gas仍空diff。D2及D3准备阶段的AXGroup瞬态已保留，不作为该断言成功证据。
 - **E**：Maps/TextEdit各20对windows均成功，app_not_found均0/20；auto无ref两种settle各5对，反转调用次序后仍ours0/10落字、Alma10/10且verified=true，BUG-R5-03（major）。每次都有ANCHOR前置与后置读回，E时段前台哨兵均Paseo。根因未定，保留双daemon/guard现场条件。
 - **F**：gas后移动及关闭测试窗，两端都用旧点431,352；只读目标PID鼠标tap确认实际down/up同点。shot_display五种coord_space均相同756×491；事件窗口字段差另记OBS，原文稿内容未变。
 - **G**：双窗arm后消费其一、手工close后再最小化不重开，剩余arm保持；0/负尺寸均成功默认240×200，4000最终1072×893。历史计数差15次，ours补15次后完整frame逐字一致。pip_status实测false→true首次采样119.703/125.908ms；全部会话/armed收空。
-- **哨兵**：1993条，1851条身份一致的连续monitor有效；初始49条查询错误、7条混合身份monitor明确剔除。有效采样中位间隔0.500024s、最大1.502142s。28次前台转换，2组完成后≤1秒候选，未证明单端焦点窃取。最终原子读取Paseo/20400、873,475。
-- **清理**：本轮TextEdit235981/236168/236170、Finder236036全部关闭；修改的自有文稿丢弃未保存。原TextEdit230637的内容/几何保留，Maps235174保留，Preview仍无窗；Font/Color面板恢复隐藏，Finder图标大小恢复24。两个daemon原PID存活；临时监听器停止。
-- **证据**：`/tmp/cu-r5`，817条正式请求（ours431/Alma386，含2条主动断连）+2条初始ping，无非预期transport_error。包含raw响应、逐字diff、全部脚本、原始哨兵、候选归因、鼠标事件、截图、manifest与环境散列。测试脚本的拼写/语法/Path错误已修正续跑，未归为产品bug。
+- **哨兵**：1993条，1851条身份一致的连续monitor有效；初始49条查询错误、7条混合身份monitor明确剔除。有效采样中位间隔0.500024s、最大1.502142s。28次前台转换，2组完成后≤1秒候选，未证明单端焦点窃取。补测另210条原子哨兵（206个monitor），5次转换、1组新候选（Chrome→Electron，双端读取均相邻）。最终原子读取Chrome/52445、1177.6796875,279.4609375。
+- **清理**：本轮TextEdit235981/236168/236170、Finder236036/236285/236294全部关闭；修改的自有文稿丢弃未保存。原TextEdit230637的内容/几何保留，Maps235174保留，Preview仍无窗；Font/Color面板恢复隐藏，Finder图标大小恢复24。两个daemon原PID存活；临时监听器停止。
+- **证据**：`/tmp/cu-r5`，859条正式请求（ours454/Alma405；主817+补42，含2条主动断连）+2条初始ping，无非预期transport_error。包含raw响应、逐字diff、全部脚本、原始哨兵、候选归因、鼠标事件、截图、manifest与环境散列。测试脚本的拼写/语法/Path错误已修正续跑，未归为产品bug。
+
+收尾并发更新：全部r5正式请求止于15:48:17后，外部于15:49:58重建二进制、15:49:59将ours换为PID61573，并于15:50:22提交`9d5e745`修复上述三项且纳入已写文档。BUGS中的修复复验声明属于该提交；本测试未做这些代码/构建/重启/提交操作，也未将旧基线结果当成新版本复验。详见R5-VERIFY末节与`environment-after-concurrent-update.json`。
