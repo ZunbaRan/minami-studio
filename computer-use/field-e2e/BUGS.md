@@ -276,6 +276,8 @@ CX17 哨兵观察补记：P6 12:35:16 的 Paseo/20400 `(806,316)` → 12:35:30 `
 
 run_id=`r3`，2026-10-09；原4项修复回归均PASS，Phase2选11项补扫。确认 **6类差异：2 major、4 minor**。证据来自两个指定 socket，同请求对照；ref按两端快照重绑。完整范围、哨兵、恢复与未覆盖项见 [R3-VERIFY.md](R3-VERIFY.md)。本节仅记录及建议裁决，没有改码。对象键序、计时、不同历史PiP计数不当作实现bug。
 
+> **Round-4 修复(同日,已验证)**：R3-01 `KeyboardLayoutTranslator.keyPresses` 改经 DispatchQueue.main 执行(HIToolbox 队列断言);R3-02 `cmdScroll` 循环钳制 `max(1,pages)`(反汇编 csinc 实锤,0/-1 仍执行一次);R3-03 快照空字符串字段统一不发射;R3-04 ax_failure 文案补 `AX error ` 前缀+句点;R3-05 armed 条目在源窗销毁后保留(disarm 仍 true);R3-06 type_text 目标校验先于 ax-ref 校验。六项均双 socket 复验通过,daemon 不再因 physical/pages:-1 崩溃。
+
 ### BUG-R3-01 — physical type_text 触发输入源读取队列断言
 
 - 严重度：major（daemon进程退出）。

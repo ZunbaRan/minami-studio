@@ -131,7 +131,18 @@ enum KeyboardLayoutTranslator {
         ([.maskShift, .maskAlternate], 10),
     ]
 
+    /// HIToolbox asserts the main queue inside
+    /// TISCopyCurrentKeyboardLayoutInputSource (islGetInputSourceListWith
+    /// Additions); request handlers run on the concurrent conn queue, so
+    /// hop to main — NSApp.run() drains DispatchQueue.main.
     static func keyPresses(for text: String) throws -> [KeyPress] {
+        if Thread.isMainThread { return try translate(text) }
+        var result: Result<[KeyPress], Error>!
+        DispatchQueue.main.sync { result = Result { try translate(text) } }
+        return try result.get()
+    }
+
+    private static func translate(_ text: String) throws -> [KeyPress] {
         guard let src = TISCopyCurrentKeyboardLayoutInputSource()?.takeRetainedValue() else {
             throw DaemonError("internal", "Unable to get current keyboard layout.")
         }

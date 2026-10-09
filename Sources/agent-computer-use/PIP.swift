@@ -606,18 +606,11 @@ final class PIPMinimizeArmer {
                 let me = Unmanaged<PIPMinimizeArmer>.fromOpaque(ctx!)
                     .takeUnretainedValue()
                 if (notif as String) == kAXUIElementDestroyedNotification {
-                    // A destroyed element's wid is unreadable and AX death
-                    // races CG removal — identify the arm by element
-                    // identity (registration is on the window element).
-                    DispatchQueue.main.async {
-                        me.lock.lock()
-                        let wid = me.arms.values.first(where: {
-                            CFEqual($0.element, el)
-                        })?.windowId
-                            ?? AXBridge.windowIDNumber(of: el)
-                        me.lock.unlock()
-                        if let wid { _ = me.disarm(windowId: wid) }
-                    }
+                    // [live probe R3] the arm SURVIVES source-window
+                    // destruction: pip_status keeps the entry and
+                    // pip_disarm still returns true. The notification is
+                    // registered (disarm removes both) but the callback
+                    // does not consume the arm.
                 } else if (notif as String) == kAXWindowMiniaturizedNotification {
                     guard let wid = AXBridge.windowIDNumber(of: el) else { return }
                     DispatchQueue.main.async { me.didMinimize(windowId: wid) }

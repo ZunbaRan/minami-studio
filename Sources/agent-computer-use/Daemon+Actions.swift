@@ -1027,14 +1027,12 @@ extension Daemon {
             throw DaemonError("invalid_arg",
                 "input_method must be auto|physical|unicode|ax")
         }
+        // [live probe R3] the target check precedes the ax-ref check:
+        // {input_method:ax} with no target → "requires pid/bundle/ref".
         let ref = a.str("ref")
-        if method == "ax", ref == nil {
-            throw DaemonError("invalid_arg",
-                "input_method=ax requires `ref`.")
-        }
         var pid: pid_t
         var refEntry: ElementStore.Entry?
-        if let ref = ref {
+        if let ref {
             let store = elementStore
             let e = try resolveEntry(ref, store: store)
             pid = e.pid; refEntry = e
@@ -1044,6 +1042,10 @@ extension Daemon {
                     "type_text requires `pid`, `bundle`, or `ref`.")
             }
             pid = p
+        }
+        if method == "ax", refEntry == nil {
+            throw DaemonError("invalid_arg",
+                "input_method=ax requires `ref`.")
         }
         let baseline = settlePrelude(pid: pid)
         switch method {
@@ -1351,7 +1353,10 @@ extension Daemon {
         let baseline = settlePrelude(pid: entry.pid)
         // scroll-route AX performs carry the enablement assertion
         try AXBridge.withEnablement(pid: entry.pid) {
-            for _ in 0..<pages {
+            // [0x100016258] csinc clamps the trip count: max(1, pages) —
+            // pages 0/-1 still perform the action once (and can fail with
+            // action_unsupported). Response echoes the raw `pages`.
+            for _ in 0..<max(1, pages) {
                 let err = AXUIElementPerformAction(entry.element,
                     action as CFString)
                 try mapAXError(err, context: "performing \(action)")

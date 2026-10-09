@@ -62,11 +62,16 @@ struct SerializedElement {
             "actions": actions,
             "children_count": childrenCount,
         ]
-        if let subrole { d["subrole"] = subrole }
-        if let roleDescription { d["role_description"] = roleDescription }
-        if let title { d["title"] = title }
-        if let value { d["value"] = value }
-        if let description { d["description"] = description }
+        // [live probe R3] empty strings are OMITTED, not emitted as "".
+        if let subrole, !subrole.isEmpty { d["subrole"] = subrole }
+        if let roleDescription, !roleDescription.isEmpty {
+            d["role_description"] = roleDescription
+        }
+        if let title, !title.isEmpty { d["title"] = title }
+        if let value, !value.isEmpty { d["value"] = value }
+        if let description, !description.isEmpty {
+            d["description"] = description
+        }
         if let selected { d["selected"] = selected }
         if let b = bounds {
             d["bounds"] = [
@@ -385,9 +390,9 @@ func mapAXError(_ err: AXError, context: String) throws {
             "Accessibility permission not granted to Alma Computer Use.",
             hint: "Open System Settings → Privacy & Security → Accessibility and enable \"Alma Computer Use\".")
     default:
-        // [ALGORITHMS §4] ax_failure = "<AXError case name> while <context>"
+        // [live probe R3] ax_failure = "AX error <case> while <context>."
         throw DaemonError("ax_failure",
-            "\(axErrorName(err)) while \(context)")
+            "AX error \(axErrorName(err)) while \(context).")
     }
 }
 

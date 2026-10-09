@@ -212,3 +212,12 @@ minimize→自动开 PiP 会话全链路实测；gas AX-only 不还原最小化�
 - **PiP 浮窗定位**(`nextCascadeOrigin` @0x10004f36c)：全局单调 counter（锁保护、关闭不重置、**读旧值再自增**);`x=max(vf.maxX-w-24-28n,minX+12)`,`y=max(vf.maxY-h-24-28n,minY+12)`;**Cocoa 顶右锚定**（视觉上是屏幕右上、菜单栏下方），非右下。本机验证 (1248,725)/(1220,471) 逐字节命中。
 - **PiP 会话回收**：已销毁 AX 元素的属性（含 wid）不可读；且 **AXUIElementDestroyed 先于 CGWindowList 移除**——两类替代判定都不可靠。真实语义：观察器只注册在解析出的窗口元素上，destroyed 通知即权威、无条件 close;MinimizeArmer 同理用元素身份 CFEqual 定位。
 - daemon 手工拉起约定：`bin/agent-computer-use daemon --socket ~/Library/Application Support/Alma/computer-use-72097929.sock --idle-seconds 3600`(MCP 客户端也会自动 spawn)。
+
+## Round-4 修复（2026-10-09，针对 R3 回归新发现的 6 项）
+
+- **scroll pages 语义**：反汇编 `AXBridge.scroll` 0x100016258 `cmp x25,#1; csinc x8,x25,xzr,gt` = `max(1,pages)`——0/-1 也执行一次动作（可 action_unsupported），响应回声原始 pages。
+- **physical type_text 崩溃根因**:`TISCopyCurrentKeyboardLayoutInputSource` 触发 `islGetInputSourceListWithAdditions` 的 main-queue 断言；请求处理在并发 conn queue。修法：`keyPresses` 整体经 `DispatchQueue.main.sync`（主线程直跑，非主跳主）。真机同请求返回 `internal` 且存活。
+- **快照空字段**:Alma 对 `subrole/role_description/title/value/description` 一律**空串不发射**(toDict 层 isEmpty 门）。
+- **ax_failure 文案**:`"AX error <case> while <context>."`——前缀 `AX error ` + 句点结尾，所有 ax_failure 路径统一。
+- **armed 与源窗销毁解耦**:MinimizeArmer 仍注册 destroyed 通知（disarm 时两者都 remove)，但回调**不消费 arm**——pip_status 保留条目、pip_disarm 返回 true。与活动 session 的 destroyed 回收（R4 语义）是两条独立路径。
+- **type_text 校验顺序**：目标（pid/bundle/ref）缺失检查先于 `input_method=ax requires ref`。
