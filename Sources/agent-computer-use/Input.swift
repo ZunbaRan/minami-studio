@@ -101,7 +101,7 @@ enum KeyParser {
             case "cmd", "command", "meta", "super": flags.insert(.maskCommand)
             case "ctrl", "control": flags.insert(.maskControl)
             case "shift": flags.insert(.maskShift)
-            case "alt", "option": flags.insert(.maskAlternate)
+            case "alt", "option", "opt": flags.insert(.maskAlternate)
             case "fn", "function": flags.insert(.maskSecondaryFn)
             default:
                 throw DaemonError("invalid_arg",
@@ -244,16 +244,40 @@ enum MenuShortcuts {
         return out
     }
 
-    /// combo string in press_key syntax: cmd/ctrl/opt/shift in fixed order
-    /// + key name (named-table reverse of keyCode, else glyph).
+    /// [DISASM 0x100030bc0–30fa0] virtual-keycode display table — a jump
+    /// table over vk−36 ∈ [0,90]; unmapped codes fall through to
+    /// `"vk" + String(format:"%02X", vk)` (e.g. vk=37 → "vk25").
+    private static let vkDisplayNames: [UInt16: String] = [
+        36: "Return", 48: "Tab", 49: "Space", 51: "Backspace", 53: "Escape",
+        96: "F5", 97: "F6", 98: "F7", 99: "F3", 100: "F8", 101: "F9",
+        103: "F11", 109: "F10", 111: "F12", 115: "Home", 116: "PageUp",
+        117: "Delete", 118: "F4", 119: "End", 120: "F2", 121: "PageDown",
+        122: "F1", 123: "Left", 124: "Right", 125: "Down", 126: "Up",
+    ]
+
+    /// combo string in press_key syntax: cmd/ctrl/opt/shift in fixed order.
+    /// [DISASM walk 0x100030608+] key part = AXMenuItemCmdChar lowercased
+    /// verbatim (glyphs like ⎋ stay raw; no glyph→name mapping); when the
+    /// char is absent/empty the AXMenuItemCmdVirtualKey maps through
+    /// vkDisplayNames or formats as vk%02X. An item with neither is
+    /// skipped entirely (combo = nil).
     static func chordString(_ el: AXUIElement) -> String? {
-        guard let (kc, flags) = shortcut(el) else { return nil }
         var parts: [String] = []
+        let bits = (AXBridge.copyAttr(el, kAXMenuItemCmdModifiersAttribute)
+            as? NSNumber)?.intValue ?? 0
+        let flags = modifierFlags(bits)
         if flags.contains(.maskCommand) { parts.append("cmd") }
         if flags.contains(.maskControl) { parts.append("ctrl") }
         if flags.contains(.maskAlternate) { parts.append("opt") }
         if flags.contains(.maskShift) { parts.append("shift") }
-        parts.append(keyName(for: kc) ?? "key\(kc)")
+        if let ch = AXBridge.copyString(el, kAXMenuItemCmdCharAttribute),
+           !ch.isEmpty {
+            parts.append(ch.lowercased())
+            return parts.joined(separator: "+")
+        }
+        guard let vk = (AXBridge.copyAttr(el, "AXMenuItemCmdVirtualKey")
+                as? NSNumber)?.uint16Value else { return nil }
+        parts.append(vkDisplayNames[vk] ?? String(format: "vk%02X", vk))
         return parts.joined(separator: "+")
     }
 

@@ -204,3 +204,11 @@ minimize→自动开 PiP 会话全链路实测；gas AX-only 不还原最小化�
   键序不同（语义等价、JSON 无键序语义）；若要逐字节对齐需换有序发射
   结构（大改，暂记为已知 cosmetic 差异，不改）
 - 给 MCP wrapper 加 ping/health 工具（23 工具面是闭集）
+
+## Round-3 修复（2026-10-09，针对 CX 外场确认的 4 个 parity bug)
+
+- **修饰键别名全集**(press_key 探针实测）:cmd/command/meta/super、ctrl/control、shift、alt/option/opt、fn/function;`ctl`/`win`/`caps` 被拒。此前只缺 `opt`。
+- **menu_shortcuts 序列化规则**(walk @0x100030608 逐指令）:mods 位 3 置位=无 cmd;cmd/ctrl/opt/shift 固定序；key=`AXMenuItemCmdChar.lowercased()` 原样（glyph ⎋/\x1b/? 不映射）;char 空→vk 跳表命名（Return/Tab/Space/Backspace/Escape/F1-F12/Home/End/PageUp/PageDown/Delete/Left/Right/Down/Up，首字母大写）；表外→`vk%02X` 大写 hex。char 与 vk 皆无→跳过该项。
+- **PiP 浮窗定位**(`nextCascadeOrigin` @0x10004f36c)：全局单调 counter（锁保护、关闭不重置、**读旧值再自增**);`x=max(vf.maxX-w-24-28n,minX+12)`,`y=max(vf.maxY-h-24-28n,minY+12)`;**Cocoa 顶右锚定**（视觉上是屏幕右上、菜单栏下方），非右下。本机验证 (1248,725)/(1220,471) 逐字节命中。
+- **PiP 会话回收**：已销毁 AX 元素的属性（含 wid）不可读；且 **AXUIElementDestroyed 先于 CGWindowList 移除**——两类替代判定都不可靠。真实语义：观察器只注册在解析出的窗口元素上，destroyed 通知即权威、无条件 close;MinimizeArmer 同理用元素身份 CFEqual 定位。
+- daemon 手工拉起约定：`bin/agent-computer-use daemon --socket ~/Library/Application Support/Alma/computer-use-72097929.sock --idle-seconds 3600`(MCP 客户端也会自动 spawn)。

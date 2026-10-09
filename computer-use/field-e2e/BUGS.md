@@ -245,3 +245,28 @@
 - workaround: 不依赖源关闭自动收尾；对本轮登记的源 ID 显式 disarm、close，并对照初始 status 验证。
 
 CX17 哨兵观察补记：P6 12:35:16 的 Paseo/20400 `(806,316)` → 12:35:30 `(746,320)` → 12:35:47 `(689.37890625,251.26953125)`，归入 BUG-CX17-哨兵光标变化待归因；P7 12:36:12→12:36:58 保持 Paseo/20400 `(609,138)`。
+
+---
+
+## 修复记录（2026-10-09 下午，commit 前）
+
+全部四个确认 bug 已修复并逐条对真机验证：
+
+### BUG-CX02-opt-修饰键 → FIXED
+- 修法：`KeyParser.parse` 修饰键表补 `opt`（真机全集实测：`cmd/command/meta/super`,`ctrl/control`,`shift`,`alt/option/opt`,`fn/function`;`ctl`/`win`/`caps` 拒绝——与我们一致）。
+- 验证：`press_key cmd+opt+f` 后台 TextEdit → `delivered:false` + 逐字 delivery_note，与真机同。
+
+### BUG-CX18-menu_shortcuts → FIXED
+- 修法：`chordString` 解耦 keyCode 解析——mods 取自 `AXMenuItemCmdModifiers` 位（bit3 set=无 cmd；顺序 cmd/ctrl/opt/shift),key 部分 = `AXMenuItemCmdChar.lowercased()` 原样（⎋/\x1b/? 等 glyph 直出）；char 空→`AXMenuItemCmdVirtualKey` 查 vk 命名表；表外→`vk%02X`。
+- vk 命名表从 0x100030bc0 跳表逐 arm 解码：36 Return,48 Tab,49 Space,51 Backspace,53 Escape,96 F5,97 F6,98 F7,99 F3,100 F8,101 F9,103 F11,109 F10,111 F12,115 Home,116 PageUp,117 Delete,118 F4,119 End,120 F2,121 PageDown,122 F1,123 Left,124 Right,125 Down,126 Up。
+- 验证：Calculator/TextEdit/Notes 三 app combo 集合与真机差集为空（41/41、全部命中）。
+
+### BUG-CX17-floater-frame → FIXED
+- 修法：从 `PIPFloaterWindow.nextCascadeOrigin(size:)` @0x10004f36c 逐指令还原：全局单调 counter(锁保护、关闭不重置、读旧值再自增）,`x=max(vf.maxX-w-24-28n, vf.minX+12)`,`y=max(vf.maxY-h-24-28n, vf.minY+12)`,mainScreen nil→(100,100)。此前实现的"右下锚定"是错的——真机是 Cocoa 顶部锚定（视觉右上）。
+- 验证：本机 vf.maxY=949 → 首开 h200 → (1248,725)、第二个 h426 → (1220,471)，与真机记录逐字节一致。
+
+### BUG-CX17-源窗口关闭残留 → FIXED
+- 根因：我们的回调用 `windowIDNumber(el)==windowId` 过滤，但**已销毁元素的属性不可读**→永远 false→会话残留。曾尝试 CGWindowList 存在性判定——又踩到 **AX 销毁先于 CGWindow 移除**的竞态（回调瞬间 CG 列表还在）。
+- 真机语义：观察器只挂在**解析出的窗口元素**上（解析失败不装）,destroyed 通知即权威，无条件 `PIPManager.close(windowId:)`。
+- 修法：去掉 wid 过滤与 CG 检查；winEl 解析失败则不装观察器（同真机）。MinimizeArmer 的 destroyed 同病同治：按 `CFEqual(el, arm.element)` 元素身份定位 arm。
+- 验证：AXPress 关闭源窗口 → 1s 内 `sessions:[]`；后续 `pip_close` → `closed:false`，与真机逐字一致。

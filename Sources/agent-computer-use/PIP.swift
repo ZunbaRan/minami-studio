@@ -175,6 +175,33 @@ final class PIPContentView: NSView {
 
 final class PIPFloaterWindow: NSPanel {
     let mirrorOf: CGWindowID
+
+    /// [DISASM 0x10004f36c–f4cc] nextCascadeOrigin(size:) — a monotonic
+    /// global counter (never decremented on close) under `cascadeLock`:
+    ///   step  = counter × 28.0   (counter read BEFORE increment)
+    ///   x     = max(vf.maxX − w − 24 − step,  vf.minX + 12)
+    ///   y     = max(vf.maxY − h − 24 − step,  vf.minY + 12)
+    ///   mainScreen nil → (100, 100)
+    /// Top-right anchoring in Cocoa coords (visually under the menu bar);
+    /// each new floater stairs 28pt down-left. Verified live:
+    ///   vf.maxY=949 → h=200 y=725, h=426 n=1 y=471, x 1248→1220→1192→1164.
+    private static let cascadeLock = NSLock()
+    private static var cascadeCount = 0
+    static func nextCascadeOrigin(size: CGSize) -> CGPoint {
+        cascadeLock.lock()
+        defer { cascadeLock.unlock() }
+        let n = cascadeCount
+        cascadeCount += 1
+        guard let scr = NSScreen.main else {
+            return CGPoint(x: 100, y: 100)
+        }
+        let vf = scr.visibleFrame
+        let step = CGFloat(n) * 28.0
+        let x = max(vf.maxX - size.width - 24 - step, vf.minX + 12)
+        let y = max(vf.maxY - size.height - 24 - step, vf.minY + 12)
+        return CGPoint(x: x, y: y)
+    }
+
     init(mirrorOf wid: CGWindowID, title: String?, size: CGSize,
          sourceAspect: CGFloat) {
         mirrorOf = wid
@@ -200,14 +227,7 @@ final class PIPFloaterWindow: NSPanel {
         }
         contentView = PIPContentView(frame: NSRect(origin: .zero, size: size),
                                      sourceAspect: sourceAspect)
-        // Default placement: bottom-right of the main screen (live probe
-        // floater_frame {x:1154,y:705} on a ~1440-wide display).
-        if let scr = NSScreen.main {
-            let vf = scr.visibleFrame
-            let origin = CGPoint(x: vf.maxX - size.width - 24,
-                                 y: vf.minY + 24)
-            setFrameOrigin(origin)
-        }
+        setFrameOrigin(PIPFloaterWindow.nextCascadeOrigin(size: size))
     }
     override func close() {
         super.close()
@@ -289,22 +309,22 @@ final class PIPSession: NSObject, SCStreamOutput, SCStreamDelegate {
     private func installDestroyObserver() {
         guard let pid = pid else { return }
         let appEl = AXUIElementCreateApplication(pid)
-        // Prefer the resolved window element; on this macOS AXWindows can
-        // return degenerate app proxies, so fall back to observing the app
-        // element and filtering delivered elements by wid.
-        let winEl = ((try? AXBridge.windows(of: pid)) ?? []).first(where: {
+        // [DISASM] the observer attaches to the RESOLVED window element
+        // only — no app-element fallback (resolution failure installs
+        // nothing). The destroyed notification is then authoritative:
+        // AX element death can precede CGWindow removal, so no existence
+        // re-check; the wid of the dead element is unreadable anyway.
+        guard let winEl = ((try? AXBridge.windows(of: pid)) ?? []).first(where: {
             AXBridge.windowIDNumber(of: $0) == windowId
         }) ?? PIPMinimizeArmer.shared.axWindowElement(of: appEl, cgWindowId: windowId)
-        let target = winEl ?? appEl
+        else { return }
+        let target = winEl
         axWindowElement = target
         var obs: AXObserver?
-        guard AXObserverCreate(pid, { _, el, _, ctx in
+        guard AXObserverCreate(pid, { _, _, _, ctx in
             guard let ctx else { return }
             let me = Unmanaged<PIPSession>.fromOpaque(ctx)
                 .takeUnretainedValue()
-            // Per-window filtering: destruction targets the MIRRORED
-            // session only — never every session sharing a PID [contract].
-            guard AXBridge.windowIDNumber(of: el) == me.windowId else { return }
             let wid = me.windowId, cb = me.onClose
             DispatchQueue.main.async { cb(wid) }
         }, &obs) == .success, let obs else { return }
@@ -585,10 +605,21 @@ final class PIPMinimizeArmer {
             let createErr = AXObserverCreate(pid, { _, el, notif, ctx in
                 let me = Unmanaged<PIPMinimizeArmer>.fromOpaque(ctx!)
                     .takeUnretainedValue()
-                guard let wid = AXBridge.windowIDNumber(of: el) else { return }
                 if (notif as String) == kAXUIElementDestroyedNotification {
-                    DispatchQueue.main.async { _ = me.disarm(windowId: wid) }
+                    // A destroyed element's wid is unreadable and AX death
+                    // races CG removal — identify the arm by element
+                    // identity (registration is on the window element).
+                    DispatchQueue.main.async {
+                        me.lock.lock()
+                        let wid = me.arms.values.first(where: {
+                            CFEqual($0.element, el)
+                        })?.windowId
+                            ?? AXBridge.windowIDNumber(of: el)
+                        me.lock.unlock()
+                        if let wid { _ = me.disarm(windowId: wid) }
+                    }
                 } else if (notif as String) == kAXWindowMiniaturizedNotification {
+                    guard let wid = AXBridge.windowIDNumber(of: el) else { return }
                     DispatchQueue.main.async { me.didMinimize(windowId: wid) }
                 }
             }, &ob)
