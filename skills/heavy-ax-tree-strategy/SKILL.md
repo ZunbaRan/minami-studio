@@ -4,7 +4,7 @@ description: Finder、Notes 等复杂窗口的快照过大、空diff或索引不
 ---
 # 快照深度与 diff
 ## 前置条件
-工具是agent_computer_use；先选bundle和窗口。本文首批依据Finder CX05/CX06，Notes实测另见notes-lifecycle。
+工具是minami_computer_use；先选bundle和窗口。本文首批依据Finder CX05/CX06，Notes实测另见notes-lifecycle。
 ## 推荐步骤（含具体工具调用示例）
 1. `get_app_state({bundle:"com.apple.finder",depth:3,interactive_only:true,screenshot_max_width:800})` 先定位window.id与主要控件。
 2. 需要文件cell或展开菜单才升到depth6。更深之前优先切列表视图/缩小目标窗口范围。

@@ -1,4 +1,4 @@
-# agent-computer-use
+# minami-computer-use
 
 Independent, MCP-native reproduction of Alma's macOS Computer Use surface.
 Behavior is benchmarked against Alma .153 (disassembly + live probes) and the
@@ -7,16 +7,16 @@ text. No added features.
 
 ```
 Agent (Codex CLI / any MCP client)
-  └── stdio MCP ── bin/agent-computer-use-mcp (node, zero-dep)
-        ├── optional host calls → AGENT_CU_HOST_URL (fail-open)
-        └── unix socket NDJSON ── bin/agent-computer-use (Swift daemon)
+  └── stdio MCP ── bin/minami-computer-use-mcp (node, zero-dep)
+        ├── optional host calls → MINAMI_CU_HOST_URL (fail-open)
+        └── unix socket NDJSON ── bin/minami-computer-use (Swift daemon)
               └── Accessibility API / CGEvent / CGWindowList / TCC
 ```
 
 ## Build & install
 
 ```sh
-./scripts/build.sh            # swift build + stage bin/agent-computer-use
+./scripts/build.sh            # swift build + stage bin/minami-computer-use
 ./scripts/install-codex.sh    # codex mcp add agent_computer_use
 ./scripts/smoke.sh            # initialize → tools/list(23) → permissions → list_apps
 ```
@@ -25,7 +25,7 @@ The MCP wrapper auto-spawns the daemon (`daemon --socket <path> --idle-seconds 9
 on first call; socket lives at
 `~/Library/Application Support/agent-computer-use/computer-use-<hash>.sock`.
 
-For non-Codex harnesses: stdio command = `<repo>/bin/agent-computer-use-mcp`
+For non-Codex harnesses: stdio command = `<repo>/bin/minami-computer-use-mcp`
 (accepts both Content-Length headers and bare-JSONL framing, replies in kind).
 
 ## Tool surface (23 — verbatim parity)
@@ -111,7 +111,7 @@ Sources/agent-computer-use/   main, Support, Daemon, Daemon+Actions,
                               Appshot+VisualIndex
 mcp/agent-computer-use-mcp.mjs   23-tool stdio server (Alma wrapper port)
 mcp/playbooks/*.md               7 verbatim app playbooks
-bin/agent-computer-use{,-mcp}    staged artifacts
+bin/minami-computer-use{,-mcp}    staged artifacts
 scripts/{build,install-codex,smoke}.sh
 docs/                            provenance notes
 ```

@@ -1,4 +1,4 @@
-# AGENTS.md — agent-computer-use
+# AGENTS.md — minami-computer-use
 
 Independent MCP-native reproduction of Alma's macOS Computer Use surface.
 **唯一准绳：严格对标 Alma。** 不加 Alma 没有的能力、不改 Alma 的 wire/错误语义，
@@ -8,11 +8,11 @@ Independent MCP-native reproduction of Alma's macOS Computer Use surface.
 ## 结构与入口
 
 ```
-Sources/agent-computer-use/   Swift daemon（main / Support / Daemon /
+Sources/minami-computer-use/  Swift daemon（main / Support / Daemon /
                               Daemon+Actions / AX / Capture / Focus /
                               Input / PIP）
-mcp/agent-computer-use-mcp.mjs  23-tool stdio MCP wrapper（Alma wrapper 移植）
-bin/agent-computer-use-mcp      稳定入口（任何 harness 指这里）
+mcp/minami-computer-use-mcp.mjs 23-tool stdio MCP wrapper（Alma wrapper 移植）
+bin/minami-computer-use-mcp     稳定入口（任何 harness 指这里）
 scripts/{build,install-codex,smoke}.sh
 ```
 
@@ -23,13 +23,13 @@ daemon 自带 45 命令注册表；未实现项返回 Alma 的 `not_implemented`
 ## 构建/验证
 
 ```sh
-./scripts/build.sh            # swift build → bin/agent-computer-use
+./scripts/build.sh            # swift build → bin/minami-computer-use
 ./scripts/smoke.sh            # initialize→tools/list(23)→permissions→list_apps
-./scripts/install-codex.sh    # codex mcp add agent_computer_use
+./scripts/install-codex.sh    # codex mcp add minami_computer_use
 ```
 
 Devin 侧已配置：项目根 `.devin/mcp_config.local.json` 的
-`mcpServers.agent_computer_use` 指到 `bin/agent-computer-use-mcp`。
+`mcpServers.minami_computer_use` 指到 `bin/minami-computer-use-mcp`。
 
 ## 本机踩出的硬坑（再改别再踩）
 
@@ -211,7 +211,7 @@ minimize→自动开 PiP 会话全链路实测；gas AX-only 不还原最小化�
 - **menu_shortcuts 序列化规则**(walk @0x100030608 逐指令）:mods 位 3 置位=无 cmd;cmd/ctrl/opt/shift 固定序；key=`AXMenuItemCmdChar.lowercased()` 原样（glyph ⎋/\x1b/? 不映射）;char 空→vk 跳表命名（Return/Tab/Space/Backspace/Escape/F1-F12/Home/End/PageUp/PageDown/Delete/Left/Right/Down/Up，首字母大写）；表外→`vk%02X` 大写 hex。char 与 vk 皆无→跳过该项。
 - **PiP 浮窗定位**(`nextCascadeOrigin` @0x10004f36c)：全局单调 counter（锁保护、关闭不重置、**读旧值再自增**);`x=max(vf.maxX-w-24-28n,minX+12)`,`y=max(vf.maxY-h-24-28n,minY+12)`;**Cocoa 顶右锚定**（视觉上是屏幕右上、菜单栏下方），非右下。本机验证 (1248,725)/(1220,471) 逐字节命中。
 - **PiP 会话回收**：已销毁 AX 元素的属性（含 wid）不可读；且 **AXUIElementDestroyed 先于 CGWindowList 移除**——两类替代判定都不可靠。真实语义：观察器只注册在解析出的窗口元素上，destroyed 通知即权威、无条件 close;MinimizeArmer 同理用元素身份 CFEqual 定位。
-- daemon 手工拉起约定：`bin/agent-computer-use daemon --socket ~/Library/Application Support/Alma/computer-use-72097929.sock --idle-seconds 3600`(MCP 客户端也会自动 spawn)。
+- daemon 手工拉起约定：`bin/minami-computer-use daemon --socket ~/Library/Application Support/minami-computer-use/computer-use-<sha1tag8>.sock --idle-seconds 3600 [--lens] [--pip-hide-hw-cursor]`(MCP 客户端也会自动 spawn)。
 
 ## Round-4 修复（2026-10-09，针对 R3 回归新发现的 6 项）
 

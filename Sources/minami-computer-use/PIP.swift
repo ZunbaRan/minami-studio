@@ -14,7 +14,7 @@ import CoreMedia
 //          pip_disarm {window_id} | {"all":true}
 //   [DISASM] PIPFloaterWindow NSPanel literals, SCStreamConfiguration setters,
 //            AVSampleBufferDisplayLayer enqueue path, AX destroy/minimize
-//            observers, "alma.lens.*" NotificationCenter broadcast family,
+//            observers, "minami.lens.*" NotificationCenter broadcast family,
 //            PIPLens {moveTo/showBadge/triggerClick/hide} inside the panel.
 // Errors (verbatim strings): "No AX window element for windowId=%u",
 //   '"width" and "height" are required when pip_open carries a preferred size',
@@ -30,14 +30,14 @@ private func onMain<T>(_ body: () throws -> T) throws -> T {
     try onMainThread(body)
 }
 
-// MARK: - Lens broadcast names (verbatim "alma.lens.*" family)
+// MARK: - Lens broadcast names (verbatim "minami.lens.*" family)
 
 enum LensBus {
-    static let move = Notification.Name("alma.lens.move")
-    static let click = Notification.Name("alma.lens.click")
-    static let scrollBadge = Notification.Name("alma.lens.scrollBadge")
-    static let typeBadge = Notification.Name("alma.lens.typeBadge")
-    static let hide = Notification.Name("alma.lens.hide")
+    static let move = Notification.Name("minami.lens.move")
+    static let click = Notification.Name("minami.lens.click")
+    static let scrollBadge = Notification.Name("minami.lens.scrollBadge")
+    static let typeBadge = Notification.Name("minami.lens.typeBadge")
+    static let hide = Notification.Name("minami.lens.hide")
 
     /// Emitted by action paths; consumed by every PIPSession's panel lens.
     /// userInfo: {"screenPoint": NSValue(CGPoint), "slideMs": Int} —
@@ -222,7 +222,7 @@ final class PIPFloaterWindow: NSPanel {
         minSize = CGSize(width: 200, height: 150)
         // [DISASM] window chrome label: "Alma PIP" or "Alma PIP — <title>".
         self.title = (title?.isEmpty == false)
-            ? "Alma PIP — \(title!)" : "Alma PIP"
+            ? "Minami PIP — \(title!)" : "Minami PIP"
         contentAspectRatio = NSSize(width: 1, height: 1)
         if sourceAspect > 0 {
             contentAspectRatio = NSSize(width: sourceAspect, height: 1)
@@ -349,7 +349,7 @@ final class PIPSession: NSObject, SCStreamOutput, SCStreamDelegate {
     /// sessions stop reacting to lens broadcasts [contract: observer cleanup].
     private var lensTokens: [NSObjectProtocol] = []
 
-    /// PIPLens consumes the same "alma.lens.*" broadcast family the action
+    /// PIPLens consumes the same "minami.lens.*" broadcast family the action
     /// layer posts — one post drives every open panel's virtual cursor.
     private func subscribeToLensBroadcasts() {
         let nc = NotificationCenter.default

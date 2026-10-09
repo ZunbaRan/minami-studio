@@ -4,7 +4,7 @@ description: 后台编辑 TextEdit 富文本并精确替换重复文本时使用
 ---
 # TextEdit 后台编辑
 ## 前置条件
-使用 agent_computer_use；先采样前台与光标。新建测试文稿，保留所有既有窗口。本文依据 CX01/CX02；ref 和 window_id 只是当次示例，必须重新获取。
+使用 minami_computer_use；先采样前台与光标。新建测试文稿，保留所有既有窗口。本文依据 CX01/CX02；ref 和 window_id 只是当次示例，必须重新获取。
 ## 推荐步骤（含具体工具调用示例）
 1. `get_app_state({bundle:"com.apple.TextEdit",depth:3})`。记录既有 window.id。
 2. `press_key({bundle:"com.apple.TextEdit",key:"cmd+n"})`，再快照确认新 window.id 和 AXTextArea ref。

@@ -4,7 +4,7 @@ description: AX控件不可达而需要截图像素点击，或遇到OCR v引用
 ---
 # 截图、坐标与OCR引用
 ## 前置条件
-必须看到本次目标窗口的实际工具截图，并知道其像素宽高；使用agent_computer_use取图和点击。不要用其他GUI驱动绕过被测面。
+必须看到本次目标窗口的实际工具截图，并知道其像素宽高；使用minami_computer_use取图和点击。不要用其他GUI驱动绕过被测面。
 ## 推荐步骤（含具体工具调用示例）
 1. `get_app_state({bundle:"com.apple.calculator",window_id:W,depth:6,interactive_only:false,screenshot_max_width:460})`。
 2. 从返回图找按钮中心。CX18实际460×816图的8按钮中心约(177,421)：`click({bundle:"com.apple.calculator",x:177,y:421,coord_space:"screenshot"})`。

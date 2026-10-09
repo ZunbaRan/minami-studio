@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// agent-computer-use MCP stdio server.
+// minami-computer-use MCP stdio server.
 // Verbatim port of Alma's Resources/cli/alma-computer-use-mcp.mjs tool surface
 // (23 registerTool sites, byte-identical across .153/.164), with the Alma host
 // HTTP side-calls kept best-effort fail-open and a hand-rolled stdio transport
@@ -19,7 +19,7 @@ import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // ---------- host side-calls (fail-open, verbatim semantics) ----------
-const CU_HOST = process.env.AGENT_CU_HOST_URL || process.env.ALMA_API_URL || "";
+const CU_HOST = process.env.MINAMI_CU_HOST_URL ?? process.env.AGENT_CU_HOST_URL ?? process.env.ALMA_API_URL ?? "";
 
 async function checkApproval(bundle, appName) {
   if (!bundle) return { approved: true, strictMode: false };
@@ -93,11 +93,11 @@ async function logAction(entry) {
 // ---------- daemon client (verbatim) ----------
 
 function resolveHelperBinary() {
-  const override = process.env.ALMA_CU_HELPER ?? process.env.AGENT_CU_HELPER;
+  const override = process.env.MINAMI_CU_HELPER ?? process.env.ALMA_CU_HELPER ?? process.env.AGENT_CU_HELPER;
   if (override && existsSync(override)) return override;
   const candidates = [];
   const almaRel = path.join("Alma Computer Use.app", "Contents", "MacOS", "AlmaComputerUse");
-  const resources = process.env.ALMA_RESOURCES_PATH;
+  const resources = process.env.MINAMI_CU_RESOURCES_PATH ?? process.env.ALMA_RESOURCES_PATH;
   if (resources) {
     candidates.push(path.join(resources, almaRel));
   }
@@ -108,10 +108,10 @@ function resolveHelperBinary() {
     candidates.push(path.join(dir, "..", "..", "computer-use", almaRel));
     candidates.push(path.join(dir, "..", "..", "..", "computer-use", almaRel));
     // our own repo layout
-    candidates.push(path.join(dir, "..", "bin", "agent-computer-use"));
-    candidates.push(path.join(dir, "..", ".build", "release", "agent-computer-use"));
-    candidates.push(path.join(dir, "..", ".build", "debug", "agent-computer-use"));
-    candidates.push(path.join(dir, "..", "..", "bin", "agent-computer-use"));
+    candidates.push(path.join(dir, "..", "bin", "minami-computer-use"));
+    candidates.push(path.join(dir, "..", ".build", "release", "minami-computer-use"));
+    candidates.push(path.join(dir, "..", ".build", "debug", "minami-computer-use"));
+    candidates.push(path.join(dir, "..", "..", "bin", "minami-computer-use"));
   }
   for (const p of candidates) {
     if (existsSync(p)) return p;
@@ -120,7 +120,7 @@ function resolveHelperBinary() {
 }
 
 function defaultSocketPath() {
-  const base = path.join(os.homedir(), "Library", "Application Support", "Alma");
+  const base = path.join(os.homedir(), "Library", "Application Support", "minami-computer-use");
   mkdirSync(base, { recursive: true });
   const helper = resolveHelperBinary();
   if (!helper) return path.join(base, "computer-use.sock");
@@ -1676,7 +1676,7 @@ defTool(
 // Content-Length headers and bare newline-delimited JSON (what codex sends),
 // and replies in the framing the client used.
 
-const SERVER_INFO = { name: "alma-computer-use", version: "1.0.0" };
+const SERVER_INFO = { name: "minami-computer-use", version: "1.0.0" };
 const INSTRUCTIONS = [
   "Drive native macOS apps via the Accessibility API and CGEvent.",
   "Start every turn with `get_app_state <bundle|pid>` — it returns a",
@@ -2086,6 +2086,6 @@ function main() {
       } catch {}
     }
   });
-  process.stderr.write("[agent-cu-mcp] ready on stdio\n");
+  process.stderr.write("[minami-cu-mcp] ready on stdio\n");
 }
 main();

@@ -15,7 +15,7 @@ let DEFAULT_IDLE_SECONDS: Double = 900
 
 func defaultSocketPath() -> String {
     let base = FileManager.default.homeDirectoryForCurrentUser
-        .appendingPathComponent("Library/Application Support/agent-computer-use")
+        .appendingPathComponent("Library/Application Support/minami-computer-use")
     try? FileManager.default.createDirectory(at: base, withIntermediateDirectories: true)
     return base.appendingPathComponent("computer-use.sock").path
 }
@@ -23,7 +23,7 @@ func defaultSocketPath() -> String {
 /// Usage text — byte-for-byte from `alma-computer-use --help`.
 func printUsage() {
     let text = """
-    AlmaComputerUse — macOS desktop automation helper (AX + ScreenCaptureKit)
+    MinamiComputerUse — macOS desktop automation helper (AX + ScreenCaptureKit)
 
     Subcommands:
       daemon [--socket PATH] [--idle-seconds N]
@@ -33,7 +33,7 @@ func printUsage() {
       version
           Print version and exit.
 
-    The daemon is normally launched automatically by the Alma app. Users do
+    The daemon is normally launched automatically by the Minami app. Users do
     not need to run it directly.
     """
     FileHandle.standardOutput.write((text + "\n").data(using: .utf8)!)
@@ -45,7 +45,7 @@ let sub = argv.count > 1 ? argv[1] : "daemon"
 switch sub {
 case "version", "--version", "-v":
     FileHandle.standardOutput.write(
-        "alma-computer-use \(HELPER_VERSION)\n".data(using: .utf8)!)
+        "minami-computer-use \(HELPER_VERSION)\n".data(using: .utf8)!)
     exit(0)
 case "help", "--help", "-h":
     printUsage()

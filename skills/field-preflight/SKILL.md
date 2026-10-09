@@ -1,12 +1,12 @@
 ---
 name: field-preflight
-description: 在用 agent_computer_use 开始真实 Mac 后台外场测试前，核验工具授权与前台光标哨兵，并准确记录环境阻塞。
+description: 在用 minami_computer_use 开始真实 Mac 后台外场测试前，核验工具授权与前台光标哨兵，并准确记录环境阻塞。
 ---
 # 后台外场测试预检
 
 ## 前置条件
 
-用户已授权测试范围，GUI 只走 agent_computer_use MCP，测试文档使用唯一 `CX<number>_` 前缀。不得改源码/配置、激活目标 app、移动用户光标或操作既有用户数据。
+用户已授权测试范围，GUI 只走 minami_computer_use MCP，测试文档使用唯一 `CX<number>_` 前缀。不得改源码/配置、激活目标 app、移动用户光标或操作既有用户数据。
 
 本手册根据 2026-10-09 CX00 的实际阻塞诊断编写。它验证的是预检失败如何判断与记录；不代表 TextEdit、Finder、Notes 等真实任务已测通。证据见 [RUNLOG](../../computer-use/field-e2e/RUNLOG.md) 和 [BUGS](../../computer-use/field-e2e/BUGS.md)。
 
@@ -17,9 +17,9 @@ description: 在用 agent_computer_use 开始真实 Mac 后台外场测试前，
 3. 做最小的只读MCP预检：
 
    ```text
-   agent_computer_use.permissions({})
-   agent_computer_use.list_apps({"days":1})
-   agent_computer_use.get_app_state({
+   minami_computer_use.permissions({})
+   minami_computer_use.list_apps({"days":1})
+   minami_computer_use.get_app_state({
      "bundle":"com.apple.TextEdit",
      "auto_launch":false,
      "depth":2,
