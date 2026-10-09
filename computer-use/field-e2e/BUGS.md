@@ -270,3 +270,512 @@ CX17 哨兵观察补记：P6 12:35:16 的 Paseo/20400 `(806,316)` → 12:35:30 `
 - 真机语义：观察器只挂在**解析出的窗口元素**上（解析失败不装）,destroyed 通知即权威，无条件 `PIPManager.close(windowId:)`。
 - 修法：去掉 wid 过滤与 CG 检查；winEl 解析失败则不装观察器（同真机）。MinimizeArmer 的 destroyed 同病同治：按 `CFEqual(el, arm.element)` 元素身份定位 arm。
 - 验证：AXPress 关闭源窗口 → 1s 内 `sessions:[]`；后续 `pip_close` → `closed:false`，与真机逐字一致。
+
+
+## Round-3 回归新发现
+
+run_id=`r3`，2026-10-09；原4项修复回归均PASS，Phase2选11项补扫。确认 **6类差异：2 major、4 minor**。证据来自两个指定 socket，同请求对照；ref按两端快照重绑。完整范围、哨兵、恢复与未覆盖项见 [R3-VERIFY.md](R3-VERIFY.md)。本节仅记录及建议裁决，没有改码。对象键序、计时、不同历史PiP计数不当作实现bug。
+
+### BUG-R3-01 — physical type_text 触发输入源读取队列断言
+
+- 严重度：major（daemon进程退出）。
+- 现象：后台测试TextEdit W234393，AX重置为ANCHOR并选中后，`type_text(input_method:physical,text:"A\nB",settle_ms:0)` 导致我们的连接EOF，后续ping拒绝连接。
+- 我们：原PID81258于13:47:34 `EXC_BREAKPOINT/SIGTRAP`；故障线程8栈为 `_dispatch_assert_queue_fail` → `islGetInputSourceListWithAdditions` → `TISCopyCurrentKeyboardLayoutInputSource` → `KeyboardLayoutTranslator.keyPresses(for:)`（Input.swift:135）→ `cmdTypeText`（Daemon+Actions.swift:1094）。这是运行时崩溃证据，不是仅凭源码推测。
+- 真机：相同请求返回 `internal/type_text delivered no text...`，随后ping成功；没有进程退出。
+- 证据命令：下面两个记录的request可用文末的socket客户端重放，text含真实换行（码点65,10,66）；先用本端快照ref重置/选中测试文稿。崩溃日志 `agent-computer-use-2026-10-09-134734.ips` 已留存。
+- 裁决建议：接受为崩溃级parity差异，检查命中HIToolbox队列约束的键盘布局读取路径；不得把新增参数拒绝或永久禁用physical作为对齐。输入源运行状态可能影响触发，不宣称每次physical调用必崩。
+
+```json
+{
+  "time": "2026-10-09T13:47:31.421936+08:00",
+  "side": "ours",
+  "request": {
+    "id": "P01-physical-ascii",
+    "cmd": "type_text",
+    "args": {
+      "bundle": "com.apple.TextEdit",
+      "pid": 64284,
+      "window_id": 234393,
+      "text": "A\nB",
+      "input_method": "physical",
+      "settle_ms": 0
+    }
+  },
+  "exception": "JSONDecodeError('Expecting value: line 1 column 1 (char 0)')"
+}
+```
+```json
+{
+  "time": "2026-10-09T13:47:31.682538+08:00",
+  "side": "alma",
+  "request": {
+    "id": "P01-physical-ascii",
+    "cmd": "type_text",
+    "args": {
+      "bundle": "com.apple.TextEdit",
+      "pid": 64284,
+      "window_id": 234393,
+      "text": "A\nB",
+      "input_method": "physical",
+      "settle_ms": 0
+    }
+  },
+  "response": {
+    "ok": false,
+    "id": "P01-physical-ascii",
+    "error": {
+      "message": "type_text delivered no text: the target app has no key window, so the keystrokes were discarded (its AX element still reports focused=true — that only means it is the app's first responder). Use set_value with the element's ref to write the field directly. Do NOT bring the app forward to make typing land — Alma never takes the user's foreground.",
+      "code": "internal"
+    }
+  }
+}
+```
+
+### BUG-R3-02 — scroll 非正 pages 未采用 Alma 的有效步数语义
+
+- 严重度：major（负数导致daemon退出）；pages=0同时有wire差异。
+- 现象：测试文稿AXScrollArea声明AXScrollDownByPage，但执行返回不支持。对同一逻辑元素分别传pages0/-1。
+- 我们：pages0直接成功 `scrolled:<ref>,pages:0`；pages-1在 `Daemon.cmdScroll` 的range遍历崩溃，PID87947退出。
+- 真机：pages0和-1均尝试动作，返回 `action_unsupported/Element does not support action performing AXScrollDownByPage.`，继续正常服务。正数1/2经恢复后双端同错误。
+- 证据命令：`P05-scroll-down--1`、`P05-scroll-down-0`，复核 `C-scroll-0/1/2`；两边ref来自同W234393的AXScrollArea。崩溃报告 `agent-computer-use-2026-10-09-135043.ips`，栈 `closure #1 in Daemon.cmdScroll(_:)`（Daemon+Actions.swift:1354）→ `_assertionFailure`。
+- 裁决建议：接受；应复刻Alma的非正pages有效步数处理，不能自行增加invalid_arg墙。本次不推断Alma究竟钳制为几步，因为该控件第一步已失败。
+
+```json
+{
+  "time": "2026-10-09T13:50:41.518321+08:00",
+  "side": "ours",
+  "request": {
+    "id": "P05-scroll-down--1",
+    "cmd": "scroll",
+    "args": {
+      "direction": "down",
+      "pages": -1,
+      "settle_ms": 0,
+      "ref": "e2"
+    }
+  },
+  "exception": "JSONDecodeError('Expecting value: line 1 column 1 (char 0)')"
+}
+```
+```json
+{
+  "time": "2026-10-09T13:50:41.537037+08:00",
+  "side": "alma",
+  "request": {
+    "id": "P05-scroll-down--1",
+    "cmd": "scroll",
+    "args": {
+      "direction": "down",
+      "pages": -1,
+      "settle_ms": 0,
+      "ref": "e1084"
+    }
+  },
+  "response": {
+    "ok": false,
+    "id": "P05-scroll-down--1",
+    "error": {
+      "message": "Element does not support action performing AXScrollDownByPage.",
+      "code": "action_unsupported"
+    }
+  }
+}
+```
+```json
+{
+  "ours": {
+    "data": {
+      "pages": 0,
+      "scrolled": "e2"
+    },
+    "id": "C-scroll-0",
+    "ok": true
+  },
+  "alma": {
+    "error": {
+      "code": "action_unsupported",
+      "message": "Element does not support action performing AXScrollDownByPage."
+    },
+    "ok": false,
+    "id": "C-scroll-0"
+  }
+}
+```
+
+### BUG-R3-03 — snapshot 保留 Alma 省略的空字符串字段
+
+- 严重度：minor（wire字段存在性不同）。
+- 现象：同一测试窗、空TextArea及“字体大小”AXButton，重复两轮原生snap。
+- 我们：TextArea含 `value:""`，Button含 `title:""`。
+- 真机：相应value/title键省略，其余对应属性一致。
+- 证据命令：先set_value清空测试TextArea，然后 `snap({bundle:"com.apple.TextEdit",pid:64284,window_id:234393,depth:5,interactive_only:false})`；`C-empty-snap-0/1` 原始记录包含完整树，`C-empty-fields-0/1` 抽取对应元素。
+- 裁决建议：接受；仅对实测空字符串字段省略行为对齐，不将空、null、缺省擅自整体合并。
+
+```json
+{
+  "ours": {
+    "elements": [
+      {
+        "role": "AXTextArea",
+        "value": ""
+      },
+      {
+        "description": "字体大小",
+        "role": "AXButton",
+        "title": ""
+      }
+    ]
+  },
+  "alma": {
+    "elements": [
+      {
+        "role": "AXTextArea"
+      },
+      {
+        "description": "字体大小",
+        "role": "AXButton"
+      }
+    ]
+  }
+}
+```
+
+### BUG-R3-04 — AX 写失败 message 缺少固定前后缀
+
+- 严重度：minor。
+- 现象：向TextArea的AXValue写入JSON数字1或true；也由disabled AXScrollBar写字符串/数组/对象复现。
+- 我们：`ax_failure / illegalArgument while setting AXValue`。
+- 真机：`ax_failure / AX error illegalArgument while setting AXValue.`。
+- 证据命令：`set_value({ref:<本端TextArea>,value:1,settle_ms:0})`，`P04-text-integer/boolean`、`C-ax-error-1/True`；code和接受/拒绝类型一致，message逐字不同。
+- 裁决建议：接受；按真实AX错误字符串形状补齐，不新增retryable/details等字段。
+
+```json
+{
+  "time": "2026-10-09T13:54:56.095562+08:00",
+  "side": "ours",
+  "request": {
+    "id": "C-ax-error-1",
+    "cmd": "set_value",
+    "args": {
+      "ref": "e3",
+      "value": 1,
+      "settle_ms": 0
+    }
+  },
+  "response": {
+    "error": {
+      "code": "ax_failure",
+      "message": "illegalArgument while setting AXValue"
+    },
+    "id": "C-ax-error-1",
+    "ok": false
+  }
+}
+```
+```json
+{
+  "time": "2026-10-09T13:54:56.121638+08:00",
+  "side": "alma",
+  "request": {
+    "id": "C-ax-error-1",
+    "cmd": "set_value",
+    "args": {
+      "ref": "e1085",
+      "value": 1,
+      "settle_ms": 0
+    }
+  },
+  "response": {
+    "error": {
+      "code": "ax_failure",
+      "message": "AX error illegalArgument while setting AXValue."
+    },
+    "ok": false,
+    "id": "C-ax-error-1"
+  }
+}
+```
+
+### BUG-R3-05 — armed 源窗销毁后清理得比 Alma 更多
+
+- 严重度：minor（状态机与后续disarm回声不同）。
+- 现象：两端pip_arm同一新建空白TextEdit窗，不最小化，直接AXPress关闭源窗。
+- 我们：0.3秒及2秒均 `armed:[]`；随后pip_disarm为false。
+- 真机：窗口已销毁仍保留armed条目；随后pip_disarm为true。sessions始终空。
+- 证据命令：W234560由Alma执行关闭、W234656由ours执行关闭，两轮均同结果；`P09-arm-status-*`、`C-arm-status-*`、`C-arm-windows`、`C-arm-disarm`。这与R4的**活动PiP session**销毁回收是不同路径，不能用R4通过替代。
+- 裁决建议：接受为过度清理的parity差异；应按Alma实测状态保留/消费armed。不能把“清得更干净”作为实现正确的理由；本次不提交修复。
+
+```json
+{
+  "time": "2026-10-09T13:55:48.298962+08:00",
+  "side": "ours",
+  "request": {
+    "id": "C-arm-arm",
+    "cmd": "pip_arm",
+    "args": {
+      "bundle": "com.apple.TextEdit",
+      "pid": 64284,
+      "window_id": 234656,
+      "title": "R3-Armed-Repeat"
+    }
+  },
+  "response": {
+    "data": {
+      "armed": {
+        "pid": 64284,
+        "title": "R3-Armed-Repeat",
+        "window_id": 234656
+      }
+    },
+    "id": "C-arm-arm",
+    "ok": true
+  }
+}
+```
+```json
+{
+  "time": "2026-10-09T13:55:48.299882+08:00",
+  "side": "alma",
+  "request": {
+    "id": "C-arm-arm",
+    "cmd": "pip_arm",
+    "args": {
+      "bundle": "com.apple.TextEdit",
+      "pid": 64284,
+      "window_id": 234656,
+      "title": "R3-Armed-Repeat"
+    }
+  },
+  "response": {
+    "data": {
+      "armed": {
+        "title": "R3-Armed-Repeat",
+        "pid": 64284,
+        "window_id": 234656
+      }
+    },
+    "ok": true,
+    "id": "C-arm-arm"
+  }
+}
+```
+```json
+{
+  "time": "2026-10-09T13:55:51.617026+08:00",
+  "side": "ours",
+  "request": {
+    "id": "C-arm-status-2",
+    "cmd": "pip_status",
+    "args": {}
+  },
+  "response": {
+    "data": {
+      "armed": [],
+      "sessions": []
+    },
+    "id": "C-arm-status-2",
+    "ok": true
+  }
+}
+```
+```json
+{
+  "time": "2026-10-09T13:55:51.617568+08:00",
+  "side": "alma",
+  "request": {
+    "id": "C-arm-status-2",
+    "cmd": "pip_status",
+    "args": {}
+  },
+  "response": {
+    "data": {
+      "armed": [
+        {
+          "title": "R3-Armed-Repeat",
+          "pid": 64284,
+          "window_id": 234656
+        }
+      ],
+      "sessions": []
+    },
+    "ok": true,
+    "id": "C-arm-status-2"
+  }
+}
+```
+```json
+{
+  "time": "2026-10-09T13:55:51.625438+08:00",
+  "side": "ours",
+  "request": {
+    "id": "C-arm-disarm",
+    "cmd": "pip_disarm",
+    "args": {
+      "window_id": 234656
+    }
+  },
+  "response": {
+    "data": {
+      "disarmed": false,
+      "window_id": 234656
+    },
+    "id": "C-arm-disarm",
+    "ok": true
+  }
+}
+```
+```json
+{
+  "time": "2026-10-09T13:55:51.625744+08:00",
+  "side": "alma",
+  "request": {
+    "id": "C-arm-disarm",
+    "cmd": "pip_disarm",
+    "args": {
+      "window_id": 234656
+    }
+  },
+  "response": {
+    "data": {
+      "disarmed": true,
+      "window_id": 234656
+    },
+    "ok": true,
+    "id": "C-arm-disarm"
+  }
+}
+```
+
+### BUG-R3-06 — type_text 的目标缺失与 ax ref 缺失校验顺序不同
+
+- 严重度：minor。
+- 现象：只传 `text:"X",input_method:"ax"`，同时不带pid/bundle/ref。
+- 我们：``invalid_arg / input_method=ax requires `ref`.``。
+- 真机：``invalid_arg / type_text requires `pid`, `bundle`, or `ref`.``。
+- 证据命令：`P10-13-type_text`与`C-order-0`两次同请求复现。有pid无ref时两端都报ax requires ref；非法method与缺/空text也逐字一致（C-order-1…5）。
+- 裁决建议：接受；按Alma实际先后顺序恢复该组合的首个错误，保留所有原错误文字与键集。
+
+```json
+{
+  "time": "2026-10-09T13:55:11.170160+08:00",
+  "side": "ours",
+  "request": {
+    "id": "C-order-0",
+    "cmd": "type_text",
+    "args": {
+      "text": "X",
+      "input_method": "ax"
+    }
+  },
+  "response": {
+    "error": {
+      "code": "invalid_arg",
+      "message": "input_method=ax requires `ref`."
+    },
+    "id": "C-order-0",
+    "ok": false
+  }
+}
+```
+```json
+{
+  "time": "2026-10-09T13:55:11.171034+08:00",
+  "side": "alma",
+  "request": {
+    "id": "C-order-0",
+    "cmd": "type_text",
+    "args": {
+      "text": "X",
+      "input_method": "ax"
+    }
+  },
+  "response": {
+    "error": {
+      "code": "invalid_arg",
+      "message": "type_text requires `pid`, `bundle`, or `ref`."
+    },
+    "ok": false,
+    "id": "C-order-0"
+  }
+}
+```
+
+### OBS-R3 — 应用解析、事件时序与哨兵（待归因，不计确认实现缺陷）
+
+- **偶发app_not_found**：`C-maps-windows` 同请求 ours称Maps不存在，Alma立即返回pid56340及空windows；随后同pid的snap双端成功，之后Maps/TextEdit交替8对windows均相同。另有ours对TextEdit的单端瞬时失败。已有真实同请求差异，但尚未稳定复现并隔离NSRunningApplication/共享桌面并发条件；建议保留原始记录调查，不据此加自动launch或自创重试墙。
+- **事件验证**：Unicode `settle_ms:0` 的“已落字仍返回no text”两端均能出现，反序测试方向翻转；auto无ref也记录到不同落字结果。不能仅凭一次成功/失败将后台key-window、双daemon焦点保护、事件队列时序合成确定根因。报告保留为观察。
+- **哨兵**：`1015`点、`42`组前后配对，其中`19`组前台或光标变化。最初4点cliclick不可用，后续CoreGraphics补位。变化目标、时间、坐标详见R3-VERIFY全表与 `/tmp/cu-field-r3-20261009-134241/sentinel.jsonl`；未收到用户归因，均待归因，未擅自恢复焦点/光标。
+
+```json
+{
+  "time": "2026-10-09T13:55:51.945176+08:00",
+  "side": "ours",
+  "request": {
+    "id": "C-maps-windows",
+    "cmd": "windows",
+    "args": {
+      "bundle": "com.apple.Maps",
+      "pid": 56340
+    }
+  },
+  "response": {
+    "error": {
+      "code": "app_not_found",
+      "message": "No running app matched com.apple.Maps."
+    },
+    "id": "C-maps-windows",
+    "ok": false
+  }
+}
+```
+```json
+{
+  "time": "2026-10-09T13:55:51.959907+08:00",
+  "side": "alma",
+  "request": {
+    "id": "C-maps-windows",
+    "cmd": "windows",
+    "args": {
+      "bundle": "com.apple.Maps",
+      "pid": 56340
+    }
+  },
+  "response": {
+    "data": {
+      "windows": [],
+      "app": {
+        "bundle": "com.apple.Maps",
+        "pid": 56340
+      }
+    },
+    "ok": true,
+    "id": "C-maps-windows"
+  }
+}
+```
+
+### Round-3 证据读取/复放
+
+原始请求、raw响应、差异、两份ips和临时探针均位于 `/tmp/cu-field-r3-20261009-134241`；关键差异已内嵌上文。以下客户端仅示范单条调用；涉及ref/窗口的例子必须在新建测试文稿上重新取本端ref/window_id，不直接重放已关闭窗。不得向原有用户文稿注入测试内容。
+
+```python
+import json, socket
+paths = {
+    "ours": "/Users/lu/Library/Application Support/Alma/computer-use-72097929.sock",
+    "alma": "/Users/lu/Library/Application Support/Alma/computer-use-9bd08bc1.sock",
+}
+request = {"id": "r3-replay", "cmd": "type_text",
+           "args": {"text": "X", "input_method": "ax"}}
+for side, path in paths.items():
+    with socket.socket(socket.AF_UNIX) as sock:
+        sock.settimeout(15)
+        sock.connect(path)
+        sock.sendall((json.dumps(request) + "\n").encode())
+        raw = b""
+        while b"\n" not in raw:
+            chunk = sock.recv(65536)
+            if not chunk:
+                break
+            raw += chunk
+        print(side, raw.decode())
+```

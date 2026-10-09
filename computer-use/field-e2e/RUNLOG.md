@@ -450,3 +450,20 @@ CX17 socket evidence: `{"time": "2026-10-09T12:36:57.059+08:00", "case": "P7-fin
 ### CX17文档核对
 
 83条socket请求/响应记录均可解析（ours42、Alma41；包含1条首次连接被拒记录），五种pip命令两端均有覆盖，随机请求id唯一。核对了最终两端空状态、20项主表、CX17三节bug/观察、文档链接、代码围栏、skill规定章节、示例JSON与Python语法。静态核对通过。skill-creator的quick_validate.py已实际尝试，因当前Python缺少PyYAML（ModuleNotFoundError: yaml）未运行成功；未安装依赖或修改配置，不能宣称该标准校验器通过。
+
+
+## run_id=r3 — Round-3 回归 + 11项补扫（2026-10-09）
+
+执行13:42:41–13:59:58 +08:00，macOS26.6.2(25G83)，HEAD `7d5e3073a449ed6c4e7acd932501156ca6456002`。任务来源 [R3-TASK.md](R3-TASK.md)，完整矩阵与哨兵见 [R3-VERIFY.md](R3-VERIFY.md)，新发现追加 [BUGS.md](BUGS.md#round-3-回归新发现)。只写这三份报告，没有改源码/配置、构建或提交。
+
+- **先ping**：指定72097929、9bd08bc1两socket于13:43:02均pong成功。任务数字id示例双端同报malformed JSON，改字符串后成功；不是实现独有错误。
+- **Phase1 4/4 PASS**：opt/alt/option别名与ctl/win拒绝一致；menu combo Calculator41、TextEdit84、Notes103，两端差集空；PiP历史counter差5次，补齐后n9/10/11同序frame一致且逐窗x/y减28；源窗销毁0.25秒首采样已双端回收session，pip_close均false。
+- **Phase2 11项**：P01输入、P02快照、P03选区、P04赋值、P05动作/scroll、P06枚举、P07wakeup、P08socket/ref、P09PiP、P10错误、P11capture/映射。6项FAIL、4项PASS、1项OBS；确认6类差异：physical队列断言崩溃、scroll非正pages（含崩溃）、快照空字段、AX错误文案、armed销毁过度清理、type_text首错顺序。2 major、4 minor。
+- **两次恢复**：13:47:34 physical与13:50:41 pages=-1使ours退出；原二进制重启到PID87947、89009，Alma37196未重启；P06/P07首次受断连污染的结果弃作独立结论，重新对照完成。没有为测试修bug。
+- **时序裁决**：Unicode零等待误报在两端均出现，不单列实现缺陷；空affix首次读回受迟发Unicode污染，独立纯AX新文稿补验通过。capture即时尺寸差发生在不同2秒缓存龄，稳定等待2.5秒复验一致。wakeup小预算的尝试数随真实初次遍历耗时不同，不以性能差报bug。
+- **待归因**：一次Maps windows的真实app_not_found/success差异，后续8对不再出现，保留OBS；哨兵变化未获用户操作确认，不写成确定focus steal。
+- **哨兵**：1015条，42组批次前后，其中19组有变化；初始4点cliclick不可用，后续只读CoreGraphics光标+指定System Events查询。连续监控13:44:20–13:59:09，末次独立选区复测另有前后采样。完整记录见证据目录sentinel.jsonl和R3-VERIFY全表。
+- **清理**：新建5文稿窗 `234320, 234393, 234560, 234656, 234718` 全关；原TextEdit230637与内容é👩‍💻保留；Calculator230248、Notes230343/145笔记维持原状。两端sessions/armed最终空、ping成功。未创建/删除用户笔记或保存测试文稿到用户目录；原始截图/探针作为证据留在/tmp。
+- **证据**：`/tmp/cu-field-r3-20261009-134241`，requests.jsonl 775条（ours410、Alma365），另4条预检；包括原始wire、排序diff、ips、脚本、输出、manifest散列。查看命令：`python3 -c 'import json,pathlib; p=pathlib.Path("/tmp/cu-field-r3-20261009-134241/requests.jsonl"); [print(x) for x in p.read_text().splitlines() if json.loads(x)["case"]=="C-order-0"]'`。
+
+结论边界：R2菜单不存在Return/Tab/F1…F12 fallback样本；未重置Alma counter直接测n0；多屏/多Space/超大树/slider与datefield/完整sky工具层/wakeup中断未覆盖。没有把这些写为PASS。
