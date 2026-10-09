@@ -740,7 +740,11 @@ enum AXBridge {
 
         while true {
             attempts += 1
-            wins = try windows(of: pid)
+            // [live probe R5] per-app AX failure (e.g. Chrome denying
+            // AXWindows) is swallowed to an empty window list inside
+            // snapshot — elements stay empty, CG metadata still fills the
+            // window envelope. The `windows` command still propagates.
+            wins = (try? windows(of: pid)) ?? []
             windowEl = chooseWindow(wins, pid: pid, requested: windowId)
             elements.removeAll()
             if let root = windowEl {

@@ -221,3 +221,9 @@ minimize→自动开 PiP 会话全链路实测；gas AX-only 不还原最小化�
 - **ax_failure 文案**:`"AX error <case> while <context>."`——前缀 `AX error ` + 句点结尾，所有 ax_failure 路径统一。
 - **armed 与源窗销毁解耦**:MinimizeArmer 仍注册 destroyed 通知（disarm 时两者都 remove)，但回调**不消费 arm**——pip_status 保留条目、pip_disarm 返回 true。与活动 session 的 destroyed 回收（R4 语义）是两条独立路径。
 - **type_text 校验顺序**：目标（pid/bundle/ref）缺失检查先于 `input_method=ax requires ref`。
+
+## Round-5 修复（2026-10-09,R5 收口确认的 3 项）
+
+- **auto 无 ref 的真实投递链**(typeText @0x10002102c):`typeTextViaFocusedAXElement` 先行——app `AXFocusedUIElement` 的 `AXSelectedText` 可写则写、否则 `AXValue` 读旧值+append 写入；失败才进 `keyPresses→typeKeyPresses`/`typeUnicodeText`(withFocusPreserved 只包事件路径）。label 恒 `auto_key_events`,focused-AX 成功也不改标。**调用点必须在 deliver 闭包内**(baseline 先于写入）。
+- **snapshot 的 per-app AX 失败**:windows(of:) 抛错→`try?` 吞为空列表继续（elements 空、ax_status 正常、window 由 CG 元数据兜底）。`windows` 命令本身仍传播错误——两条路径不同，勿混。
+- **window 封套恒发**：无窗 app 也输出 `{"id":null,"title":null,"bounds":null}`，不是省略键。

@@ -697,6 +697,8 @@ extension Daemon {
             d["menu_shortcuts"] = MenuShortcuts.wireEntries(
                 pid: app.processIdentifier)
         }
+        // [live probe R5] the window envelope is ALWAYS emitted — a
+        // windowless app yields the three-key null triple.
         if let wid = snap.windowId {
             d["window"] = [
                 "id": Int(wid),
@@ -708,6 +710,9 @@ extension Daemon {
                     "h": Double(snap.windowBounds?.height ?? 0),
                 ],
             ]
+        } else {
+            d["window"] = ["id": NSNull(), "title": NSNull(),
+                           "bounds": NSNull()]
         }
         return d
     }
@@ -1001,6 +1006,37 @@ extension Daemon {
         try mapAXError(err, context: "appending to AXValue")
     }
 
+    /// typeTextViaFocusedAXElement [0x100023b90]: app AXFocusedUIElement →
+    /// AXSelectedText:=text when settable, else AXValue:=(old ?? "")+text
+    /// when settable. Returns delivery success; failure falls through to
+    /// the key-event chain in typeText.
+    private func typeViaFocusedAX(_ text: String, pid: pid_t) -> Bool {
+        let appEl = AXUIElementCreateApplication(pid)
+        var v: CFTypeRef?
+        guard AXUIElementCopyAttributeValue(appEl,
+                "AXFocusedUIElement" as CFString, &v) == .success,
+              let el = v as! AXUIElement? else { return false }
+        var settable = DarwinBoolean(false)
+        _ = AXUIElementIsAttributeSettable(el,
+            "AXSelectedText" as CFString, &settable)
+        if settable.boolValue,
+           AXUIElementSetAttributeValue(el, "AXSelectedText" as CFString,
+                                      text as CFTypeRef) == .success {
+            return true
+        }
+        settable = false
+        _ = AXUIElementIsAttributeSettable(el,
+            kAXValueAttribute as CFString, &settable)
+        guard settable.boolValue else { return false }
+        var cur: CFTypeRef?
+        _ = AXUIElementCopyAttributeValue(el,
+            kAXValueAttribute as CFString, &cur)
+        let merged = (cur as? String ?? "") + text
+        return AXUIElementSetAttributeValue(el,
+            kAXValueAttribute as CFString,
+            merged as CFTypeRef) == .success
+    }
+
     func cmdType(_ a: JSONDict) throws -> JSONDict {
         try actionPreflight(a)
         let ref = try requireStr(a, "ref")
@@ -1071,25 +1107,25 @@ extension Daemon {
                 return ["typed": true, "method": "ax_ref",
                         "length": text.count]
             }
-            // [live probe .164] auto without ref NEVER takes the
-            // focused-AX path — it always delivers events and always
-            // reports auto_key_events.
-            // physical (try?) → unicode fallback — one label either way
-            if let presses = try? KeyboardLayoutTranslator
-                    .keyPresses(for: text) {
-                return try finishTypeEvents(a: a, pid: pid,
-                    baseline: baseline, text: text,
-                    method: "auto_key_events") {
-                    try EventDispatch.withFocusPreserved(pid: pid) {
-                        try EventDispatch.typeKeyPresses(presses, pid: pid)
-                    }
-                }
-            }
+            // [0x10002102c] auto without ref runs inside deliver:
+            // focused-AX insertion (AXSelectedText, else AXValue append)
+            // → physical (try?) → unicode. The TypeVerification baseline
+            // must be captured BEFORE the AX write; the method label
+            // stays auto_key_events on every branch.
             return try finishTypeEvents(a: a, pid: pid,
                 baseline: baseline, text: text,
                 method: "auto_key_events") {
-                try EventDispatch.withFocusPreserved(pid: pid) {
-                    try EventDispatch.typeUnicodeText(text, pid: pid)
+                if !self.typeViaFocusedAX(text, pid: pid) {
+                    try EventDispatch.withFocusPreserved(pid: pid) {
+                        if let presses = try? KeyboardLayoutTranslator
+                                .keyPresses(for: text) {
+                            try EventDispatch.typeKeyPresses(presses,
+                                                           pid: pid)
+                        } else {
+                            try EventDispatch.typeUnicodeText(text,
+                                                           pid: pid)
+                        }
+                    }
                 }
             }
         case "physical":

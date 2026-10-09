@@ -781,3 +781,104 @@ for side, path in paths.items():
             raw += chunk
         print(side, raw.decode())
 ```
+
+
+## Round-5 收口新发现
+
+> **Round-5 修复(同日,已验证)**：R5-01 `snapshot` 对 per-app `AXWindows` 失败 `try?` 吞成空列表(Chrome 等拒 AX 的 app 不再整体报 ax_not_granted,CG 元数据照样填 window);R5-02 `snapToDict` 无窗也发 `window:{id,title,bounds}` 三 null;R5-03 `typeTextViaFocusedAXElement` 按 0x10002102c 还原——auto 无 ref 的 deliver 内先试 `AXFocusedUIElement` 插入(AXSelectedText→AXValue append),label 恒 `auto_key_events`,且**必须在 TypeVerification baseline 之后**执行(否则 verifier 读到已写入态误判 unchanged)。三项均双 socket 逐字节复验。
+
+
+run_id=`r5`，2026-10-09；按[R5-TASK.md](R5-TASK.md)完成A→G，完整覆盖与哨兵见[R5-VERIFY.md](R5-VERIFY.md)。确认 **3类差异（1 major、2 minor）**；均已双socket同请求对照，ref仅在前置AX操作按本端重绑。无产品代码修改、无daemon重启。原始证据 `/tmp/cu-r5`，817条请求记录另加2条初始ping。
+
+### BUG-R5-01 — Chrome AX不可读时，get_app_state 的成功/错误分支不同
+
+- 严重度：minor（wire成功/错误形状不同）。
+- 现象：R5-B扫描运行中的Chrome菜单，两个独立同请求对照均复现。
+- 我们：`ok:false,error.code:ax_not_granted`，附Alma Computer Use授权hint。
+- 真机：`ok:true`，`ax_status:no_wakeup_budget`、空elements、window50968，不含menu_shortcuts。
+- 环境限定：双方permissions仍accessibility/screen_recording=true；随后相同Chrome windows请求两端都报ax_not_granted，说明本条并非简单宣称全局权限不同。未查明Chrome AX不可读的根因，也未推断所有AX失败都应被吞掉。
+- 证据：`B-menu-com.google.Chrome`与`B-menu-com.google.Chrome-retry`；`B-chrome-permissions/B-chrome-windows`提供上下文。不能将空combo计数0=0报告为PASS。
+- 裁决建议：接受为该现场get_app_state异常路径的parity差异；按Alma本条响应调查分支，不新增授权流程或重试墙。
+
+```json
+{"id":"B-menu-com.google.Chrome-retry","cmd":"get_app_state","args":{"bundle":"com.google.Chrome","depth":0,"include_screenshot":false,"disable_diff":true,"wakeup_seconds":0}}
+```
+
+我们（2026-10-09T15:27:29.313485+08:00）：
+
+```json
+{"error":{"code":"ax_not_granted","hint":"Open System Settings → Privacy & Security → Accessibility and enable \"Alma Computer Use\".","message":"Accessibility permission not granted to Alma Computer Use."},"id":"B-menu-com.google.Chrome-retry","ok":false}
+```
+
+Alma（2026-10-09T15:27:29.658499+08:00）：
+
+```json
+{"data":{"wakeup_attempts":1,"snapshot_id":"s_2026-10-09T072731Z","ax_status":"no_wakeup_budget","wakeup_duration_ms":0,"app":{"name":"Google Chrome","bundle":"com.google.Chrome","pid":52445},"elements":[],"window":{"title":"WiseStudio Admin","id":50968,"bounds":{"w":1512,"h":888,"x":0,"y":33}}},"ok":true,"id":"B-menu-com.google.Chrome-retry"}
+```
+
+### BUG-R5-02 — 无窗快照省略了Alma保留的null window封套
+
+- 严重度：minor（键存在性不同）。
+- 现象：正在运行且无窗的Preview PID96946；windows双端确认空后，同请求snap与get_app_state各重复两次。
+- 我们：成功响应不含window。
+- 真机：成功响应始终含 `window:{id:null,title:null,bounds:null}`。
+- 证据：`C-window-shape-snap-0/1`及`C-window-shape-get_app_state-0/1`。去snapshot_id后，其余响应逐字相同。A的Calendar无窗样本提供旁证；正式裁决仅依赖重复Preview实验。
+- 裁决建议：接受；复刻无窗window三字段null形状，不擅自改变其它空值/缺省规则。这不是R3-03的元素空字符串问题。
+
+```json
+{"id":"C-window-shape-snap-0","cmd":"snap","args":{"bundle":"com.apple.Preview","pid":96946,"depth":0,"interactive_only":false,"wakeup_seconds":0,"include_screenshot":false,"disable_diff":true,"auto_launch":false}}
+```
+
+我们（2026-10-09T15:28:04.676471+08:00）：
+
+```json
+{"data":{"app":{"bundle":"com.apple.Preview","name":"预览","pid":96946},"ax_status":"no_wakeup_budget","elements":[],"snapshot_id":"s_2026-10-09T072804Z","wakeup_attempts":1,"wakeup_duration_ms":0},"id":"C-window-shape-snap-0","ok":true}
+```
+
+Alma（2026-10-09T15:28:04.891894+08:00）：
+
+```json
+{"data":{"wakeup_attempts":1,"snapshot_id":"s_2026-10-09T072806Z","ax_status":"no_wakeup_budget","wakeup_duration_ms":0,"app":{"name":"预览","bundle":"com.apple.Preview","pid":96946},"elements":[],"window":{"title":null,"id":null,"bounds":null}},"ok":true,"id":"C-window-shape-snap-0"}
+```
+
+### BUG-R5-03 — 后台TextEdit auto无ref输入稳定不落字，Alma成功
+
+- 严重度：major（核心输入功能在对照现场失败，未崩溃）。
+- 现象：同一个自有后台TextEdit测试窗W235981，settle_ms=0与省略两组，每组双端各5次。每端调用前本端AX ref恢复ANCHOR、选中全文、snap确认ANCHOR/focused=true；动作后0.5秒再snap读回。奇数轮交换Alma→ours顺序。
+- 我们：**10/10**返回`internal/type_text delivered no text...`，不含typed/verified；后置文本全部仍为ANCHOR。
+- 真机：**10/10** `typed:true,verified:true,method:auto_key_events,length:7`，实际文本全部为请求的r5textN。
+- 证据：`E-auto-zero-0…4`、`E-auto-default-0…4`；`E-typing.jsonl/.json`包含每次完整前置/后置读回；正式type_text请求完全不含ref，目标bundle/pid/window_id/text相同。
+- 前台：该测试阶段有效0.5秒哨兵全为Paseo，未采到TextEdit前台；未通过activate/raise来让真机落字。前置/后置均为两套原daemon并存的同一现场，ours focus_guard.armed=false、Alma=true。
+- 裁决建议：将R3单次auto无ref观察提升为本轮**可重复的行为差异**。根因仍未定，不声称已排除双daemon事件保护交互；不把恢复前台或增加用户重试作为对齐。与R3中“Unicode已落字但零等待误报”不同，本轮ours实际也未落字。
+
+```json
+{"id":"E-auto-default-0","cmd":"type_text","args":{"bundle":"com.apple.TextEdit","pid":64284,"window_id":235981,"input_method":"auto","text":"r5text0"}}
+```
+
+我们（2026-10-09T15:30:48.592486+08:00）：
+
+```json
+{"error":{"code":"internal","message":"type_text delivered no text: the target app has no key window, so the keystrokes were discarded (its AX element still reports focused=true — that only means it is the app's first responder). Use set_value with the element's ref to write the field directly. Do NOT bring the app forward to make typing land — Alma never takes the user's foreground."},"id":"E-auto-default-0","ok":false}
+```
+
+Alma（2026-10-09T15:30:52.715963+08:00）：
+
+```json
+{"data":{"method":"auto_key_events","verified":true,"typed":true,"length":7},"ok":true,"id":"E-auto-default-0"}
+```
+
+同case后置读回（两端均focused=true，snap成功）：
+
+```json
+{"ours":{"value":"ANCHOR","focused":true,"response_ok":true,"error":null},"alma":{"value":"r5text0","focused":true,"response_ok":true,"error":null}}
+```
+
+### OBS-R5 — 保留观察，不计确认实现bug
+
+- **枚举偶发项**：Maps/TextEdit bundle+实时pid各20对windows，四组均0/20 app_not_found。本轮另有A-color-scan（TextEdit snap无pid）ours app_not_found/Alma成功；不能用不同请求参数的连发结果宣布旧OBS已消失。
+- **焦点候选**：有效连续哨兵1851点，28次前台转换、495次光标变化；初始49条查询错误与7条混合身份monitor样本不计有效前台证据。15:29:12.815和15:34:57.816两个转换落在请求完成后1s内：前者双方Finder gas均有候选，后者27条PiP调用覆盖两端。完整具体case/时间/光标见R5-VERIFY及`sentinel-transitions.json`。没有已证实的单端focus steal。
+- **中树ref顺序**：D的removed_refs两端各自排序、成员一致，跨端ref分配历史不同使重绑后的数组顺序不同；不当作算法差异。原始数组未删除。
+- **PiP瞬态/顺序**：两个arm的数组顺序相反；最小化0.4s时ours短暂session/armed重叠，1s后双端同状态；无稳定错误结论。历史cascade差15次，经校准后0/负/4000尺寸完整frame一致，不误报位置。
+- **事件窗口标记**：F移动后两个相同click的实际坐标及响应均431,352，但event tap窗口字段ours235981/Alma230637；关闭后均230637。保存为内部事件差异，未仅凭这些字段确认协议缺陷。
+
+以上观察各自有双端记录或完整哨兵，不提出无Alma依据的工程改造。复放只能用新建测试对象，原R5文稿/窗口已清理。
