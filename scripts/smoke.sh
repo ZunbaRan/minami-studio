@@ -1,5 +1,6 @@
 #!/bin/sh
-# End-to-end smoke: MCP initialize → tools/list (must be the 23 Alma tools)
+# End-to-end smoke: MCP initialize → tools/list (23 Alma parity + 5 pip_* +
+# Skill + 5 record_* = 34 tools)
 # → permissions → list_apps → sky_get_app_state on a windowed app.
 set -e
 cd "$(dirname "$0")/.."
@@ -32,8 +33,8 @@ send({"jsonrpc":"2.0","method":"notifications/initialized"})
 
 send({"jsonrpc":"2.0","id":2,"method":"tools/list","params":{}})
 r = recv(); names = sorted(t["name"] for t in r["result"]["tools"])
-assert len(names)==29, names
-print("tools/list: 29 tools OK")
+assert len(names)==34, names
+print("tools/list: 34 tools OK")
 
 send({"jsonrpc":"2.0","id":3,"method":"tools/call",
       "params":{"name":"permissions","arguments":{}}})

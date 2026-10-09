@@ -1754,6 +1754,74 @@ defTool(
   })
 );
 
+// ---------- recording tools (minami-studio extension — no Alma equivalent) ----------
+// Not wrapped in gated(): recording targets the screen, not a bundle, so the
+// per-app approval gate does not apply.
+
+defTool(
+  "record_start",
+  "Start recording the screen (or one window) to an mp4 via ScreenCaptureKit, cursor EXCLUDED from pixels — cursor moves and clicks are captured separately to <out>.cursor.json for later re-compositing/zoom export. Returns once the first frame is written. Blocks while a recording is already active.",
+  {
+    out: { type: "string", description: "Output path, .mp4 or .mov (required)." },
+    window_id: { type: "integer", description: "Record only this CGWindowID's on-screen rect (display-relative crop; occluded pixels show whatever is on top). Omit for full display." },
+    display_id: { type: "integer", description: "CGDirectDisplayID to record. Default: main display." },
+    fps: { type: "integer", description: "Capture rate, 1–120. Default 60." },
+    audio: { type: "boolean", description: "Also record system audio inline. Default false." }
+  },
+  ["out"],
+  async (args) => {
+    const res = await daemon.call("record_start", {
+      out: args.out, window_id: args.window_id, display_id: args.display_id,
+      fps: args.fps, audio: args.audio
+    });
+    return { content: [textBlock(JSON.stringify(res, null, 2))] };
+  }
+);
+
+defTool(
+  "record_stop",
+  "Stop the active recording, finalize the mp4 (moov atom) and write the cursor telemetry sidecar. Returns {out, frames, duration_s, cursor_telemetry}.",
+  {},
+  [],
+  async () => {
+    const res = await daemon.call("record_stop", {});
+    return { content: [textBlock(JSON.stringify(res, null, 2))] };
+  }
+);
+
+defTool(
+  "record_pause",
+  "Pause the active recording — captured frames are dropped and the timeline is rebased so the pause never appears in the file.",
+  {},
+  [],
+  async () => {
+    const res = await daemon.call("record_pause", {});
+    return { content: [textBlock(JSON.stringify(res, null, 2))] };
+  }
+);
+
+defTool(
+  "record_resume",
+  "Resume a paused recording.",
+  {},
+  [],
+  async () => {
+    const res = await daemon.call("record_resume", {});
+    return { content: [textBlock(JSON.stringify(res, null, 2))] };
+  }
+);
+
+defTool(
+  "record_status",
+  "Report the active recording: {recording, paused, out, frames, elapsed_ms, width, height, cursor_tap}. Returns {recording:false} when idle.",
+  {},
+  [],
+  async () => {
+    const res = await daemon.call("record_status", {});
+    return { content: [textBlock(JSON.stringify(res, null, 2))] };
+  }
+);
+
 // ---------- minimal MCP stdio transport ----------
 // Auto-detects framing like the SDK's StdioServerTransport: accepts both
 // Content-Length headers and bare newline-delimited JSON (what codex sends),
@@ -1771,6 +1839,7 @@ const INSTRUCTIONS = [
   "and never by bringing a window forward and putting it back. Every verb works on a background app; nothing here needs the foreground.",
   "Never activate, raise, or otherwise front an app on your own initiative. If an action reports it could not be delivered, tell the user — do not reach for the foreground to force it through.",
   "PiP mirrors: pip_open/pip_close/pip_status/pip_arm/pip_disarm manage live floating window mirrors; pip_arm makes the user's own minimize gesture spawn a mirror.",
+  "Session recording: record_start{out,window_id?|display_id?,fps?,audio?}/record_stop/record_pause/record_resume/record_status capture the screen to mp4 without the OS cursor; cursor telemetry lands in <out>.cursor.json for auto-zoom re-compositing.",
   "Field-tested playbooks: call the Skill tool with a computer-use doc name, or read skill://computer-use resources."
 ].join(" ");
 

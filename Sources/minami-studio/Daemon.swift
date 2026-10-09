@@ -127,6 +127,14 @@ final class Daemon {
 
         armIdleTimer()
         Capture.probeScreenRecording()
+        // SIGTERM/SIGINT take the clean shutdown path (finalize recording,
+        // unlink socket) instead of dying mid-write.
+        for sig in [SIGTERM, SIGINT] {
+            signal(sig, SIG_IGN)
+            let src = DispatchSource.makeSignalSource(signal: sig, queue: .main)
+            src.setEventHandler { [weak self] in self?.initiateShutdown() }
+            src.resume()
+        }
         let acceptQ = DispatchQueue(label: "agent-cu.accept")
         acceptQ.async { self.acceptLoop() }
         // NSApp.run() pumps the main runloop AND drains DispatchQueue.main —
@@ -146,6 +154,12 @@ final class Daemon {
         t.setEventHandler { [weak self] in
             guard let self else { return }
             guard !self.shutdownRequested else { return }
+            // An active recording keeps the daemon alive — idle-shutdown mid
+            // capture would leave an mdat without moov atom (unplayable file).
+            if RecordManager.shared.isRecording {
+                self.lastActivity = Date()
+                return
+            }
             if Date().timeIntervalSince(self.lastActivity) > self.idleSeconds {
                 self.initiateShutdown()
             }
@@ -158,6 +172,10 @@ final class Daemon {
     /// unlink the socket, exit. Also used by the idle path.
     func initiateShutdown() {
         shutdownRequested = true
+        // Finalize any in-flight recording so the file gets its moov atom.
+        if RecordManager.shared.isRecording {
+            _ = try? RecordManager.shared.stop()
+        }
         AXBridge.restoreAllEnhancedUI()
         if listenFD >= 0 { Darwin.close(listenFD); listenFD = -1 }
         unlink(socketPath)
@@ -262,6 +280,14 @@ final class Daemon {
         case "pip_status": return try cmdPipStatus(args)
         case "pip_arm": return try cmdPipArm(args)
         case "pip_disarm": return try cmdPipDisarm(args)
+
+        // recording — minami-studio extension (no Alma equivalent; see
+        // docs/RECORDLY-ZOOM-PIPELINE.md for the design baseline)
+        case "record_start": return try cmdRecordStart(args)
+        case "record_stop": return try cmdRecordStop(args)
+        case "record_pause": return try cmdRecordPause(args)
+        case "record_resume": return try cmdRecordResume(args)
+        case "record_status": return try cmdRecordStatus(args)
 
         // Full-surface commands present in Alma's dispatch but outside this
         // build's implemented subset. Named explicitly so they are NOT
