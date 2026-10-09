@@ -163,10 +163,44 @@ minimize→自动开 PiP 会话全链路实测；gas AX-only 不还原最小化�
 带截图才 unminimize；armed 一次性消费；8MiB 分片行 + 双 peer 并发 +
 码点中段切片全通。
 
+## 真实桌面 E2E 补记（10 场景 T01-T10，run_id=r1）
+
+与真 .164 daemon 同机双 socket 对照跑完。关键实测语义：
+
+- **坐标映射只在 `get_app_state`（含截图）注册**；`shot`/`shot_display`
+  不注册。无映射时 click/drag 按**原始屏幕坐标**派发并回声原值；
+  有映射时翻译并回声**派发点**（翻译后）。我们实现逐字吻合
+  （实测同一坐标两次执行：(30,31)→(196,117.5) 陈旧映射 vs 真机同款
+  陈旧命中；gas 后 (30,31)→(225,146.5) 与真机分毫不差）
+- **stale 映射会被照常使用**——映射按 pid 存取、不校验 window_id；
+  对 A 的映射点击 B 的截图像素会命中 A 的旧位置（真机同）。点击前
+  必须重新 gas 刷新映射，这是协议使用约束不是 bug
+- **pip_arm 无 bundle/pid → `app_not_found` / `No running app matched
+  pid=0.`**（真机逐字一致）；armed 响应 `{armed:{pid,title,window_id}}`
+- `press_key cmd+n` 后台 TextEdit/Finder 均 menu_ax_press 真开新窗；
+  `cmd+f`/`cmd+2`/`delete`/`cmd+delete`/`cmd+s` 在无 enabled 持有者时
+  suppressed——真机逐字一致（含 TextEdit cmd+s 后台抑制 → 保存面板
+  仅 AX 可达）
+- Notes 148 条目中深度 snap 双方均 >120s 超时（真机同样，非我们的
+  性能问题）；笔记删除走**列表 cell 右键上下文菜单→"删除"**（末项，
+  enabled），无确认弹窗即删；AS 路径 -1743 未授权
+- PiP：open→status(has_first_frame)→close 全链路与真机一致；浮窗
+  镜像随 set_value 实时更新；TCC 屏录弹窗非目标 app AX 窗，须对
+  host pid 发像素点击，且注意截图缩放换算
+- type_text：CJK 走 `unicode_events` 后台可落字（含 \n）；`auto` 无
+  ref 恒 `auto_key_events`，CJK 键事件丢字是 macOS 事实非 bug
+- 前台哨兵全程 Paseo；**一次例外**：Notes 上下文菜单删除动作后
+  Electron(46582,agent-browser dev) 成为前台——无法归因是我们的
+  AXPress 还是用户操作，记录在案待复现
+
 ## 已拒的 Codex 建议（画蛇添足，不收）
 
 - 给 daemon 加请求体大小上限/超时（Alma 无此墙）
 - 把 `not_implemented` 命令实现出来（Alma 自己就是 not_implemented）
 - 给错误加 `retryable`/`details` 字段（wire 无此键）
-- 规范化 response 键序（Alma 即字典序 JSONEncoder）
+- 规范化 response 键序。修正：live 探针实锤 Alma **不是**字典序——
+  `{"path","width","height"}`、`coord_space` 在 `clicks` 前、`from:{y,x}`
+  ——是 Foundation NSDictionary 的枚举序。我们 `.sortedKeys` 输出与真机
+  键序不同（语义等价、JSON 无键序语义）；若要逐字节对齐需换有序发射
+  结构（大改，暂记为已知 cosmetic 差异，不改）
 - 给 MCP wrapper 加 ping/health 工具（23 工具面是闭集）
