@@ -55,6 +55,16 @@ agent ──stdio──> MCP wrapper (29 tools) ──unix socket NDJSON──> 
 - 合并：`ffmpeg -f concat -safe 0 -i list.txt -c copy out.mov`；边界 DTS 非单调告警属输出时基取整，用 `-fps_mode passthrough -enc_time_base demux -f null` 做最终解码核验。
 - 详细逐操作证据格式见 `computer-use/field-e2e/lawrence/`（LOG.md + evidence/*.json + out/QA.md）。
 
+## 遮挡/最小化窗口的渲染真相（Lawrence 并行测实证）
+
+- **截图会冻结**：窗口被完全遮挡时，`screencapture -l` 和 daemon 截图返回**逐字节相同**的帧——macOS 不重绘不可见窗口。**截图不能当"到达了新页面"的证据，AX 树才是真相**；怀疑冻结时对同区域两次截图比 sha256。
+- **但 PiP 流是活的**：SCK 对源窗口强制合成，`has_first_frame`/`last_frame_age_ms` 正常推进——"镜像在动"不等于"窗口在你屏上可见"。
+- **效果延迟 2–15s**：遮挡窗口上点击投递成功，但视觉/AX 变化有渲染限流，**必须轮询**（快照哈希对比），不能点完立刻验证。
+- **toggle 型控件连点会抵消**：连点偶数次回到原状，看起来像"没生效"。
+- **ref 会轮换**：`eNNNN` 每次快照重新编号，旧 ref 报 `element_not_found`；`get_app_state` 返回 diff 不是全树，要全树用 socket `snap`。
+- **MCP `get_app_state` 含 `unminimizeIfNeeded` 分支**（AX.swift:617）：对最小化窗口取状态可能自动还原它——最小化态探索用 socket `snap` 路径规避。
+- **窗口可能"你以为最小化，实际是被遮死"**：AXMinimized=false + 完全被其他窗口覆盖时外观不可见但 AX/事件全通。判状态查 AX 属性，别凭视野。
+
 ## 后台安全底线（每个手册都重复，因为每次都会忘）
 
 - 不抢前台、不动用户光标、不 activate/raise 应用。所有操作后台投递。
