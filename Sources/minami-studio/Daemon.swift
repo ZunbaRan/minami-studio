@@ -288,6 +288,8 @@ final class Daemon {
         case "record_pause": return try cmdRecordPause(args)
         case "record_resume": return try cmdRecordResume(args)
         case "record_status": return try cmdRecordStatus(args)
+        case "zoom_export": return try cmdZoomExport(args)
+        case "zoom_suggest": return try cmdZoomSuggest(args)
 
         // Full-surface commands present in Alma's dispatch but outside this
         // build's implemented subset. Named explicitly so they are NOT

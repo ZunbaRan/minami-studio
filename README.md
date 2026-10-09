@@ -93,7 +93,7 @@ bin/minami-studio daemon \
 ### 冒烟验证
 
 ```sh
-./scripts/smoke.sh    # initialize → tools/list(24) → permissions → list_apps
+./scripts/smoke.sh    # initialize → tools/list(36) → permissions → list_apps
 ```
 
 ## Build & install
@@ -101,7 +101,7 @@ bin/minami-studio daemon \
 ```sh
 ./scripts/build.sh            # swift build + stage bin/minami-studio
 ./scripts/install-codex.sh    # codex mcp add minami_studio
-./scripts/smoke.sh            # initialize → tools/list(23) → permissions → list_apps
+./scripts/smoke.sh            # initialize → tools/list(36) → permissions → list_apps
 ```
 
 The MCP wrapper auto-spawns the daemon (`daemon --socket <path> --idle-seconds 900`)
@@ -192,7 +192,7 @@ Package.swift
 Sources/minami-studio/   main, Support, Daemon, Daemon+Actions,
                               AX, Capture, Focus, Input, MCPServer, PIP,
                               Appshot+VisualIndex
-mcp/minami-studio-mcp.mjs   23-tool stdio server (Alma wrapper port)
+mcp/minami-studio-mcp.mjs   36-tool stdio server (Alma wrapper port + record_*/zoom_*)
 mcp/playbooks/*.md               7 verbatim app playbooks
 bin/minami-studio{,-mcp}    staged artifacts
 scripts/{build,install-codex,smoke}.sh

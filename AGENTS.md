@@ -33,8 +33,8 @@ Independent MCP-native reproduction of Alma's macOS Computer Use surface.
 Sources/minami-studio/  Swift daemon（main / Support / Daemon /
                               Daemon+Actions / AX / Capture / Focus /
                               Input / PIP）
-mcp/minami-studio-mcp.mjs 34-tool stdio MCP wrapper（Alma wrapper 移植
-                              + 5 record_* 新面工具）
+mcp/minami-studio-mcp.mjs 36-tool stdio MCP wrapper（Alma wrapper 移植
+                              + 5 record_* + 2 zoom_* 新面工具）
 bin/minami-studio-mcp     稳定入口（任何 harness 指这里）
 scripts/{build,install-codex,smoke}.sh
 ```
@@ -47,7 +47,7 @@ daemon 自带 45 命令注册表；未实现项返回 Alma 的 `not_implemented`
 
 ```sh
 ./scripts/build.sh            # swift build → bin/minami-studio
-./scripts/smoke.sh            # initialize→tools/list(23)→permissions→list_apps
+./scripts/smoke.sh            # initialize→tools/list(36)→permissions→list_apps
 ./scripts/install-codex.sh    # codex mcp add minami_studio
 ```
 

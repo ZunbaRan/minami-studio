@@ -1822,6 +1822,51 @@ defTool(
   }
 );
 
+defTool(
+  "zoom_export",
+  "Post-process a recording into an auto-zoomed mp4: decodes `in`, clusters click telemetry into zoom regions (or uses explicit `regions`), renders the Recordly-style camera (easeOutZoom, focus-anchored affine, cursor-follow safe zone, chained pan), re-draws the cursor + click rings, and writes `out`. Blocks until finished — expect ~realtime on 60fps sources.",
+  {
+    in: { type: "string", description: "Source recording path (mp4/mov) written by record_stop." },
+    out: { type: "string", description: "Destination path (.mp4 recommended)." },
+    cursor: { type: "string", description: "Cursor telemetry JSON. Default: <in>.cursor.json." },
+    depth: { type: "integer", description: "Zoom depth 1–6 (1.25×–5×). Default 3 = 1.8×." },
+    auto_zoom: { type: "boolean", description: "Cluster clicks into regions automatically (default true)." },
+    regions: {
+      type: "array",
+      description: "Explicit regions — overrides auto_zoom. Each: {start_ms,end_ms,cx,cy,depth?}.",
+      items: { type: "object" }
+    },
+    show_cursor: { type: "boolean", description: "Draw the cursor overlay (default true)." },
+    click_rings: { type: "boolean", description: "Draw expanding rings at clicks (default true)." }
+  },
+  ["in", "out"],
+  async (args) => {
+    const res = await daemon.call("zoom_export", {
+      in: args.in, out: args.out, cursor: args.cursor, depth: args.depth,
+      auto_zoom: args.auto_zoom, regions: args.regions,
+      show_cursor: args.show_cursor, click_rings: args.click_rings
+    });
+    return { content: [textBlock(JSON.stringify(res, null, 2))] };
+  }
+);
+
+defTool(
+  "zoom_suggest",
+  "Dry-run auto-zoom: returns the click count and zoom regions the exporter would use for `in` (or a `cursor` JSON). Useful to inspect/edit before passing explicit `regions` to zoom_export.",
+  {
+    in: { type: "string", description: "Recording path; telemetry defaults to <in>.cursor.json." },
+    cursor: { type: "string", description: "Cursor telemetry JSON directly (overrides `in`)." },
+    depth: { type: "integer", description: "Zoom depth 1–6 for suggested regions. Default 3." }
+  },
+  [],
+  async (args) => {
+    const res = await daemon.call("zoom_suggest", {
+      in: args.in, cursor: args.cursor, depth: args.depth
+    });
+    return { content: [textBlock(JSON.stringify(res, null, 2))] };
+  }
+);
+
 // ---------- minimal MCP stdio transport ----------
 // Auto-detects framing like the SDK's StdioServerTransport: accepts both
 // Content-Length headers and bare newline-delimited JSON (what codex sends),
@@ -1839,7 +1884,7 @@ const INSTRUCTIONS = [
   "and never by bringing a window forward and putting it back. Every verb works on a background app; nothing here needs the foreground.",
   "Never activate, raise, or otherwise front an app on your own initiative. If an action reports it could not be delivered, tell the user — do not reach for the foreground to force it through.",
   "PiP mirrors: pip_open/pip_close/pip_status/pip_arm/pip_disarm manage live floating window mirrors; pip_arm makes the user's own minimize gesture spawn a mirror.",
-  "Session recording: record_start{out,window_id?|display_id?,fps?,audio?}/record_stop/record_pause/record_resume/record_status capture the screen to mp4 without the OS cursor; cursor telemetry lands in <out>.cursor.json for auto-zoom re-compositing.",
+  "Session recording: record_start{out,window_id?|display_id?,fps?,audio?}/record_stop/record_pause/record_resume/record_status capture the screen to mp4 without the OS cursor; cursor telemetry lands in <out>.cursor.json. zoom_export{in,out,...} re-renders it with auto-zoom + cursor overlay; zoom_suggest previews the regions.",
   "Field-tested playbooks: call the Skill tool with a computer-use doc name, or read skill://computer-use resources."
 ].join(" ");
 
