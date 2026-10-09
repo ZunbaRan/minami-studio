@@ -1,0 +1,25 @@
+{
+  "number": 29,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/029_gateway-whitelist-ax.mov",
+  "capture_pid": 51107,
+  "start": 1791550196.900394,
+  "seconds": 8,
+  "status": "success",
+  "element": "网关/联系人白名单",
+  "method": "click ref=e389 strategy=ax",
+  "effect": "显示7名联系人、个人/群聊、渠道/状态筛选和搜索；权限开关/加入/移除只读",
+  "media": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2754,
+        "height": 1884
+      }
+    ],
+    "format": {
+      "duration": "8.106667"
+    }
+  }
+}

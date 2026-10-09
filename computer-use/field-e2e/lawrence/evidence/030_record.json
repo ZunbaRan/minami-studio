@@ -1,0 +1,11 @@
+{
+  "number": 30,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/030_whitelist-test-search.mov",
+  "capture_pid": 51578,
+  "start": 1791550224.4002318,
+  "seconds": 8,
+  "status": "fail",
+  "element": "白名单/测试搜索",
+  "method": "type_text ref=e453 input_method=ax codex-tour-01",
+  "effect": "无效果：输入框仍为空、联系人仍7名"
+}

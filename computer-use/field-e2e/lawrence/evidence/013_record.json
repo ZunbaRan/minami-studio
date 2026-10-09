@@ -1,0 +1,11 @@
+{
+  "number": 13,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/013_gateway-integrations.mov",
+  "capture_pid": 42583,
+  "start": 1791549633.360223,
+  "seconds": 8,
+  "status": "fail",
+  "element": "网关/集成",
+  "method": "click screen ← screenshot(356,150)",
+  "effect": "无效果：仍为渠道/Chatwoot页"
+}

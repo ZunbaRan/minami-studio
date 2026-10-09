@@ -1,0 +1,11 @@
+{
+  "number": 78,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/078_native-menu-access.mov",
+  "capture_pid": 69145,
+  "start": 1791551918.832045,
+  "seconds": 8,
+  "status": "fail",
+  "element": "原生菜单栏访问",
+  "method": "press_key ctrl+F2",
+  "effect": "suppressed：后台无ENABLED菜单项持有此chord；未投递，未激活应用绕过"
+}

@@ -1,0 +1,11 @@
+{
+  "number": 16,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/016_settings-general.mov",
+  "capture_pid": 43717,
+  "start": 1791549730.668689,
+  "seconds": 8,
+  "status": "fail",
+  "element": "设置/通用",
+  "method": "click screen ← screenshot(148,73)",
+  "effect": "无效果：仅悬停底色，内容仍是网关"
+}

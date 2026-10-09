@@ -1,0 +1,11 @@
+{
+  "number": 1,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/001_add-account.mov",
+  "capture_pid": 37723,
+  "start": 1791549217.3022568,
+  "seconds": 8,
+  "status": "fail",
+  "element": "网关/添加账户",
+  "method": "click screenshot(1205,555)",
+  "effect": "无效果；录像报错：sandbox dispatch_source_create returned NULL"
+}

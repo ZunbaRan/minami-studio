@@ -1,0 +1,11 @@
+{
+  "number": 4,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/004_account-name-focus.mov",
+  "capture_pid": 39664,
+  "start": 1791549388.3510668,
+  "seconds": 8,
+  "status": "fail",
+  "element": "添加账户/账户名称聚焦",
+  "method": "click screenshot(575,382)",
+  "effect": "无效果：截图未见焦点变化，下一步用测试输入验证"
+}

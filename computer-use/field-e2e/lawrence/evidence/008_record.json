@@ -1,0 +1,11 @@
+{
+  "number": 8,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/008_email-scroll.mov",
+  "capture_pid": 41869,
+  "start": 1791549518.6710699,
+  "seconds": 8,
+  "status": "fail",
+  "element": "Email弹窗向下滚动",
+  "method": "scroll e14 down 1",
+  "effect": "报错：Element does not support action AXScrollDownByPage；当前树无 ScrollArea"
+}

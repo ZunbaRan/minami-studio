@@ -1,0 +1,11 @@
+{
+  "number": 25,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/025_cancel-avatar-upload.mov",
+  "capture_pid": 49049,
+  "start": 1791550039.2986062,
+  "seconds": 8,
+  "status": "fail",
+  "element": "上传文件弹窗/取消（坐标）",
+  "method": "click screen ← screenshot(938,615)",
+  "effect": "无效果：原生文件选择弹窗仍在；改用当前AX取消按钮"
+}

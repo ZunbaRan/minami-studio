@@ -1,0 +1,25 @@
+{
+  "number": 69,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/069_file-workspaces.mov",
+  "capture_pid": 65689,
+  "start": 1791551480.84014,
+  "seconds": 8,
+  "status": "success",
+  "element": "主侧栏/上下文治理中心",
+  "method": "click ref=e2266 strategy=ax",
+  "effect": "进入工作区列表，显示Skills、数据保护及各工作区设置；未切换或删除工作区",
+  "media": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2754,
+        "height": 1884
+      }
+    ],
+    "format": {
+      "duration": "8.175000"
+    }
+  }
+}

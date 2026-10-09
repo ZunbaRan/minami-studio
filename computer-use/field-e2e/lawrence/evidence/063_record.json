@@ -1,0 +1,25 @@
+{
+  "number": 63,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/063_scheduled-tasks.mov",
+  "capture_pid": 64662,
+  "start": 1791551296.7072341,
+  "seconds": 8,
+  "status": "success",
+  "element": "任务/计划任务",
+  "method": "click ref=e1979 strategy=ax",
+  "effect": "显示周期/单次计划、状态筛选、最近运行；立即运行/启用/删除均未执行",
+  "media": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2754,
+        "height": 1884
+      }
+    ],
+    "format": {
+      "duration": "8.081667"
+    }
+  }
+}

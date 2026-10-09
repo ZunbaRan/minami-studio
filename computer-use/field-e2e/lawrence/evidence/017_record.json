@@ -1,0 +1,11 @@
+{
+  "number": 17,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/017_menu-preferences.mov",
+  "capture_pid": 44751,
+  "start": 1791549756.5586329,
+  "seconds": 8,
+  "status": "fail",
+  "element": "Electron/Preferences…",
+  "method": "press_key cmd+,",
+  "effect": "无效果：menu_ax_press 已投递，仍停留网关页"
+}

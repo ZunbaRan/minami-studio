@@ -1,0 +1,25 @@
+{
+  "number": 28,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/028_gateway-integrations-ax.mov",
+  "capture_pid": 50349,
+  "start": 1791550161.645066,
+  "seconds": 8,
+  "status": "success",
+  "element": "网关/集成（AX恢复）",
+  "method": "click ref=e245 strategy=ax",
+  "effect": "进入用户连接页：飞书、钉钉、Google Drive；连接授权入口只读未执行",
+  "media": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2754,
+        "height": 1884
+      }
+    ],
+    "format": {
+      "duration": "8.146667"
+    }
+  }
+}

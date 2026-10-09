@@ -1,0 +1,4829 @@
+{
+  "app": {
+    "bundle": "com.github.Electron",
+    "name": "Electron",
+    "pid": 86359
+  },
+  "ax_status": "populated",
+  "elements": [
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 874,
+        "w": 1309,
+        "x": 156,
+        "y": 33
+      },
+      "children_count": 1,
+      "enabled": true,
+      "focused": false,
+      "ref": "e20",
+      "role": "AXWebArea",
+      "role_description": "HTML 内容",
+      "selected": false,
+      "title": "WiseStudio"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 874,
+        "w": 1309,
+        "x": 156,
+        "y": 33
+      },
+      "children_count": 4,
+      "enabled": true,
+      "focused": false,
+      "ref": "e21",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 1,
+        "w": 1,
+        "x": 156,
+        "y": 33
+      },
+      "children_count": 1,
+      "enabled": true,
+      "focused": false,
+      "ref": "e22",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 874,
+        "w": 1309,
+        "x": 156,
+        "y": 33
+      },
+      "children_count": 1,
+      "enabled": true,
+      "focused": false,
+      "ref": "e23",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 20,
+        "w": 1289,
+        "x": 176,
+        "y": 887
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e165",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 1,
+        "w": 1,
+        "x": 156,
+        "y": 33
+      },
+      "children_count": 1,
+      "enabled": true,
+      "focused": false,
+      "ref": "e24",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 1,
+        "w": 1,
+        "x": 156,
+        "y": 33
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e25",
+      "role": "AXGroup",
+      "role_description": "提醒",
+      "selected": false,
+      "subrole": "AXApplicationAlert"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 874,
+        "w": 1309,
+        "x": 156,
+        "y": 33
+      },
+      "children_count": 3,
+      "enabled": true,
+      "focused": false,
+      "ref": "e26",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 874,
+        "w": 80,
+        "x": 156,
+        "y": 33
+      },
+      "children_count": 2,
+      "enabled": true,
+      "focused": false,
+      "ref": "e27",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 874,
+        "w": 80,
+        "x": 156,
+        "y": 33
+      },
+      "children_count": 4,
+      "enabled": true,
+      "focused": false,
+      "ref": "e166",
+      "role": "AXGroup",
+      "role_description": "补充内容",
+      "selected": false,
+      "subrole": "AXLandmarkComplementary"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 108,
+        "w": 63,
+        "x": 164,
+        "y": 73
+      },
+      "children_count": 1,
+      "enabled": true,
+      "focused": false,
+      "ref": "e167",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 52,
+        "w": 52,
+        "x": 170,
+        "y": 105
+      },
+      "children_count": 4,
+      "enabled": true,
+      "focused": false,
+      "ref": "e168",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "阿玛拉"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 63,
+        "w": 63,
+        "x": 164,
+        "y": 100
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e169",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 88,
+        "w": 84,
+        "x": 156,
+        "y": 87
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e170",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 56,
+        "w": 56,
+        "x": 168,
+        "y": 103
+      },
+      "children_count": 1,
+      "enabled": true,
+      "focused": false,
+      "ref": "e171",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 56,
+        "w": 56,
+        "x": 168,
+        "y": 103
+      },
+      "children_count": 0,
+      "description": "阿玛拉",
+      "enabled": true,
+      "focused": false,
+      "ref": "e172",
+      "role": "AXImage",
+      "role_description": "图像",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 14,
+        "w": 14,
+        "x": 208,
+        "y": 143
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e173",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 219,
+        "w": 79,
+        "x": 156,
+        "y": 206
+      },
+      "children_count": 5,
+      "enabled": true,
+      "focused": false,
+      "ref": "e174",
+      "role": "AXGroup",
+      "role_description": "导航",
+      "selected": false,
+      "subrole": "AXLandmarkNavigation"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 40,
+        "w": 40,
+        "x": 176,
+        "y": 206
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e175",
+      "role": "AXLink",
+      "role_description": "链接",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 40,
+        "w": 40,
+        "x": 176,
+        "y": 259
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e176",
+      "role": "AXLink",
+      "role_description": "链接",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 40,
+        "w": 40,
+        "x": 176,
+        "y": 301
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e177",
+      "role": "AXLink",
+      "role_description": "链接",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 40,
+        "w": 40,
+        "x": 176,
+        "y": 343
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e178",
+      "role": "AXLink",
+      "role_description": "链接",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 40,
+        "w": 40,
+        "x": 176,
+        "y": 385
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e179",
+      "role": "AXLink",
+      "role_description": "链接",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 40,
+        "w": 40,
+        "x": 176,
+        "y": 815
+      },
+      "children_count": 1,
+      "enabled": true,
+      "focused": false,
+      "ref": "e180",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 40,
+        "w": 40,
+        "x": 176,
+        "y": 815
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e181",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 40,
+        "w": 40,
+        "x": 176,
+        "y": 859
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e182",
+      "role": "AXLink",
+      "role_description": "链接",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 874,
+        "w": 1309,
+        "x": 156,
+        "y": 33
+      },
+      "children_count": 14,
+      "enabled": true,
+      "focused": false,
+      "ref": "e183",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 36,
+        "w": 36,
+        "x": 1405,
+        "y": 57
+      },
+      "children_count": 0,
+      "description": "Close",
+      "enabled": true,
+      "focused": false,
+      "ref": "e184",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 36,
+        "w": 195,
+        "x": 509,
+        "y": 269
+      },
+      "children_count": 1,
+      "enabled": true,
+      "focused": false,
+      "ref": "e185",
+      "role": "AXHeading",
+      "role_description": "标题",
+      "selected": false,
+      "title": "选择你的数字形象",
+      "value": "2"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 28,
+        "w": 195,
+        "x": 509,
+        "y": 273
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e186",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "选择你的数字形象"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 136,
+        "w": 108,
+        "x": 361,
+        "y": 337
+      },
+      "children_count": 2,
+      "enabled": true,
+      "focused": false,
+      "ref": "e187",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "Asian Female 颖诗"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 64,
+        "w": 64,
+        "x": 383,
+        "y": 359
+      },
+      "children_count": 0,
+      "description": "Asian Female",
+      "enabled": true,
+      "focused": false,
+      "ref": "e188",
+      "role": "AXImage",
+      "role_description": "图像",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 16,
+        "w": 27,
+        "x": 401,
+        "y": 433
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e189",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "颖诗"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 136,
+        "w": 108,
+        "x": 489,
+        "y": 337
+      },
+      "children_count": 2,
+      "enabled": true,
+      "focused": false,
+      "ref": "e190",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "Western Female 艾玛"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 64,
+        "w": 64,
+        "x": 511,
+        "y": 359
+      },
+      "children_count": 0,
+      "description": "Western Female",
+      "enabled": true,
+      "focused": false,
+      "ref": "e191",
+      "role": "AXImage",
+      "role_description": "图像",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 16,
+        "w": 27,
+        "x": 529,
+        "y": 433
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e192",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "艾玛"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 136,
+        "w": 108,
+        "x": 617,
+        "y": 337
+      },
+      "children_count": 3,
+      "enabled": true,
+      "focused": false,
+      "ref": "e193",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "African Female 阿玛拉"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 64,
+        "w": 64,
+        "x": 639,
+        "y": 359
+      },
+      "children_count": 0,
+      "description": "African Female",
+      "enabled": true,
+      "focused": false,
+      "ref": "e194",
+      "role": "AXImage",
+      "role_description": "图像",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 16,
+        "w": 40,
+        "x": 651,
+        "y": 433
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e195",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "阿玛拉"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 24,
+        "w": 24,
+        "x": 705,
+        "y": 333
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e196",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 136,
+        "w": 108,
+        "x": 745,
+        "y": 337
+      },
+      "children_count": 2,
+      "enabled": true,
+      "focused": false,
+      "ref": "e197",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "Latin Female 索菲亚"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 64,
+        "w": 64,
+        "x": 767,
+        "y": 359
+      },
+      "children_count": 0,
+      "description": "Latin Female",
+      "enabled": true,
+      "focused": false,
+      "ref": "e198",
+      "role": "AXImage",
+      "role_description": "图像",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 16,
+        "w": 40,
+        "x": 779,
+        "y": 433
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e199",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "索菲亚"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 136,
+        "w": 108,
+        "x": 361,
+        "y": 493
+      },
+      "children_count": 2,
+      "enabled": true,
+      "focused": false,
+      "ref": "e200",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "Asian Male 家豪"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 64,
+        "w": 64,
+        "x": 383,
+        "y": 515
+      },
+      "children_count": 0,
+      "description": "Asian Male",
+      "enabled": true,
+      "focused": false,
+      "ref": "e201",
+      "role": "AXImage",
+      "role_description": "图像",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 16,
+        "w": 27,
+        "x": 401,
+        "y": 589
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e202",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "家豪"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 136,
+        "w": 108,
+        "x": 489,
+        "y": 493
+      },
+      "children_count": 2,
+      "enabled": true,
+      "focused": false,
+      "ref": "e203",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "Western Male 伊桑"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 64,
+        "w": 64,
+        "x": 511,
+        "y": 515
+      },
+      "children_count": 0,
+      "description": "Western Male",
+      "enabled": true,
+      "focused": false,
+      "ref": "e204",
+      "role": "AXImage",
+      "role_description": "图像",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 16,
+        "w": 27,
+        "x": 529,
+        "y": 589
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e205",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "伊桑"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 136,
+        "w": 108,
+        "x": 617,
+        "y": 493
+      },
+      "children_count": 2,
+      "enabled": true,
+      "focused": false,
+      "ref": "e206",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "African Male 贾巴里"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 64,
+        "w": 64,
+        "x": 639,
+        "y": 515
+      },
+      "children_count": 0,
+      "description": "African Male",
+      "enabled": true,
+      "focused": false,
+      "ref": "e207",
+      "role": "AXImage",
+      "role_description": "图像",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 16,
+        "w": 40,
+        "x": 651,
+        "y": 589
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e208",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "贾巴里"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 136,
+        "w": 108,
+        "x": 745,
+        "y": 493
+      },
+      "children_count": 2,
+      "enabled": true,
+      "focused": false,
+      "ref": "e209",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "Latin Male 马可"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 64,
+        "w": 64,
+        "x": 767,
+        "y": 515
+      },
+      "children_count": 0,
+      "description": "Latin Male",
+      "enabled": true,
+      "focused": false,
+      "ref": "e210",
+      "role": "AXImage",
+      "role_description": "图像",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 16,
+        "w": 27,
+        "x": 785,
+        "y": 589
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e211",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "马可"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 19,
+        "w": 153,
+        "x": 530,
+        "y": 653
+      },
+      "children_count": 3,
+      "enabled": true,
+      "focused": false,
+      "ref": "e212",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 14,
+        "w": 78,
+        "x": 530,
+        "y": 655
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e213",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "点击选择，按 "
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 15,
+        "w": 22,
+        "x": 614,
+        "y": 655
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e214",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "ESC"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 14,
+        "w": 40,
+        "x": 643,
+        "y": 655
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e215",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": " 关闭。"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 520,
+        "w": 360,
+        "x": 901,
+        "y": 170
+      },
+      "children_count": 1,
+      "enabled": true,
+      "focused": false,
+      "ref": "e216",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 520,
+        "w": 360,
+        "x": 901,
+        "y": 170
+      },
+      "children_count": 1,
+      "enabled": true,
+      "focused": false,
+      "ref": "e217",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 520,
+        "w": 293,
+        "x": 934,
+        "y": 170
+      },
+      "children_count": 0,
+      "description": "无法播放媒体。",
+      "enabled": false,
+      "focused": false,
+      "ref": "e218",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 33,
+        "w": 192,
+        "x": 985,
+        "y": 702
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e219",
+      "role": "AXTextField",
+      "role_description": "文本栏",
+      "selected": false,
+      "value": "阿玛拉"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 20,
+        "w": 113,
+        "x": 1024,
+        "y": 751
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": true,
+      "ref": "e220",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "上传自定义头像"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 874,
+        "w": 1229,
+        "x": 236,
+        "y": 33
+      },
+      "children_count": 2,
+      "enabled": true,
+      "focused": false,
+      "ref": "e28",
+      "role": "AXGroup",
+      "role_description": "主体内容",
+      "selected": false,
+      "subrole": "AXLandmarkMain"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 834,
+        "w": 224,
+        "x": 236,
+        "y": 73
+      },
+      "children_count": 8,
+      "enabled": true,
+      "focused": false,
+      "ref": "e221",
+      "role": "AXGroup",
+      "role_description": "导航",
+      "selected": false,
+      "subrole": "AXLandmarkNavigation"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 36,
+        "w": 191,
+        "x": 252,
+        "y": 89
+      },
+      "children_count": 1,
+      "description": "通用",
+      "enabled": true,
+      "focused": false,
+      "ref": "e222",
+      "role": "AXLink",
+      "role_description": "链接",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 15,
+        "w": 27,
+        "x": 292,
+        "y": 100
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e223",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "通用"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 36,
+        "w": 191,
+        "x": 252,
+        "y": 129
+      },
+      "children_count": 1,
+      "description": "工作区",
+      "enabled": true,
+      "focused": false,
+      "ref": "e224",
+      "role": "AXLink",
+      "role_description": "链接",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 15,
+        "w": 40,
+        "x": 292,
+        "y": 140
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e225",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "工作区"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 36,
+        "w": 191,
+        "x": 252,
+        "y": 169
+      },
+      "children_count": 1,
+      "description": "服务商",
+      "enabled": true,
+      "focused": false,
+      "ref": "e226",
+      "role": "AXLink",
+      "role_description": "链接",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 15,
+        "w": 40,
+        "x": 292,
+        "y": 180
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e227",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "服务商"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 36,
+        "w": 191,
+        "x": 252,
+        "y": 209
+      },
+      "children_count": 1,
+      "description": "频道智能体",
+      "enabled": true,
+      "focused": false,
+      "ref": "e228",
+      "role": "AXLink",
+      "role_description": "链接",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 15,
+        "w": 67,
+        "x": 292,
+        "y": 220
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e229",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "频道智能体"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 36,
+        "w": 191,
+        "x": 252,
+        "y": 249
+      },
+      "children_count": 2,
+      "description": "网关",
+      "enabled": true,
+      "focused": false,
+      "ref": "e230",
+      "role": "AXLink",
+      "role_description": "链接",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 36,
+        "w": 191,
+        "x": 252,
+        "y": 249
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e231",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 15,
+        "w": 27,
+        "x": 292,
+        "y": 260
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e232",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "网关"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 36,
+        "w": 191,
+        "x": 252,
+        "y": 289
+      },
+      "children_count": 1,
+      "description": "语音",
+      "enabled": true,
+      "focused": false,
+      "ref": "e233",
+      "role": "AXLink",
+      "role_description": "链接",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 15,
+        "w": 27,
+        "x": 292,
+        "y": 300
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e234",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "语音"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 36,
+        "w": 191,
+        "x": 252,
+        "y": 329
+      },
+      "children_count": 1,
+      "description": "Web 配置",
+      "enabled": true,
+      "focused": false,
+      "ref": "e235",
+      "role": "AXLink",
+      "role_description": "链接",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 15,
+        "w": 58,
+        "x": 292,
+        "y": 340
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e236",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "Web 配置"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 36,
+        "w": 191,
+        "x": 252,
+        "y": 369
+      },
+      "children_count": 1,
+      "description": "系统",
+      "enabled": true,
+      "focused": false,
+      "ref": "e237",
+      "role": "AXLink",
+      "role_description": "链接",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 15,
+        "w": 27,
+        "x": 292,
+        "y": 380
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e238",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "系统"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 834,
+        "w": 1005,
+        "x": 460,
+        "y": 73
+      },
+      "children_count": 3,
+      "enabled": true,
+      "focused": false,
+      "ref": "e239",
+      "role": "AXGroup",
+      "role_description": "主体内容",
+      "selected": false,
+      "subrole": "AXLandmarkMain"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 36,
+        "w": 167,
+        "x": 472,
+        "y": 85
+      },
+      "children_count": 1,
+      "enabled": true,
+      "focused": false,
+      "ref": "e240",
+      "role": "AXHeading",
+      "role_description": "标题",
+      "selected": false,
+      "title": "GATEWAY",
+      "value": "2"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 15,
+        "w": 68,
+        "x": 484,
+        "y": 96
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e241",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "GATEWAY"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 156,
+        "w": 167,
+        "x": 472,
+        "y": 129
+      },
+      "children_count": 4,
+      "enabled": true,
+      "focused": false,
+      "ref": "e242",
+      "role": "AXGroup",
+      "role_description": "导航",
+      "selected": false,
+      "subrole": "AXLandmarkNavigation"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 36,
+        "w": 167,
+        "x": 472,
+        "y": 129
+      },
+      "children_count": 1,
+      "description": "渠道",
+      "enabled": true,
+      "focused": false,
+      "ref": "e243",
+      "role": "AXLink",
+      "role_description": "链接",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 15,
+        "w": 27,
+        "x": 508,
+        "y": 140
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e244",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "渠道"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 36,
+        "w": 167,
+        "x": 472,
+        "y": 169
+      },
+      "children_count": 1,
+      "description": "集成",
+      "enabled": true,
+      "focused": false,
+      "ref": "e245",
+      "role": "AXLink",
+      "role_description": "链接",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 15,
+        "w": 27,
+        "x": 508,
+        "y": 180
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e246",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "集成"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 36,
+        "w": 167,
+        "x": 472,
+        "y": 209
+      },
+      "children_count": 1,
+      "description": "白名单",
+      "enabled": true,
+      "focused": false,
+      "ref": "e247",
+      "role": "AXLink",
+      "role_description": "链接",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 15,
+        "w": 40,
+        "x": 508,
+        "y": 220
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e248",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "白名单"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 36,
+        "w": 167,
+        "x": 472,
+        "y": 249
+      },
+      "children_count": 1,
+      "description": "邮箱白名单",
+      "enabled": true,
+      "focused": false,
+      "ref": "e249",
+      "role": "AXLink",
+      "role_description": "链接",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 15,
+        "w": 67,
+        "x": 508,
+        "y": 260
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e250",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "邮箱白名单"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 834,
+        "w": 813,
+        "x": 652,
+        "y": 73
+      },
+      "children_count": 53,
+      "enabled": true,
+      "focused": false,
+      "ref": "e251",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 32,
+        "w": 238,
+        "x": 676,
+        "y": 97
+      },
+      "children_count": 1,
+      "enabled": true,
+      "focused": false,
+      "ref": "e252",
+      "role": "AXHeading",
+      "role_description": "标题",
+      "selected": false,
+      "title": "渠道管理",
+      "value": "1"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 24,
+        "w": 82,
+        "x": 676,
+        "y": 101
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e253",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "渠道管理"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 20,
+        "w": 238,
+        "x": 676,
+        "y": 133
+      },
+      "children_count": 1,
+      "enabled": true,
+      "focused": false,
+      "ref": "e254",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 15,
+        "w": 238,
+        "x": 676,
+        "y": 136
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e255",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "管理本地通信渠道和 Chatwoot 消息留存"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 32,
+        "w": 83,
+        "x": 1358,
+        "y": 109
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e256",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "刷新"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 15,
+        "w": 40,
+        "x": 733,
+        "y": 203
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e257",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "已连接"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 36,
+        "w": 211,
+        "x": 693,
+        "y": 234
+      },
+      "children_count": 1,
+      "enabled": true,
+      "focused": false,
+      "ref": "e258",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 28,
+        "w": 15,
+        "x": 693,
+        "y": 238
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e259",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "2"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 18,
+        "w": 211,
+        "x": 693,
+        "y": 270
+      },
+      "children_count": 1,
+      "enabled": true,
+      "focused": false,
+      "ref": "e260",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 14,
+        "w": 55,
+        "x": 693,
+        "y": 272
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e261",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "/ 2 已启用"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 15,
+        "w": 27,
+        "x": 993,
+        "y": 203
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e262",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "错误"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 36,
+        "w": 211,
+        "x": 953,
+        "y": 234
+      },
+      "children_count": 1,
+      "enabled": true,
+      "focused": false,
+      "ref": "e263",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 28,
+        "w": 16,
+        "x": 953,
+        "y": 238
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e264",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "0"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 18,
+        "w": 211,
+        "x": 953,
+        "y": 270
+      },
+      "children_count": 1,
+      "enabled": true,
+      "focused": false,
+      "ref": "e265",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 14,
+        "w": 50,
+        "x": 953,
+        "y": 272
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e266",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "需要处理"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 15,
+        "w": 88,
+        "x": 1254,
+        "y": 203
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e267",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "Chatwoot 留存"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 36,
+        "w": 210,
+        "x": 1214,
+        "y": 234
+      },
+      "children_count": 1,
+      "enabled": true,
+      "focused": false,
+      "ref": "e268",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 28,
+        "w": 15,
+        "x": 1214,
+        "y": 238
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e269",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "2"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 18,
+        "w": 210,
+        "x": 1214,
+        "y": 270
+      },
+      "children_count": 1,
+      "enabled": true,
+      "focused": false,
+      "ref": "e270",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 14,
+        "w": 37,
+        "x": 1214,
+        "y": 272
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e271",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "已连接"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 20,
+        "w": 54,
+        "x": 689,
+        "y": 345
+      },
+      "children_count": 1,
+      "enabled": true,
+      "focused": false,
+      "ref": "e272",
+      "role": "AXHeading",
+      "role_description": "标题",
+      "selected": false,
+      "title": "渠道状态",
+      "value": "2"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 15,
+        "w": 54,
+        "x": 689,
+        "y": 348
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e273",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "渠道状态"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 26,
+        "w": 41,
+        "x": 1387,
+        "y": 342
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e274",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "全部"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 50,
+        "w": 241,
+        "x": 689,
+        "y": 380
+      },
+      "children_count": 6,
+      "enabled": true,
+      "focused": false,
+      "ref": "e275",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "Telegram 0/0 未配置"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 22,
+        "w": 22,
+        "x": 707,
+        "y": 394
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e276",
+      "role": "AXImage",
+      "role_description": "图像",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 14,
+        "w": 54,
+        "x": 742,
+        "y": 398
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e277",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "Telegram"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 12,
+        "w": 7,
+        "x": 885,
+        "y": 399
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e278",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "0"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 12,
+        "w": 7,
+        "x": 892,
+        "y": 399
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e279",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "/"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 12,
+        "w": 7,
+        "x": 898,
+        "y": 399
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e280",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "0"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 6,
+        "w": 6,
+        "x": 911,
+        "y": 402
+      },
+      "children_count": 0,
+      "description": "未配置",
+      "enabled": true,
+      "focused": false,
+      "ref": "e281",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 50,
+        "w": 241,
+        "x": 938,
+        "y": 380
+      },
+      "children_count": 5,
+      "enabled": true,
+      "focused": false,
+      "ref": "e282",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "WhatsApp 0/0 未配置"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 14,
+        "w": 60,
+        "x": 991,
+        "y": 398
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e283",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "WhatsApp"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 12,
+        "w": 7,
+        "x": 1134,
+        "y": 399
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e284",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "0"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 12,
+        "w": 7,
+        "x": 1141,
+        "y": 399
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e285",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "/"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 12,
+        "w": 7,
+        "x": 1147,
+        "y": 399
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e286",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "0"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 6,
+        "w": 6,
+        "x": 1160,
+        "y": 402
+      },
+      "children_count": 0,
+      "description": "未配置",
+      "enabled": true,
+      "focused": false,
+      "ref": "e287",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 50,
+        "w": 241,
+        "x": 1187,
+        "y": 380
+      },
+      "children_count": 5,
+      "enabled": true,
+      "focused": false,
+      "ref": "e288",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "Email 1/1 在线"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 14,
+        "w": 32,
+        "x": 1240,
+        "y": 398
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e289",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "Email"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 12,
+        "w": 7,
+        "x": 1383,
+        "y": 399
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e290",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "1"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 12,
+        "w": 7,
+        "x": 1390,
+        "y": 399
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e291",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "/"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 12,
+        "w": 7,
+        "x": 1396,
+        "y": 399
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e292",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "1"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 6,
+        "w": 6,
+        "x": 1409,
+        "y": 402
+      },
+      "children_count": 0,
+      "description": "在线",
+      "enabled": true,
+      "focused": false,
+      "ref": "e293",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 50,
+        "w": 241,
+        "x": 689,
+        "y": 438
+      },
+      "children_count": 5,
+      "enabled": true,
+      "focused": false,
+      "ref": "e294",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "飞书 1/1 在线"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 14,
+        "w": 25,
+        "x": 742,
+        "y": 456
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e295",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "飞书"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 12,
+        "w": 7,
+        "x": 885,
+        "y": 457
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e296",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "1"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 12,
+        "w": 7,
+        "x": 892,
+        "y": 457
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e297",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "/"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 12,
+        "w": 7,
+        "x": 898,
+        "y": 457
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e298",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "1"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 6,
+        "w": 6,
+        "x": 911,
+        "y": 460
+      },
+      "children_count": 0,
+      "description": "在线",
+      "enabled": true,
+      "focused": false,
+      "ref": "e299",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 50,
+        "w": 241,
+        "x": 938,
+        "y": 438
+      },
+      "children_count": 5,
+      "enabled": true,
+      "focused": false,
+      "ref": "e300",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "Lark 0/0 未配置"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 14,
+        "w": 26,
+        "x": 991,
+        "y": 456
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e301",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "Lark"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 12,
+        "w": 7,
+        "x": 1134,
+        "y": 457
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e302",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "0"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 12,
+        "w": 7,
+        "x": 1141,
+        "y": 457
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e303",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "/"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 12,
+        "w": 7,
+        "x": 1147,
+        "y": 457
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e304",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "0"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 6,
+        "w": 6,
+        "x": 1160,
+        "y": 460
+      },
+      "children_count": 0,
+      "description": "未配置",
+      "enabled": true,
+      "focused": false,
+      "ref": "e305",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 50,
+        "w": 241,
+        "x": 1187,
+        "y": 438
+      },
+      "children_count": 5,
+      "enabled": true,
+      "focused": false,
+      "ref": "e306",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "钉钉 0/0 未配置"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 14,
+        "w": 25,
+        "x": 1240,
+        "y": 456
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e307",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "钉钉"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 12,
+        "w": 7,
+        "x": 1383,
+        "y": 457
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e308",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "0"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 12,
+        "w": 7,
+        "x": 1390,
+        "y": 457
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e309",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "/"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 12,
+        "w": 7,
+        "x": 1396,
+        "y": 457
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e310",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "0"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 6,
+        "w": 6,
+        "x": 1409,
+        "y": 460
+      },
+      "children_count": 0,
+      "description": "未配置",
+      "enabled": true,
+      "focused": false,
+      "ref": "e311",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 50,
+        "w": 241,
+        "x": 689,
+        "y": 496
+      },
+      "children_count": 5,
+      "enabled": true,
+      "focused": false,
+      "ref": "e312",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "企业微信 0/0 未配置"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 14,
+        "w": 50,
+        "x": 742,
+        "y": 514
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e313",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "企业微信"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 12,
+        "w": 7,
+        "x": 885,
+        "y": 515
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e314",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "0"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 12,
+        "w": 7,
+        "x": 892,
+        "y": 515
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e315",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "/"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 12,
+        "w": 7,
+        "x": 898,
+        "y": 515
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e316",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "0"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 6,
+        "w": 6,
+        "x": 911,
+        "y": 518
+      },
+      "children_count": 0,
+      "description": "未配置",
+      "enabled": true,
+      "focused": false,
+      "ref": "e317",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 42,
+        "w": 128,
+        "x": 676,
+        "y": 583
+      },
+      "children_count": 2,
+      "enabled": true,
+      "focused": false,
+      "ref": "e318",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "自定义渠道 2"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 15,
+        "w": 67,
+        "x": 692,
+        "y": 597
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e319",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "自定义渠道"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 14,
+        "w": 8,
+        "x": 774,
+        "y": 597
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e320",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "2"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 42,
+        "w": 121,
+        "x": 808,
+        "y": 583
+      },
+      "children_count": 2,
+      "enabled": true,
+      "focused": false,
+      "ref": "e321",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "Chatwoot 2"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 15,
+        "w": 60,
+        "x": 824,
+        "y": 597
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e322",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "Chatwoot"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 14,
+        "w": 8,
+        "x": 899,
+        "y": 597
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e323",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "2"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 28,
+        "w": 765,
+        "x": 676,
+        "y": 650
+      },
+      "children_count": 1,
+      "enabled": true,
+      "focused": false,
+      "ref": "e324",
+      "role": "AXHeading",
+      "role_description": "标题",
+      "selected": false,
+      "title": "Chatwoot 客服平台",
+      "value": "2"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 22,
+        "w": 158,
+        "x": 676,
+        "y": 653
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e325",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "Chatwoot 客服平台"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 20,
+        "w": 765,
+        "x": 676,
+        "y": 686
+      },
+      "children_count": 1,
+      "enabled": true,
+      "focused": false,
+      "ref": "e326",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 15,
+        "w": 353,
+        "x": 676,
+        "y": 689
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e327",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "配置 Chatwoot 服务器连接，消息将自动同步到 Chatwoot。"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 20,
+        "w": 354,
+        "x": 697,
+        "y": 743
+      },
+      "children_count": 1,
+      "enabled": true,
+      "focused": false,
+      "ref": "e328",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 15,
+        "w": 69,
+        "x": 697,
+        "y": 746
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e329",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "服务器 URL"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 20,
+        "w": 354,
+        "x": 697,
+        "y": 767
+      },
+      "children_count": 1,
+      "enabled": true,
+      "focused": false,
+      "ref": "e330",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 15,
+        "w": 173,
+        "x": 697,
+        "y": 770
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e331",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "http://localhost:13300"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 20,
+        "w": 353,
+        "x": 1067,
+        "y": 743
+      },
+      "children_count": 1,
+      "enabled": true,
+      "focused": false,
+      "ref": "e332",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 15,
+        "w": 27,
+        "x": 1067,
+        "y": 746
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e333",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "邮箱"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 20,
+        "w": 353,
+        "x": 1067,
+        "y": 767
+      },
+      "children_count": 1,
+      "enabled": true,
+      "focused": false,
+      "ref": "e334",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 15,
+        "w": 172,
+        "x": 1067,
+        "y": 770
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e335",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "lawrence@wiselawai.com"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 14,
+        "w": 37,
+        "x": 725,
+        "y": 812
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e336",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "已连接"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 32,
+        "w": 181,
+        "x": 1124,
+        "y": 803
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e337",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "打开 Chatwoot 控制台"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 32,
+        "w": 107,
+        "x": 1313,
+        "y": 803
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e338",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "检查状态"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 25,
+        "w": 139,
+        "x": 676,
+        "y": 882
+      },
+      "children_count": 1,
+      "enabled": true,
+      "focused": false,
+      "ref": "e339",
+      "role": "AXHeading",
+      "role_description": "标题",
+      "selected": false,
+      "title": "Chatwoot 收件箱",
+      "value": "2"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 22,
+        "w": 139,
+        "x": 676,
+        "y": 885
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e340",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "Chatwoot 收件箱"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 27,
+        "w": 117,
+        "x": 1276,
+        "y": 880
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e341",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "同步 Email"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 27,
+        "w": 40,
+        "x": 1401,
+        "y": 880
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e342",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 765,
+        "x": 676,
+        "y": 907
+      },
+      "children_count": 1,
+      "enabled": true,
+      "focused": false,
+      "ref": "e343",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 536,
+        "x": 676,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e344",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "Chatwoot 平台中的 Inbox 列表。旧 Email Inbox 只会在手动触发时同步为本地 Email 账户。"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 69,
+        "x": 721,
+        "y": 907
+      },
+      "children_count": 1,
+      "enabled": true,
+      "focused": false,
+      "ref": "e345",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 69,
+        "x": 721,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e346",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "feishu:飞书"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 69,
+        "x": 721,
+        "y": 907
+      },
+      "children_count": 3,
+      "enabled": true,
+      "focused": false,
+      "ref": "e347",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 19,
+        "x": 721,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e348",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "Api"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 31,
+        "x": 739,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e349",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "· ID #"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 6,
+        "x": 769,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e350",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "1"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 155,
+        "x": 1269,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e351",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "在 Chatwoot 查看"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 65,
+        "x": 721,
+        "y": 907
+      },
+      "children_count": 1,
+      "enabled": true,
+      "focused": false,
+      "ref": "e352",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 65,
+        "x": 721,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e353",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "email:wise"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 65,
+        "x": 721,
+        "y": 907
+      },
+      "children_count": 3,
+      "enabled": true,
+      "focused": false,
+      "ref": "e354",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 19,
+        "x": 721,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e355",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "Api"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 31,
+        "x": 739,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e356",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "· ID #"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 8,
+        "x": 769,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e357",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "5"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 155,
+        "x": 1269,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e358",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "在 Chatwoot 查看"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 765,
+        "x": 676,
+        "y": 907
+      },
+      "children_count": 1,
+      "enabled": true,
+      "focused": false,
+      "ref": "e359",
+      "role": "AXHeading",
+      "role_description": "标题",
+      "selected": false,
+      "title": "已关联的 Chatwoot 归档",
+      "value": "2"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 199,
+        "x": 676,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e360",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "已关联的 Chatwoot 归档"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 765,
+        "x": 676,
+        "y": 907
+      },
+      "children_count": 1,
+      "enabled": true,
+      "focused": false,
+      "ref": "e361",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 351,
+        "x": 676,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e362",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "以下本地渠道已关联到 Chatwoot Inbox，消息仅同步留存。"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 86,
+        "x": 693,
+        "y": 907
+      },
+      "children_count": 1,
+      "enabled": true,
+      "focused": false,
+      "ref": "e363",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 29,
+        "x": 693,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e364",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "wise"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 86,
+        "x": 693,
+        "y": 907
+      },
+      "children_count": 3,
+      "enabled": true,
+      "focused": false,
+      "ref": "e365",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 30,
+        "x": 693,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e366",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "email"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 49,
+        "x": 723,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e367",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "· Inbox #"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 8,
+        "x": 771,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e368",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "5"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 155,
+        "x": 1269,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e369",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "在 Chatwoot 查看"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 89,
+        "x": 693,
+        "y": 907
+      },
+      "children_count": 1,
+      "enabled": true,
+      "focused": false,
+      "ref": "e370",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 27,
+        "x": 693,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e371",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "飞书"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 89,
+        "x": 693,
+        "y": 907
+      },
+      "children_count": 3,
+      "enabled": true,
+      "focused": false,
+      "ref": "e372",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 35,
+        "x": 693,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e373",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "feishu"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 49,
+        "x": 727,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e374",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "· Inbox #"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 6,
+        "x": 776,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e375",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "1"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 155,
+        "x": 1269,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e376",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "在 Chatwoot 查看"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 731,
+        "x": 693,
+        "y": 907
+      },
+      "children_count": 1,
+      "enabled": true,
+      "focused": false,
+      "ref": "e377",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 156,
+        "x": 693,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e378",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "Chatwoot 仅用于消息留存"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 731,
+        "x": 693,
+        "y": 907
+      },
+      "children_count": 1,
+      "enabled": true,
+      "focused": false,
+      "ref": "e379",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 726,
+        "x": 693,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e380",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "Telegram、Email 等渠道在客户端本地配置收发；Chatwoot 只保留会话记录，供人工查看和接管。旧 Chatwoot Email Inbox 可在添加 Email 账户时导入为本地配置。"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 175,
+        "x": 693,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e381",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "打开 Chatwoot Inbox"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 28,
+        "w": 28,
+        "x": 240,
+        "y": 39
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e29",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 1309,
+        "x": 156,
+        "y": 907
+      },
+      "children_count": 0,
+      "description": "Notifications alt+T",
+      "enabled": true,
+      "focused": false,
+      "ref": "e30",
+      "role": "AXGroup",
+      "role_description": "区域",
+      "selected": false,
+      "subrole": "AXLandmarkRegion"
+    }
+  ],
+  "elements_are_diff": true,
+  "menu_shortcuts": [
+    {
+      "combo": "cmd+opt+⎋",
+      "path": [
+        "Apple",
+        "强制退出…"
+      ]
+    },
+    {
+      "combo": "cmd+opt+shift+⎋",
+      "path": [
+        "Apple",
+        "强制退出“Electron”"
+      ]
+    },
+    {
+      "combo": "cmd+ctrl+q",
+      "path": [
+        "Apple",
+        "锁定屏幕"
+      ]
+    },
+    {
+      "combo": "cmd+shift+q",
+      "path": [
+        "Apple",
+        "退出登录“lu”…"
+      ]
+    },
+    {
+      "combo": "cmd+opt+shift+q",
+      "path": [
+        "Apple",
+        "退出登录“lu”"
+      ]
+    },
+    {
+      "combo": "cmd+,",
+      "path": [
+        "Electron",
+        "Preferences…"
+      ]
+    },
+    {
+      "combo": "cmd+h",
+      "path": [
+        "Electron",
+        "Hide WiseStudio"
+      ]
+    },
+    {
+      "combo": "cmd+opt+h",
+      "path": [
+        "Electron",
+        "Hide Others"
+      ]
+    },
+    {
+      "combo": "cmd+q",
+      "path": [
+        "Electron",
+        "Quit WiseStudio"
+      ]
+    },
+    {
+      "combo": "cmd+opt+q",
+      "path": [
+        "Electron",
+        "退出并保留窗口"
+      ]
+    },
+    {
+      "combo": "cmd+n",
+      "path": [
+        "File",
+        "New Document"
+      ]
+    },
+    {
+      "combo": "cmd+o",
+      "path": [
+        "File",
+        "Open…"
+      ]
+    },
+    {
+      "combo": "cmd+s",
+      "path": [
+        "File",
+        "Save"
+      ]
+    },
+    {
+      "combo": "cmd+shift+s",
+      "path": [
+        "File",
+        "Save As…"
+      ]
+    },
+    {
+      "combo": "cmd+w",
+      "path": [
+        "File",
+        "Close Window"
+      ]
+    },
+    {
+      "combo": "cmd+opt+w",
+      "path": [
+        "File",
+        "全部关闭"
+      ]
+    },
+    {
+      "combo": "cmd+z",
+      "path": [
+        "Edit",
+        "Undo"
+      ]
+    },
+    {
+      "combo": "cmd+shift+z",
+      "path": [
+        "Edit",
+        "Redo"
+      ]
+    },
+    {
+      "combo": "cmd+x",
+      "path": [
+        "Edit",
+        "Cut"
+      ]
+    },
+    {
+      "combo": "cmd+c",
+      "path": [
+        "Edit",
+        "Copy"
+      ]
+    },
+    {
+      "combo": "cmd+v",
+      "path": [
+        "Edit",
+        "Paste"
+      ]
+    },
+    {
+      "combo": "cmd+opt+shift+v",
+      "path": [
+        "Edit",
+        "Paste and Match Style"
+      ]
+    },
+    {
+      "combo": "cmd+a",
+      "path": [
+        "Edit",
+        "Select All"
+      ]
+    },
+    {
+      "combo": "🎤",
+      "path": [
+        "Edit",
+        "开始听写…"
+      ]
+    },
+    {
+      "combo": "🌐",
+      "path": [
+        "Edit",
+        "表情与符号"
+      ]
+    },
+    {
+      "combo": "cmd+r",
+      "path": [
+        "View",
+        "Reload"
+      ]
+    },
+    {
+      "combo": "cmd+shift+r",
+      "path": [
+        "View",
+        "Force Reload"
+      ]
+    },
+    {
+      "combo": "cmd+opt+i",
+      "path": [
+        "View",
+        "Toggle Developer Tools"
+      ]
+    },
+    {
+      "combo": "cmd+0",
+      "path": [
+        "View",
+        "Actual Size"
+      ]
+    },
+    {
+      "combo": "cmd++",
+      "path": [
+        "View",
+        "Zoom In"
+      ]
+    },
+    {
+      "combo": "cmd+-",
+      "path": [
+        "View",
+        "Zoom Out"
+      ]
+    },
+    {
+      "combo": "f",
+      "path": [
+        "View",
+        "Toggle Full Screen"
+      ]
+    },
+    {
+      "combo": "cmd+m",
+      "path": [
+        "Window",
+        "Minimize"
+      ]
+    }
+  ],
+  "snapshot_id": "s_2026-10-09T124835Z",
+  "unchanged_element_count": 4,
+  "wakeup_attempts": 1,
+  "wakeup_duration_ms": 0,
+  "window": {
+    "bounds": {
+      "h": 874,
+      "w": 1309,
+      "x": 156,
+      "y": 33
+    },
+    "id": 234415,
+    "title": "WiseStudio"
+  }
+}

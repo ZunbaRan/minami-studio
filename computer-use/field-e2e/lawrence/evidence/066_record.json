@@ -1,0 +1,25 @@
+{
+  "number": 66,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/066_agent-codex-config.mov",
+  "capture_pid": 65216,
+  "start": 1791551388.0449111,
+  "seconds": 8,
+  "status": "success",
+  "element": "新建智能体/Codex配置",
+  "method": "click ref=e2216 strategy=ax",
+  "effect": "进入名称、角色、模型、提示词、描述配置；未填写或创建",
+  "media": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2754,
+        "height": 1884
+      }
+    ],
+    "format": {
+      "duration": "8.141667"
+    }
+  }
+}

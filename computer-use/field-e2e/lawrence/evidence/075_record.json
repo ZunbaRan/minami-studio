@@ -1,0 +1,25 @@
+{
+  "number": 75,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/075_applications.mov",
+  "capture_pid": 67519,
+  "start": 1791551727.358867,
+  "seconds": 8,
+  "status": "success",
+  "element": "主侧栏/运行总览",
+  "method": "click ref=e2916 strategy=ax",
+  "effect": "九宫格入口实际为运行总览：智能体、任务、成本、活动和时间范围筛选",
+  "media": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2754,
+        "height": 1884
+      }
+    ],
+    "format": {
+      "duration": "8.010000"
+    }
+  }
+}

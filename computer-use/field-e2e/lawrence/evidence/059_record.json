@@ -1,0 +1,25 @@
+{
+  "number": 59,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/059_task-board.mov",
+  "capture_pid": 63421,
+  "start": 1791551157.179373,
+  "seconds": 8,
+  "status": "success",
+  "element": "主侧栏/任务生命周期",
+  "method": "click ref=e1418 strategy=ax",
+  "effect": "离开会话侧栏，显示任务列表/计划任务、工作区筛选、新建及状态分类",
+  "media": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2754,
+        "height": 1884
+      }
+    ],
+    "format": {
+      "duration": "8.100000"
+    }
+  }
+}

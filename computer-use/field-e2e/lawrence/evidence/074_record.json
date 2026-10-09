@@ -1,0 +1,25 @@
+{
+  "number": 74,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/074_data-redaction.mov",
+  "capture_pid": 67362,
+  "start": 1791551686.16105,
+  "seconds": 8,
+  "status": "success",
+  "element": "数据保护/数据脱敏",
+  "method": "click ref=e2947 strategy=ax",
+  "effect": "显示文件脱敏、文本脱敏、文件还原、文本还原四入口；未处理真实文档",
+  "media": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2754,
+        "height": 1884
+      }
+    ],
+    "format": {
+      "duration": "8.146667"
+    }
+  }
+}

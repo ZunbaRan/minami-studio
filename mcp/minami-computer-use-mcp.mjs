@@ -1671,6 +1671,89 @@ defTool(
   }
 );
 
+// ---------- Minami product-layer tools (not in Alma's 23-tool surface) ----------
+// Picture-in-Picture mirror control. The daemon protocol is unchanged Alma
+// wire; these five MCP tools are our own product surface so agents can open
+// mirrors on request instead of requiring socket-level orchestration.
+
+defTool(
+  "pip_open",
+  "Open a floating Picture-in-Picture mirror of an app window — a live, always-on-top video of that window. Works on background, occluded, or minimized windows (ScreenCaptureKit captures the texture regardless of visibility). Identify the window by window_id (from get_app_state window.id) directly, or by bundle/pid plus optional title to pick a window. Optional width/height set the floater size.",
+  {
+    window_id: { type: "integer", description: "CGWindowID of the window to mirror (from get_app_state window.id). Direct path — no bundle/pid needed." },
+    bundle: { type: "string", description: "Bundle id — resolves the app and picks its window (title filters the pick)." },
+    pid: { type: "integer", description: "Process id — same resolution as bundle." },
+    title: { type: "string", description: "Window-title filter when resolving by app, and the floater's display title." },
+    width: { type: "number", description: "Preferred floater width in points." },
+    height: { type: "number", description: "Preferred floater height in points." }
+  },
+  [],
+  async (args) => gated("pip_open", args, async () => {
+    const res = await daemon.call("pip_open", {
+      window_id: args.window_id, pid: args.pid, bundle: args.bundle,
+      title: args.title, width: args.width, height: args.height
+    });
+    return { content: [textBlock(JSON.stringify(res, null, 2))] };
+  })
+);
+
+defTool(
+  "pip_close",
+  "Close a PiP mirror. Pass window_id for one session, or all:true to close every session.",
+  {
+    window_id: { type: "integer", description: "CGWindowID whose PiP session to close." },
+    all: { type: "boolean", description: "Close all PiP sessions." }
+  },
+  [],
+  async (args) => gated("pip_close", args, async () => {
+    const res = await daemon.call("pip_close", { window_id: args.window_id, all: args.all });
+    return { content: [textBlock(JSON.stringify(res, null, 2))] };
+  })
+);
+
+defTool(
+  "pip_status",
+  "List live PiP mirror sessions (window_id, floater frame, first-frame status, frame age) and currently armed windows.",
+  {},
+  [],
+  async () => {
+    const res = await daemon.call("pip_status", {});
+    return { content: [textBlock(JSON.stringify(res, null, 2))] };
+  }
+);
+
+defTool(
+  "pip_arm",
+  "Arm a window so that when the USER minimizes it, a PiP mirror pops open automatically (then disarms). Edge-triggered: the arm only fires on the minimize transition — an already-minimized window must be restored and minimized again to trigger. This is the 'minimize → floating mirror' product gesture; nothing happens until the user minimizes. Direct path needs window_id AND pid; or resolve by bundle/pid + title.",
+  {
+    window_id: { type: "integer", description: "CGWindowID to arm (requires pid too on the direct path)." },
+    bundle: { type: "string", description: "Bundle id — resolves the app and picks its window (title filters)." },
+    pid: { type: "integer", description: "Process id of the window's owner." },
+    title: { type: "string", description: "Title stored on the arm entry (empty allowed); also filters the app-window pick." }
+  },
+  [],
+  async (args) => gated("pip_arm", args, async () => {
+    const res = await daemon.call("pip_arm", {
+      window_id: args.window_id, pid: args.pid, bundle: args.bundle, title: args.title
+    });
+    return { content: [textBlock(JSON.stringify(res, null, 2))] };
+  })
+);
+
+defTool(
+  "pip_disarm",
+  "Remove a PiP arm entry. Pass window_id, or all:true to disarm everything.",
+  {
+    window_id: { type: "integer", description: "CGWindowID to disarm." },
+    all: { type: "boolean", description: "Disarm all armed windows." }
+  },
+  [],
+  async (args) => gated("pip_disarm", args, async () => {
+    const res = await daemon.call("pip_disarm", { window_id: args.window_id, all: args.all });
+    return { content: [textBlock(JSON.stringify(res, null, 2))] };
+  })
+);
+
 // ---------- minimal MCP stdio transport ----------
 // Auto-detects framing like the SDK's StdioServerTransport: accepts both
 // Content-Length headers and bare newline-delimited JSON (what codex sends),
@@ -1687,6 +1770,7 @@ const INSTRUCTIONS = [
   "HARD RULE: never take the user's foreground app, key window, or cursor — not even momentarily,",
   "and never by bringing a window forward and putting it back. Every verb works on a background app; nothing here needs the foreground.",
   "Never activate, raise, or otherwise front an app on your own initiative. If an action reports it could not be delivered, tell the user — do not reach for the foreground to force it through.",
+  "PiP mirrors: pip_open/pip_close/pip_status/pip_arm/pip_disarm manage live floating window mirrors; pip_arm makes the user's own minimize gesture spawn a mirror.",
   "Field-tested playbooks: call the Skill tool with a computer-use doc name, or read skill://computer-use resources."
 ].join(" ");
 

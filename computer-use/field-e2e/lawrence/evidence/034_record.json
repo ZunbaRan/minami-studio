@@ -1,0 +1,25 @@
+{
+  "number": 34,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/034_general-settings-ax.mov",
+  "capture_pid": 53707,
+  "start": 1791550343.411097,
+  "seconds": 8,
+  "status": "success",
+  "element": "设置/通用（AX恢复）",
+  "method": "click ref=e222 strategy=ax",
+  "effect": "显示开机自启动、每月备份、版本更新、OpenTelemetry；现有配置只读",
+  "media": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2754,
+        "height": 1884
+      }
+    ],
+    "format": {
+      "duration": "8.106667"
+    }
+  }
+}

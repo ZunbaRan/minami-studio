@@ -1,0 +1,25 @@
+{
+  "number": 43,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/043_voice-settings.mov",
+  "capture_pid": 58416,
+  "start": 1791550633.143046,
+  "seconds": 8,
+  "status": "success",
+  "element": "设置/语音",
+  "method": "click ref=e233 strategy=ax",
+  "effect": "显示Whisper引擎、快速/优化/翻译、语言和模型下载；配置与模型未改",
+  "media": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2754,
+        "height": 1884
+      }
+    ],
+    "format": {
+      "duration": "8.213333"
+    }
+  }
+}

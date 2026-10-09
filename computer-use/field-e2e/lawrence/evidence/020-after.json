@@ -1,0 +1,337 @@
+{
+  "app": {
+    "bundle": "com.github.Electron",
+    "name": "Electron",
+    "pid": 86359
+  },
+  "ax_status": "populated",
+  "elements": [
+    {
+      "actions": [
+        "AXRaise"
+      ],
+      "bounds": {
+        "h": 874,
+        "w": 1309,
+        "x": 156,
+        "y": 33
+      },
+      "children_count": 4,
+      "enabled": true,
+      "focused": false,
+      "ref": "e14",
+      "role": "AXWindow",
+      "role_description": "标准窗口",
+      "subrole": "AXStandardWindow",
+      "title": "WiseStudio"
+    },
+    {
+      "actions": [
+        "AXPress"
+      ],
+      "bounds": {
+        "h": 16,
+        "w": 16,
+        "x": 164,
+        "y": 41
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e2",
+      "role": "AXButton",
+      "role_description": "关闭按钮",
+      "subrole": "AXCloseButton"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXZoomWindow",
+        "AXShowMenu"
+      ],
+      "bounds": {
+        "h": 16,
+        "w": 16,
+        "x": 210,
+        "y": 41
+      },
+      "children_count": 1,
+      "description": "此按钮也可以执行缩放窗口的操作",
+      "enabled": true,
+      "focused": false,
+      "ref": "e3",
+      "role": "AXButton",
+      "role_description": "全屏幕按钮",
+      "subrole": "AXFullScreenButton"
+    },
+    {
+      "actions": [
+        "AXPress"
+      ],
+      "bounds": {
+        "h": 16,
+        "w": 16,
+        "x": 187,
+        "y": 41
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e4",
+      "role": "AXButton",
+      "role_description": "最小化按钮",
+      "subrole": "AXMinimizeButton"
+    }
+  ],
+  "elements_are_diff": true,
+  "menu_shortcuts": [
+    {
+      "combo": "cmd+opt+⎋",
+      "path": [
+        "Apple",
+        "强制退出…"
+      ]
+    },
+    {
+      "combo": "cmd+opt+shift+⎋",
+      "path": [
+        "Apple",
+        "强制退出“Electron”"
+      ]
+    },
+    {
+      "combo": "cmd+ctrl+q",
+      "path": [
+        "Apple",
+        "锁定屏幕"
+      ]
+    },
+    {
+      "combo": "cmd+shift+q",
+      "path": [
+        "Apple",
+        "退出登录“lu”…"
+      ]
+    },
+    {
+      "combo": "cmd+opt+shift+q",
+      "path": [
+        "Apple",
+        "退出登录“lu”"
+      ]
+    },
+    {
+      "combo": "cmd+,",
+      "path": [
+        "Electron",
+        "Preferences…"
+      ]
+    },
+    {
+      "combo": "cmd+h",
+      "path": [
+        "Electron",
+        "Hide WiseStudio"
+      ]
+    },
+    {
+      "combo": "cmd+opt+h",
+      "path": [
+        "Electron",
+        "Hide Others"
+      ]
+    },
+    {
+      "combo": "cmd+q",
+      "path": [
+        "Electron",
+        "Quit WiseStudio"
+      ]
+    },
+    {
+      "combo": "cmd+opt+q",
+      "path": [
+        "Electron",
+        "退出并保留窗口"
+      ]
+    },
+    {
+      "combo": "cmd+n",
+      "path": [
+        "File",
+        "New Document"
+      ]
+    },
+    {
+      "combo": "cmd+o",
+      "path": [
+        "File",
+        "Open…"
+      ]
+    },
+    {
+      "combo": "cmd+s",
+      "path": [
+        "File",
+        "Save"
+      ]
+    },
+    {
+      "combo": "cmd+shift+s",
+      "path": [
+        "File",
+        "Save As…"
+      ]
+    },
+    {
+      "combo": "cmd+w",
+      "path": [
+        "File",
+        "Close Window"
+      ]
+    },
+    {
+      "combo": "cmd+opt+w",
+      "path": [
+        "File",
+        "全部关闭"
+      ]
+    },
+    {
+      "combo": "cmd+z",
+      "path": [
+        "Edit",
+        "Undo"
+      ]
+    },
+    {
+      "combo": "cmd+shift+z",
+      "path": [
+        "Edit",
+        "Redo"
+      ]
+    },
+    {
+      "combo": "cmd+x",
+      "path": [
+        "Edit",
+        "Cut"
+      ]
+    },
+    {
+      "combo": "cmd+c",
+      "path": [
+        "Edit",
+        "Copy"
+      ]
+    },
+    {
+      "combo": "cmd+v",
+      "path": [
+        "Edit",
+        "Paste"
+      ]
+    },
+    {
+      "combo": "cmd+opt+shift+v",
+      "path": [
+        "Edit",
+        "Paste and Match Style"
+      ]
+    },
+    {
+      "combo": "cmd+a",
+      "path": [
+        "Edit",
+        "Select All"
+      ]
+    },
+    {
+      "combo": "🎤",
+      "path": [
+        "Edit",
+        "开始听写…"
+      ]
+    },
+    {
+      "combo": "🌐",
+      "path": [
+        "Edit",
+        "表情与符号"
+      ]
+    },
+    {
+      "combo": "cmd+r",
+      "path": [
+        "View",
+        "Reload"
+      ]
+    },
+    {
+      "combo": "cmd+shift+r",
+      "path": [
+        "View",
+        "Force Reload"
+      ]
+    },
+    {
+      "combo": "cmd+opt+i",
+      "path": [
+        "View",
+        "Toggle Developer Tools"
+      ]
+    },
+    {
+      "combo": "cmd+0",
+      "path": [
+        "View",
+        "Actual Size"
+      ]
+    },
+    {
+      "combo": "cmd++",
+      "path": [
+        "View",
+        "Zoom In"
+      ]
+    },
+    {
+      "combo": "cmd+-",
+      "path": [
+        "View",
+        "Zoom Out"
+      ]
+    },
+    {
+      "combo": "f",
+      "path": [
+        "View",
+        "Toggle Full Screen"
+      ]
+    },
+    {
+      "combo": "cmd+m",
+      "path": [
+        "Window",
+        "Minimize"
+      ]
+    }
+  ],
+  "removed_refs": [
+    "e16"
+  ],
+  "snapshot_id": "s_2026-10-09T124428Z",
+  "unchanged_element_count": 0,
+  "wakeup_attempts": 1,
+  "wakeup_duration_ms": 0,
+  "window": {
+    "bounds": {
+      "h": 874,
+      "w": 1309,
+      "x": 156,
+      "y": 33
+    },
+    "id": 234415,
+    "title": "WiseStudio"
+  }
+}

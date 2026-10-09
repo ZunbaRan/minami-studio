@@ -1,0 +1,29 @@
+{
+  "operations": 80,
+  "success": 61,
+  "failure": 19,
+  "clips_duration_sum_seconds": 496.7033369999999,
+  "window_id": 234415,
+  "pid": 86359,
+  "video": "out/lawrence-tour.mov",
+  "video_duration_seconds": 496.711979,
+  "video_size_bytes": 121065148,
+  "failure_categories": {
+    "无效果": 16,
+    "报错": 2,
+    "suppressed": 1
+  },
+  "successful_dialog_cancellations": 5,
+  "exhaustive": false,
+  "stop_reason": "80-operation budget reached",
+  "original_route_restored": true,
+  "target_bounds_unchanged_in_observations": true,
+  "foreground_cursor_anomaly": "076: origin undetermined; paused until read-only check showed Paseo foreground again",
+  "final_runtime_difference": "Email wise channel: Command failed; existing channel controls were not operated",
+  "skill": "skills/lawrence-exploration/SKILL.md",
+  "video_decode_exit": 0,
+  "video_decode_log_bytes": 0,
+  "visual_qa_clips": 61,
+  "skill_path": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/skills/lawrence-exploration/SKILL.md",
+  "final_screenshot": "evidence/final-clean.jpg"
+}

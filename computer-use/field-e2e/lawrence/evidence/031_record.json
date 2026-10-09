@@ -1,0 +1,25 @@
+{
+  "number": 31,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/031_whitelist-set-search.mov",
+  "capture_pid": 51855,
+  "start": 1791550250.716898,
+  "seconds": 8,
+  "status": "success",
+  "element": "白名单/测试搜索（AXValue）",
+  "method": "set_value ref=e453 codex-tour-01",
+  "effect": "搜索框落字、联系人结果变为0；set_value 比 type_text 稳定",
+  "media": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2754,
+        "height": 1884
+      }
+    ],
+    "format": {
+      "duration": "8.156667"
+    }
+  }
+}

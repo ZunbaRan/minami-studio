@@ -1,0 +1,25 @@
+{
+  "number": 80,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/080_restore-original-gateway.mov",
+  "capture_pid": 69370,
+  "start": 1791551972.679862,
+  "seconds": 8,
+  "status": "success",
+  "element": "清理/恢复原网关页面",
+  "method": "click ref=e4180 strategy=ax",
+  "effect": "恢复网关→渠道→自定义渠道/全部；无弹窗。邮箱末态为Command failed，与初始在线不同，未操作现有账户连接开关",
+  "media": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2754,
+        "height": 1884
+      }
+    ],
+    "format": {
+      "duration": "8.086667"
+    }
+  }
+}

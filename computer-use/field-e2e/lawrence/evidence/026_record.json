@@ -1,0 +1,25 @@
+{
+  "number": 26,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/026_cancel-upload-ax.mov",
+  "capture_pid": 49677,
+  "start": 1791550088.405781,
+  "seconds": 8,
+  "status": "success",
+  "element": "上传文件弹窗/取消（AX）",
+  "method": "click ref=e163 strategy=ax",
+  "effect": "弹窗取消：原生文件选择框关闭；未上传任何文件",
+  "media": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2754,
+        "height": 1884
+      }
+    ],
+    "format": {
+      "duration": "8.181667"
+    }
+  }
+}

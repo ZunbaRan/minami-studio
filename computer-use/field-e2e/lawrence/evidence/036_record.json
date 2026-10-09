@@ -1,0 +1,25 @@
+{
+  "number": 36,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/036_workspace-location-options.mov",
+  "capture_pid": 54752,
+  "start": 1791550406.8353658,
+  "seconds": 8,
+  "status": "success",
+  "element": "工作区位置/下拉",
+  "method": "click ref=e798 strategy=ax",
+  "effect": "展开当前路径和自定义入口；未选择新目录",
+  "media": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2754,
+        "height": 1884
+      }
+    ],
+    "format": {
+      "duration": "8.210000"
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "number": 15,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/015_gateway-whitelist.mov",
+  "capture_pid": 43367,
+  "start": 1791549696.381294,
+  "seconds": 8,
+  "status": "fail",
+  "element": "网关/白名单",
+  "method": "click screen ← screenshot(362,190)",
+  "effect": "无效果：仅文字呈悬停样式，内容仍是渠道页"
+}

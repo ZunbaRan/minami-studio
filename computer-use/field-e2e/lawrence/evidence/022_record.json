@@ -1,0 +1,25 @@
+{
+  "number": 22,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/022_avatar-menu.mov",
+  "capture_pid": 46857,
+  "start": 1791549926.441396,
+  "seconds": 8,
+  "status": "success",
+  "element": "主侧栏/头像",
+  "method": "click screen ← screenshot(40,98)",
+  "effect": "打开数字形象选择页；可见8种形象、名称编辑、上传自定义头像、关闭；未更换形象",
+  "media": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2754,
+        "height": 1884
+      }
+    ],
+    "format": {
+      "duration": "8.201667"
+    }
+  }
+}

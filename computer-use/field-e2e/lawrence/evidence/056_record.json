@@ -1,0 +1,25 @@
+{
+  "number": 56,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/056_conversation-files-pane.mov",
+  "capture_pid": 62606,
+  "start": 1791551044.675787,
+  "seconds": 8,
+  "status": "success",
+  "element": "会话/文件侧栏",
+  "method": "click ref=e1431 strategy=ax",
+  "effect": "关闭MCP弹层并打开文件/Skills侧栏，显示工作区文件；未编辑文件",
+  "media": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2754,
+        "height": 1884
+      }
+    ],
+    "format": {
+      "duration": "8.125000"
+    }
+  }
+}

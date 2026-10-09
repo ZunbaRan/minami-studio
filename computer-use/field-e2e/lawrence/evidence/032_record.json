@@ -1,0 +1,25 @@
+{
+  "number": 32,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/032_clear-whitelist-search.mov",
+  "capture_pid": 52289,
+  "start": 1791550287.9359622,
+  "seconds": 8,
+  "status": "success",
+  "element": "白名单/清空测试搜索",
+  "method": "set_value ref=e453 空串",
+  "effect": "测试词已清除，恢复原7名联系人",
+  "media": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2754,
+        "height": 1884
+      }
+    ],
+    "format": {
+      "duration": "8.105000"
+    }
+  }
+}

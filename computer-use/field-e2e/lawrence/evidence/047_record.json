@@ -1,0 +1,25 @@
+{
+  "number": 47,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/047_collapse-docker-services.mov",
+  "capture_pid": 59685,
+  "start": 1791550753.904005,
+  "seconds": 8,
+  "status": "success",
+  "element": "系统/Docker服务折叠",
+  "method": "click ref=e1168 strategy=ax",
+  "effect": "收起服务卡片，露出主机服务、数据、日志及环境区域",
+  "media": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2754,
+        "height": 1884
+      }
+    ],
+    "format": {
+      "duration": "8.175000"
+    }
+  }
+}

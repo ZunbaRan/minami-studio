@@ -1,0 +1,25 @@
+{
+  "number": 7,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/007_add-email.mov",
+  "capture_pid": 41416,
+  "start": 1791549487.096071,
+  "seconds": 8,
+  "status": "success",
+  "element": "添加账户/Email",
+  "method": "click screen(973.12,227.30)",
+  "effect": "显示 Chatwoot 邮箱导入、刷新列表、Gmail/Apple/Yahoo/163/QQ/Outlook模板、邮箱凭据",
+  "media": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2754,
+        "height": 1884
+      }
+    ],
+    "format": {
+      "duration": "8.183333"
+    }
+  }
+}

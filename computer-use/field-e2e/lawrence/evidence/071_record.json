@@ -1,0 +1,25 @@
+{
+  "number": 71,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/071_data-protection.mov",
+  "capture_pid": 66829,
+  "start": 1791551588.127351,
+  "seconds": 8,
+  "status": "success",
+  "element": "上下文治理/数据保护",
+  "method": "click ref=e2429 strategy=ax",
+  "effect": "显示识别规则、智能识别、快速扫描、数据脱敏、上传和手动规则入口；未改全局脱敏",
+  "media": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2754,
+        "height": 1884
+      }
+    ],
+    "format": {
+      "duration": "8.165000"
+    }
+  }
+}

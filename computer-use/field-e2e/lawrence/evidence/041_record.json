@@ -1,0 +1,25 @@
+{
+  "number": 41,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/041_cancel-provider-api-key.mov",
+  "capture_pid": 56539,
+  "start": 1791550548.724263,
+  "seconds": 8,
+  "status": "success",
+  "element": "API密钥配置/取消",
+  "method": "click ref=e974 strategy=ax",
+  "effect": "弹窗取消：返回服务商列表，已配置数量仍1",
+  "media": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2754,
+        "height": 1884
+      }
+    ],
+    "format": {
+      "duration": "8.021667"
+    }
+  }
+}

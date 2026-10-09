@@ -1,0 +1,25 @@
+{
+  "number": 33,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/033_email-whitelist.mov",
+  "capture_pid": 52650,
+  "start": 1791550319.431224,
+  "seconds": 8,
+  "status": "success",
+  "element": "网关/邮箱白名单",
+  "method": "click ref=e428 strategy=ax",
+  "effect": "显示精确邮箱和域名规则、添加/单项删除/清空全部；写入类按钮只读",
+  "media": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2754,
+        "height": 1884
+      }
+    ],
+    "format": {
+      "duration": "8.161667"
+    }
+  }
+}

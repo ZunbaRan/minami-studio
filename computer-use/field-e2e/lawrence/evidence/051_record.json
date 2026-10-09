@@ -1,0 +1,25 @@
+{
+  "number": 51,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/051_collapse-data-connections.mov",
+  "capture_pid": 60486,
+  "start": 1791550869.536469,
+  "seconds": 8,
+  "status": "success",
+  "element": "系统/数据与连接折叠",
+  "method": "click ref=e1202 strategy=ax",
+  "effect": "收起连接信息，露出日志入口",
+  "media": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2754,
+        "height": 1884
+      }
+    ],
+    "format": {
+      "duration": "8.070000"
+    }
+  }
+}

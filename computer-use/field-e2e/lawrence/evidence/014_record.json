@@ -1,0 +1,11 @@
+{
+  "number": 14,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/014_gateway-integrations-retry.mov",
+  "capture_pid": 42811,
+  "start": 1791549666.3823302,
+  "seconds": 8,
+  "status": "fail",
+  "element": "网关/集成重试",
+  "method": "click_count=2 screen ← screenshot(356,150)",
+  "effect": "无效果：重试后仍为渠道页，停止重复"
+}

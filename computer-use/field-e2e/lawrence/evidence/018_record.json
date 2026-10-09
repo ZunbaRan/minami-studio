@@ -1,0 +1,11 @@
+{
+  "number": 18,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/018_menu-open.mov",
+  "capture_pid": 45114,
+  "start": 1791549786.842718,
+  "seconds": 8,
+  "status": "fail",
+  "element": "File/Open…",
+  "method": "press_key cmd+o",
+  "effect": "无效果：menu_ax_press 已投递，无打开对话框"
+}

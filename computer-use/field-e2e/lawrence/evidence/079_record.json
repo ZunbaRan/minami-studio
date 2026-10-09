@@ -1,0 +1,25 @@
+{
+  "number": 79,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/079_restore-settings.mov",
+  "capture_pid": 69229,
+  "start": 1791551947.9950368,
+  "seconds": 8,
+  "status": "success",
+  "element": "清理/返回设置",
+  "method": "click ref=e3455 strategy=ax",
+  "effect": "退出活动页，返回设置；无对话框",
+  "media": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2754,
+        "height": 1884
+      }
+    ],
+    "format": {
+      "duration": "8.091667"
+    }
+  }
+}

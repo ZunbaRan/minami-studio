@@ -1,0 +1,25 @@
+{
+  "number": 72,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/072_data-smart-recognition.mov",
+  "capture_pid": 66981,
+  "start": 1791551632.517534,
+  "seconds": 8,
+  "status": "success",
+  "element": "数据保护/智能识别",
+  "method": "click ref=e2945 strategy=ax",
+  "effect": "显示选择文件并发送开始分析、指令输入和禁用扫描按钮；未发送",
+  "media": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2754,
+        "height": 1884
+      }
+    ],
+    "format": {
+      "duration": "8.111667"
+    }
+  }
+}

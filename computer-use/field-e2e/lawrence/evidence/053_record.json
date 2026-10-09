@@ -1,0 +1,25 @@
+{
+  "number": 53,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/053_logs-errors-only.mov",
+  "capture_pid": 60843,
+  "start": 1791550927.9306061,
+  "seconds": 8,
+  "status": "success",
+  "element": "系统/日志仅错误筛选",
+  "method": "click ref=e1351 strategy=ax",
+  "effect": "日志列表切换为暂无日志，未修改服务状态",
+  "media": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2754,
+        "height": 1884
+      }
+    ],
+    "format": {
+      "duration": "8.173333"
+    }
+  }
+}

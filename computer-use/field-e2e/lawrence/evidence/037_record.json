@@ -1,0 +1,25 @@
+{
+  "number": 37,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/037_provider-settings.mov",
+  "capture_pid": 55092,
+  "start": 1791550437.889398,
+  "seconds": 8,
+  "status": "success",
+  "element": "设置/服务商",
+  "method": "click ref=e226 strategy=ax",
+  "effect": "关闭工作区下拉并进入 Claude Code 状态页；登录/文档会离开目标窗口，未执行",
+  "media": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2754,
+        "height": 1884
+      }
+    ],
+    "format": {
+      "duration": "8.133333"
+    }
+  }
+}

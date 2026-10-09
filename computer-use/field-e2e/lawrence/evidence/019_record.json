@@ -1,0 +1,11 @@
+{
+  "number": 19,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/019_main-inbox.mov",
+  "capture_pid": 45445,
+  "start": 1791549812.621053,
+  "seconds": 8,
+  "status": "fail",
+  "element": "主侧栏/收件箱图标",
+  "method": "click screen ← screenshot(38,189)",
+  "effect": "无效果：图标悬停，页面未导航"
+}

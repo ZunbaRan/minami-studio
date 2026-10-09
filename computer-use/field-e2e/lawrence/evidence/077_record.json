@@ -1,0 +1,25 @@
+{
+  "number": 77,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/077_analytics-activity.mov",
+  "capture_pid": 68947,
+  "start": 1791551874.507278,
+  "seconds": 8,
+  "status": "success",
+  "element": "运行总览/活动",
+  "method": "click ref=e3205 strategy=ax",
+  "effect": "后台进入活动列表，显示类型筛选和历史运行事件；未启动新运行",
+  "media": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2754,
+        "height": 1884
+      }
+    ],
+    "format": {
+      "duration": "8.113333"
+    }
+  }
+}

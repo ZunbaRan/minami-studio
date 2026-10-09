@@ -1,0 +1,25 @@
+{
+  "number": 57,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/057_conversation-skills-pane.mov",
+  "capture_pid": 62717,
+  "start": 1791551075.4893959,
+  "seconds": 8,
+  "status": "success",
+  "element": "会话侧栏/Skills",
+  "method": "click ref=e1689 strategy=ax",
+  "effect": "页签切换成功，显示加载动画与Refresh入口；内容加载受限",
+  "media": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2754,
+        "height": 1884
+      }
+    ],
+    "format": {
+      "duration": "8.203333"
+    }
+  }
+}

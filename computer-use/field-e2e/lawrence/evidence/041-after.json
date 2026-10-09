@@ -1,0 +1,4012 @@
+{
+  "app": {
+    "bundle": "com.github.Electron",
+    "name": "Electron",
+    "pid": 86359
+  },
+  "ax_status": "populated",
+  "elements": [
+    {
+      "actions": [
+        "AXRaise"
+      ],
+      "bounds": {
+        "h": 874,
+        "w": 1309,
+        "x": 156,
+        "y": 33
+      },
+      "children_count": 4,
+      "enabled": true,
+      "focused": false,
+      "ref": "e15",
+      "role": "AXWindow",
+      "role_description": "标准窗口",
+      "subrole": "AXStandardWindow",
+      "title": "WiseStudio"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 874,
+        "w": 1309,
+        "x": 156,
+        "y": 33
+      },
+      "children_count": 1,
+      "enabled": true,
+      "focused": true,
+      "ref": "e20",
+      "role": "AXWebArea",
+      "role_description": "HTML 内容",
+      "selected": false,
+      "title": "WiseStudio"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 874,
+        "w": 1309,
+        "x": 156,
+        "y": 33
+      },
+      "children_count": 4,
+      "enabled": true,
+      "focused": false,
+      "ref": "e21",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 1,
+        "w": 1,
+        "x": 156,
+        "y": 33
+      },
+      "children_count": 1,
+      "enabled": true,
+      "focused": false,
+      "ref": "e22",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 874,
+        "w": 1309,
+        "x": 156,
+        "y": 33
+      },
+      "children_count": 1,
+      "enabled": true,
+      "focused": false,
+      "ref": "e23",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 20,
+        "w": 1289,
+        "x": 176,
+        "y": 887
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e165",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 1,
+        "w": 1,
+        "x": 156,
+        "y": 33
+      },
+      "children_count": 1,
+      "enabled": true,
+      "focused": false,
+      "ref": "e977",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 1,
+        "w": 1,
+        "x": 156,
+        "y": 33
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e25",
+      "role": "AXGroup",
+      "role_description": "提醒",
+      "selected": false,
+      "subrole": "AXApplicationAlert"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 874,
+        "w": 1309,
+        "x": 156,
+        "y": 33
+      },
+      "children_count": 3,
+      "enabled": true,
+      "focused": false,
+      "ref": "e26",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 874,
+        "w": 80,
+        "x": 156,
+        "y": 33
+      },
+      "children_count": 1,
+      "enabled": true,
+      "focused": false,
+      "ref": "e27",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 874,
+        "w": 80,
+        "x": 156,
+        "y": 33
+      },
+      "children_count": 4,
+      "enabled": true,
+      "focused": false,
+      "ref": "e166",
+      "role": "AXGroup",
+      "role_description": "补充内容",
+      "selected": false,
+      "subrole": "AXLandmarkComplementary"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 108,
+        "w": 63,
+        "x": 164,
+        "y": 73
+      },
+      "children_count": 1,
+      "enabled": true,
+      "focused": false,
+      "ref": "e167",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 52,
+        "w": 52,
+        "x": 170,
+        "y": 105
+      },
+      "children_count": 4,
+      "enabled": true,
+      "focused": false,
+      "ref": "e168",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "阿玛拉"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 87,
+        "w": 83,
+        "x": 156,
+        "y": 88
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e169",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 63,
+        "w": 63,
+        "x": 164,
+        "y": 100
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e170",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 57,
+        "w": 57,
+        "x": 167,
+        "y": 103
+      },
+      "children_count": 1,
+      "enabled": true,
+      "focused": false,
+      "ref": "e171",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 57,
+        "w": 57,
+        "x": 167,
+        "y": 103
+      },
+      "children_count": 0,
+      "description": "阿玛拉",
+      "enabled": true,
+      "focused": false,
+      "ref": "e172",
+      "role": "AXImage",
+      "role_description": "图像",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 14,
+        "w": 14,
+        "x": 208,
+        "y": 143
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e173",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 219,
+        "w": 79,
+        "x": 156,
+        "y": 206
+      },
+      "children_count": 5,
+      "enabled": true,
+      "focused": false,
+      "ref": "e174",
+      "role": "AXGroup",
+      "role_description": "导航",
+      "selected": false,
+      "subrole": "AXLandmarkNavigation"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 40,
+        "w": 40,
+        "x": 176,
+        "y": 206
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e175",
+      "role": "AXLink",
+      "role_description": "链接",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 40,
+        "w": 40,
+        "x": 176,
+        "y": 259
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e176",
+      "role": "AXLink",
+      "role_description": "链接",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 40,
+        "w": 40,
+        "x": 176,
+        "y": 301
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e177",
+      "role": "AXLink",
+      "role_description": "链接",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 40,
+        "w": 40,
+        "x": 176,
+        "y": 343
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e178",
+      "role": "AXLink",
+      "role_description": "链接",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 40,
+        "w": 40,
+        "x": 176,
+        "y": 385
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e179",
+      "role": "AXLink",
+      "role_description": "链接",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 40,
+        "w": 40,
+        "x": 176,
+        "y": 815
+      },
+      "children_count": 1,
+      "enabled": true,
+      "focused": false,
+      "ref": "e180",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 40,
+        "w": 40,
+        "x": 176,
+        "y": 815
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e181",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 40,
+        "w": 40,
+        "x": 176,
+        "y": 859
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e182",
+      "role": "AXLink",
+      "role_description": "链接",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 874,
+        "w": 1229,
+        "x": 236,
+        "y": 33
+      },
+      "children_count": 2,
+      "enabled": true,
+      "focused": false,
+      "ref": "e28",
+      "role": "AXGroup",
+      "role_description": "主体内容",
+      "selected": false,
+      "subrole": "AXLandmarkMain"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 834,
+        "w": 224,
+        "x": 236,
+        "y": 73
+      },
+      "children_count": 8,
+      "enabled": true,
+      "focused": false,
+      "ref": "e221",
+      "role": "AXGroup",
+      "role_description": "导航",
+      "selected": false,
+      "subrole": "AXLandmarkNavigation"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 36,
+        "w": 191,
+        "x": 252,
+        "y": 89
+      },
+      "children_count": 1,
+      "description": "通用",
+      "enabled": true,
+      "focused": false,
+      "ref": "e222",
+      "role": "AXLink",
+      "role_description": "链接",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 15,
+        "w": 27,
+        "x": 292,
+        "y": 100
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e223",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "通用"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 36,
+        "w": 191,
+        "x": 252,
+        "y": 129
+      },
+      "children_count": 1,
+      "description": "工作区",
+      "enabled": true,
+      "focused": false,
+      "ref": "e224",
+      "role": "AXLink",
+      "role_description": "链接",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 15,
+        "w": 40,
+        "x": 292,
+        "y": 140
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e225",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "工作区"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 36,
+        "w": 191,
+        "x": 252,
+        "y": 169
+      },
+      "children_count": 2,
+      "description": "服务商",
+      "enabled": true,
+      "focused": false,
+      "ref": "e226",
+      "role": "AXLink",
+      "role_description": "链接",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 36,
+        "w": 191,
+        "x": 252,
+        "y": 169
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e810",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 15,
+        "w": 40,
+        "x": 292,
+        "y": 180
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e227",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "服务商"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 36,
+        "w": 191,
+        "x": 252,
+        "y": 209
+      },
+      "children_count": 1,
+      "description": "频道智能体",
+      "enabled": true,
+      "focused": false,
+      "ref": "e228",
+      "role": "AXLink",
+      "role_description": "链接",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 15,
+        "w": 67,
+        "x": 292,
+        "y": 220
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e229",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "频道智能体"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 36,
+        "w": 191,
+        "x": 252,
+        "y": 249
+      },
+      "children_count": 1,
+      "description": "网关",
+      "enabled": true,
+      "focused": false,
+      "ref": "e230",
+      "role": "AXLink",
+      "role_description": "链接",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 15,
+        "w": 27,
+        "x": 292,
+        "y": 260
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e232",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "网关"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 36,
+        "w": 191,
+        "x": 252,
+        "y": 289
+      },
+      "children_count": 1,
+      "description": "语音",
+      "enabled": true,
+      "focused": false,
+      "ref": "e233",
+      "role": "AXLink",
+      "role_description": "链接",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 15,
+        "w": 27,
+        "x": 292,
+        "y": 300
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e234",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "语音"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 36,
+        "w": 191,
+        "x": 252,
+        "y": 329
+      },
+      "children_count": 1,
+      "description": "Web 配置",
+      "enabled": true,
+      "focused": false,
+      "ref": "e235",
+      "role": "AXLink",
+      "role_description": "链接",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 15,
+        "w": 58,
+        "x": 292,
+        "y": 340
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e236",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "Web 配置"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 36,
+        "w": 191,
+        "x": 252,
+        "y": 369
+      },
+      "children_count": 1,
+      "description": "系统",
+      "enabled": true,
+      "focused": false,
+      "ref": "e237",
+      "role": "AXLink",
+      "role_description": "链接",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 15,
+        "w": 27,
+        "x": 292,
+        "y": 380
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e238",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "系统"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 834,
+        "w": 1005,
+        "x": 460,
+        "y": 73
+      },
+      "children_count": 4,
+      "enabled": true,
+      "focused": false,
+      "ref": "e239",
+      "role": "AXGroup",
+      "role_description": "主体内容",
+      "selected": false,
+      "subrole": "AXLandmarkMain"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 36,
+        "w": 167,
+        "x": 472,
+        "y": 85
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e811",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "Claude Code"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 36,
+        "w": 167,
+        "x": 472,
+        "y": 125
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e812",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "Codex"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 36,
+        "w": 167,
+        "x": 472,
+        "y": 165
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e813",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "OpenCode"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 834,
+        "w": 813,
+        "x": 652,
+        "y": 73
+      },
+      "children_count": 126,
+      "enabled": true,
+      "focused": false,
+      "ref": "e830",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 20,
+        "w": 491,
+        "x": 771,
+        "y": 97
+      },
+      "children_count": 1,
+      "enabled": true,
+      "focused": false,
+      "ref": "e831",
+      "role": "AXGroup",
+      "role_description": "组",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 15,
+        "w": 491,
+        "x": 771,
+        "y": 100
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e832",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "OpenCode 是多服务商 AI 编程代理。为各模型服务商配置 API 密钥和 OAuth 授权。"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 36,
+        "w": 36,
+        "x": 1311,
+        "y": 97
+      },
+      "children_count": 0,
+      "description": "刷新",
+      "enabled": true,
+      "focused": false,
+      "ref": "e833",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 18,
+        "w": 576,
+        "x": 771,
+        "y": 157
+      },
+      "children_count": 1,
+      "enabled": true,
+      "focused": false,
+      "ref": "e834",
+      "role": "AXHeading",
+      "role_description": "标题",
+      "selected": false,
+      "title": "已配置 (1)",
+      "value": "3"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 14,
+        "w": 60,
+        "x": 771,
+        "y": 159
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e835",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "已配置 (1)"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 28,
+        "w": 28,
+        "x": 784,
+        "y": 198
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e836",
+      "role": "AXImage",
+      "role_description": "图像",
+      "selected": false,
+      "title": "DeepSeek"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 15,
+        "w": 63,
+        "x": 824,
+        "y": 195
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e837",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "DeepSeek"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 14,
+        "w": 38,
+        "x": 910,
+        "y": 195
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e838",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "已配置"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 14,
+        "w": 108,
+        "x": 824,
+        "y": 216
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e839",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "DeepSeek API 密钥"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 28,
+        "w": 28,
+        "x": 1210,
+        "y": 198
+      },
+      "children_count": 0,
+      "description": "查看文档",
+      "enabled": true,
+      "focused": false,
+      "ref": "e840",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 28,
+        "w": 28,
+        "x": 1242,
+        "y": 198
+      },
+      "children_count": 0,
+      "description": "测试连接",
+      "enabled": true,
+      "focused": false,
+      "ref": "e841",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 28,
+        "w": 28,
+        "x": 1274,
+        "y": 198
+      },
+      "children_count": 0,
+      "description": "更新 API 密钥",
+      "enabled": true,
+      "focused": false,
+      "ref": "e842",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 28,
+        "w": 28,
+        "x": 1306,
+        "y": 198
+      },
+      "children_count": 0,
+      "description": "移除",
+      "enabled": true,
+      "focused": false,
+      "ref": "e843",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 18,
+        "w": 576,
+        "x": 771,
+        "y": 267
+      },
+      "children_count": 1,
+      "enabled": true,
+      "focused": false,
+      "ref": "e844",
+      "role": "AXHeading",
+      "role_description": "标题",
+      "selected": false,
+      "title": "可用 (23)",
+      "value": "3"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 14,
+        "w": 57,
+        "x": 771,
+        "y": 269
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e845",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "可用 (23)"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 28,
+        "w": 28,
+        "x": 784,
+        "y": 308
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e846",
+      "role": "AXImage",
+      "role_description": "图像",
+      "selected": false,
+      "title": "OpenAI"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 15,
+        "w": 46,
+        "x": 824,
+        "y": 305
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e847",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "OpenAI"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 14,
+        "w": 153,
+        "x": 824,
+        "y": 326
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e848",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "ChatGPT Plus/Pro 订阅登录"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 28,
+        "w": 28,
+        "x": 1164,
+        "y": 308
+      },
+      "children_count": 0,
+      "description": "查看文档",
+      "enabled": true,
+      "focused": false,
+      "ref": "e849",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 28,
+        "w": 45,
+        "x": 1196,
+        "y": 308
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e850",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "登录"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 28,
+        "w": 90,
+        "x": 1244,
+        "y": 308
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e851",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "API 密钥"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 28,
+        "w": 28,
+        "x": 784,
+        "y": 376
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e852",
+      "role": "AXImage",
+      "role_description": "图像",
+      "selected": false,
+      "title": "Anthropic"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 15,
+        "w": 61,
+        "x": 824,
+        "y": 373
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e853",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "Anthropic"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 14,
+        "w": 90,
+        "x": 824,
+        "y": 394
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e854",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "Claude API 密钥"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 28,
+        "w": 29,
+        "x": 1214,
+        "y": 376
+      },
+      "children_count": 0,
+      "description": "查看文档",
+      "enabled": true,
+      "focused": false,
+      "ref": "e855",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 28,
+        "w": 88,
+        "x": 1246,
+        "y": 376
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e856",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "API 密钥"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 28,
+        "w": 28,
+        "x": 784,
+        "y": 444
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e857",
+      "role": "AXImage",
+      "role_description": "图像",
+      "selected": false,
+      "title": "Google"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 15,
+        "w": 60,
+        "x": 824,
+        "y": 441
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e858",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "Google AI"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 14,
+        "w": 135,
+        "x": 824,
+        "y": 462
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e859",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "Google AI (Gemini) 登录"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 28,
+        "w": 29,
+        "x": 1214,
+        "y": 444
+      },
+      "children_count": 0,
+      "description": "查看文档",
+      "enabled": true,
+      "focused": false,
+      "ref": "e860",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 28,
+        "w": 88,
+        "x": 1246,
+        "y": 444
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e861",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "API 密钥"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 28,
+        "w": 28,
+        "x": 784,
+        "y": 512
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e862",
+      "role": "AXImage",
+      "role_description": "图像",
+      "selected": false,
+      "title": "Github"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 15,
+        "w": 91,
+        "x": 824,
+        "y": 509
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e863",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "GitHub Copilot"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 14,
+        "w": 111,
+        "x": 824,
+        "y": 530
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e864",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "GitHub Copilot 登录"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 28,
+        "w": 28,
+        "x": 1257,
+        "y": 512
+      },
+      "children_count": 0,
+      "description": "查看文档",
+      "enabled": true,
+      "focused": false,
+      "ref": "e865",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 28,
+        "w": 45,
+        "x": 1289,
+        "y": 512
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e866",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "登录"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 28,
+        "w": 28,
+        "x": 784,
+        "y": 580
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e867",
+      "role": "AXImage",
+      "role_description": "图像",
+      "selected": false,
+      "title": "OpenRouter"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 15,
+        "w": 74,
+        "x": 824,
+        "y": 577
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e868",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "OpenRouter"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 14,
+        "w": 160,
+        "x": 824,
+        "y": 598
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e869",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "统一 API 网关，支持多种模型"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 28,
+        "w": 29,
+        "x": 1214,
+        "y": 580
+      },
+      "children_count": 0,
+      "description": "查看文档",
+      "enabled": true,
+      "focused": false,
+      "ref": "e870",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 28,
+        "w": 88,
+        "x": 1246,
+        "y": 580
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e871",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "API 密钥"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 28,
+        "w": 28,
+        "x": 784,
+        "y": 648
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e872",
+      "role": "AXImage",
+      "role_description": "图像",
+      "selected": false,
+      "title": "Grok"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 15,
+        "w": 63,
+        "x": 824,
+        "y": 645
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e873",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "xAI (Grok)"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 14,
+        "w": 98,
+        "x": 824,
+        "y": 666
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e874",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "xAI Grok API 密钥"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 28,
+        "w": 29,
+        "x": 1214,
+        "y": 648
+      },
+      "children_count": 0,
+      "description": "查看文档",
+      "enabled": true,
+      "focused": false,
+      "ref": "e875",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 28,
+        "w": 88,
+        "x": 1246,
+        "y": 648
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e876",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "API 密钥"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 28,
+        "w": 28,
+        "x": 784,
+        "y": 716
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e877",
+      "role": "AXImage",
+      "role_description": "图像",
+      "selected": false,
+      "title": "Mistral"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 15,
+        "w": 58,
+        "x": 824,
+        "y": 713
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e878",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "Mistral AI"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 14,
+        "w": 103,
+        "x": 824,
+        "y": 734
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e879",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "Mistral AI API 密钥"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 28,
+        "w": 29,
+        "x": 1214,
+        "y": 716
+      },
+      "children_count": 0,
+      "description": "查看文档",
+      "enabled": true,
+      "focused": false,
+      "ref": "e880",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 28,
+        "w": 88,
+        "x": 1246,
+        "y": 716
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e881",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "API 密钥"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 28,
+        "w": 28,
+        "x": 784,
+        "y": 784
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e882",
+      "role": "AXImage",
+      "role_description": "图像",
+      "selected": false,
+      "title": "AWS"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 15,
+        "w": 84,
+        "x": 824,
+        "y": 781
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e883",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "AWS Bedrock"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 14,
+        "w": 105,
+        "x": 824,
+        "y": 802
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e884",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "AWS Bedrock 凭据"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 28,
+        "w": 29,
+        "x": 1214,
+        "y": 784
+      },
+      "children_count": 0,
+      "description": "查看文档",
+      "enabled": true,
+      "focused": false,
+      "ref": "e885",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 28,
+        "w": 88,
+        "x": 1246,
+        "y": 784
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e886",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "API 密钥"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 28,
+        "w": 28,
+        "x": 784,
+        "y": 852
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e887",
+      "role": "AXImage",
+      "role_description": "图像",
+      "selected": false,
+      "title": "Azure"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 15,
+        "w": 85,
+        "x": 824,
+        "y": 849
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e888",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "Azure OpenAI"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 14,
+        "w": 174,
+        "x": 824,
+        "y": 870
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e889",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "Azure OpenAI Service API 密钥"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 28,
+        "w": 29,
+        "x": 1214,
+        "y": 852
+      },
+      "children_count": 0,
+      "description": "查看文档",
+      "enabled": true,
+      "focused": false,
+      "ref": "e890",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 28,
+        "w": 88,
+        "x": 1246,
+        "y": 852
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e891",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "API 密钥"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 28,
+        "x": 784,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e892",
+      "role": "AXImage",
+      "role_description": "图像",
+      "selected": false,
+      "title": "Zhipu"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 69,
+        "x": 824,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e893",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "GLM (智谱)"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 128,
+        "x": 824,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e894",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "智谱 AI (GLM) API 密钥"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 29,
+        "x": 1214,
+        "y": 907
+      },
+      "children_count": 0,
+      "description": "查看文档",
+      "enabled": true,
+      "focused": false,
+      "ref": "e895",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 88,
+        "x": 1246,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e896",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "API 密钥"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 28,
+        "x": 784,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e897",
+      "role": "AXImage",
+      "role_description": "图像",
+      "selected": false,
+      "title": "Zhipu"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 147,
+        "x": 824,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e898",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "GLM Coding Plan (智谱)"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 150,
+        "x": 824,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e899",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "GLM Coding Plan 订阅密钥"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 29,
+        "x": 1214,
+        "y": 907
+      },
+      "children_count": 0,
+      "description": "查看文档",
+      "enabled": true,
+      "focused": false,
+      "ref": "e900",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 88,
+        "x": 1246,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e901",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "API 密钥"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 28,
+        "x": 784,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e902",
+      "role": "AXImage",
+      "role_description": "图像",
+      "selected": false,
+      "title": "Minimax"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 51,
+        "x": 824,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e903",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "Minimax"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 97,
+        "x": 824,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e904",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "Minimax API 密钥"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 29,
+        "x": 1214,
+        "y": 907
+      },
+      "children_count": 0,
+      "description": "查看文档",
+      "enabled": true,
+      "focused": false,
+      "ref": "e905",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 88,
+        "x": 1246,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e906",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "API 密钥"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 28,
+        "x": 784,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e907",
+      "role": "AXImage",
+      "role_description": "图像",
+      "selected": false,
+      "title": "Minimax"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 221,
+        "x": 824,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e908",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "MiniMax Token Plan (minimaxi.com)"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 227,
+        "x": 824,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e909",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "MiniMax 国内版 (minimaxi.com) API 密钥"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 29,
+        "x": 1214,
+        "y": 907
+      },
+      "children_count": 0,
+      "description": "查看文档",
+      "enabled": true,
+      "focused": false,
+      "ref": "e910",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 88,
+        "x": 1246,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e911",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "API 密钥"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 28,
+        "x": 784,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e912",
+      "role": "AXImage",
+      "role_description": "图像",
+      "selected": false,
+      "title": "MoonshotAI"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 78,
+        "x": 824,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e913",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "Moonshot AI"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 121,
+        "x": 824,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e914",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "Moonshot AI API 密钥"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 29,
+        "x": 1214,
+        "y": 907
+      },
+      "children_count": 0,
+      "description": "查看文档",
+      "enabled": true,
+      "focused": false,
+      "ref": "e915",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 88,
+        "x": 1246,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e916",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "API 密钥"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 28,
+        "x": 784,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e917",
+      "role": "AXImage",
+      "role_description": "图像",
+      "selected": false,
+      "title": "MoonshotAI"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 118,
+        "x": 824,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e918",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "Moonshot AI (国内)"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 158,
+        "x": 824,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e919",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "Moonshot AI (国内) API 密钥"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 29,
+        "x": 1214,
+        "y": 907
+      },
+      "children_count": 0,
+      "description": "查看文档",
+      "enabled": true,
+      "focused": false,
+      "ref": "e920",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 88,
+        "x": 1246,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e921",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "API 密钥"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 28,
+        "x": 784,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e922",
+      "role": "AXImage",
+      "role_description": "图像",
+      "selected": false,
+      "title": "Kimi"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 98,
+        "x": 824,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e923",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "Kimi For Coding"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 140,
+        "x": 824,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e924",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "Kimi For Coding API 密钥"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 29,
+        "x": 1214,
+        "y": 907
+      },
+      "children_count": 0,
+      "description": "查看文档",
+      "enabled": true,
+      "focused": false,
+      "ref": "e925",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 88,
+        "x": 1246,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e926",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "API 密钥"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 28,
+        "x": 784,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e927",
+      "role": "AXImage",
+      "role_description": "图像",
+      "selected": false,
+      "title": "Alibaba"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 86,
+        "x": 824,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e928",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "Alibaba (通义)"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 111,
+        "x": 824,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e929",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "阿里云通义 API 密钥"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 29,
+        "x": 1214,
+        "y": 907
+      },
+      "children_count": 0,
+      "description": "查看文档",
+      "enabled": true,
+      "focused": false,
+      "ref": "e930",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 88,
+        "x": 1246,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e931",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "API 密钥"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 28,
+        "x": 784,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e932",
+      "role": "AXImage",
+      "role_description": "图像",
+      "selected": false,
+      "title": "Alibaba"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 116,
+        "x": 824,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e933",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "Alibaba 百炼 (国内)"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 148,
+        "x": 824,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e934",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "阿里云百炼 (国内) API 密钥"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 29,
+        "x": 1214,
+        "y": 907
+      },
+      "children_count": 0,
+      "description": "查看文档",
+      "enabled": true,
+      "focused": false,
+      "ref": "e935",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 88,
+        "x": 1246,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e936",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "API 密钥"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 28,
+        "x": 784,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e937",
+      "role": "AXImage",
+      "role_description": "图像",
+      "selected": false,
+      "title": "Alibaba"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 124,
+        "x": 824,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e938",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "Alibaba Coding Plan"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 185,
+        "x": 824,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e939",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "阿里云百炼 Coding Plan 订阅密钥"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 29,
+        "x": 1214,
+        "y": 907
+      },
+      "children_count": 0,
+      "description": "查看文档",
+      "enabled": true,
+      "focused": false,
+      "ref": "e940",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 88,
+        "x": 1246,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e941",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "API 密钥"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 28,
+        "x": 784,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e942",
+      "role": "AXImage",
+      "role_description": "图像",
+      "selected": false,
+      "title": "Alibaba"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 187,
+        "x": 824,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e943",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "Alibaba 百炼 Token Plan (国内)"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 215,
+        "x": 824,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e944",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "阿里云百炼 Token Plan (国内) 订阅密钥"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 29,
+        "x": 1214,
+        "y": 907
+      },
+      "children_count": 0,
+      "description": "查看文档",
+      "enabled": true,
+      "focused": false,
+      "ref": "e945",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 88,
+        "x": 1246,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e946",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "API 密钥"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 28,
+        "x": 784,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e947",
+      "role": "AXImage",
+      "role_description": "图像",
+      "selected": false,
+      "title": "DeepInfra"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 64,
+        "x": 824,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e948",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "Deep Infra"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 109,
+        "x": 824,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e949",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "Deep Infra API 密钥"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 29,
+        "x": 1214,
+        "y": 907
+      },
+      "children_count": 0,
+      "description": "查看文档",
+      "enabled": true,
+      "focused": false,
+      "ref": "e950",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 88,
+        "x": 1246,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e951",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "API 密钥"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 28,
+        "x": 784,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e952",
+      "role": "AXImage",
+      "role_description": "图像",
+      "selected": false,
+      "title": "Zhipu"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 25,
+        "x": 824,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e953",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "Z.AI"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 73,
+        "x": 824,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e954",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "Z.AI API 密钥"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 29,
+        "x": 1214,
+        "y": 907
+      },
+      "children_count": 0,
+      "description": "查看文档",
+      "enabled": true,
+      "focused": false,
+      "ref": "e955",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 88,
+        "x": 1246,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e956",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "API 密钥"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 103,
+        "x": 824,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e957",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "Custom Provider"
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 106,
+        "x": 824,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e958",
+      "role": "AXStaticText",
+      "role_description": "文本",
+      "selected": false,
+      "value": "OpenAI 兼容服务商"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 88,
+        "x": 1246,
+        "y": 907
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e959",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false,
+      "title": "API 密钥"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 28,
+        "w": 28,
+        "x": 240,
+        "y": 39
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e29",
+      "role": "AXButton",
+      "role_description": "按钮",
+      "selected": false
+    },
+    {
+      "actions": [
+        "AXShowMenu",
+        "AXScrollToVisible"
+      ],
+      "bounds": {
+        "h": 0,
+        "w": 1309,
+        "x": 156,
+        "y": 907
+      },
+      "children_count": 0,
+      "description": "Notifications alt+T",
+      "enabled": true,
+      "focused": false,
+      "ref": "e30",
+      "role": "AXGroup",
+      "role_description": "区域",
+      "selected": false,
+      "subrole": "AXLandmarkRegion"
+    },
+    {
+      "actions": [
+        "AXPress"
+      ],
+      "bounds": {
+        "h": 16,
+        "w": 16,
+        "x": 164,
+        "y": 41
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e2",
+      "role": "AXButton",
+      "role_description": "关闭按钮",
+      "subrole": "AXCloseButton"
+    },
+    {
+      "actions": [
+        "AXPress",
+        "AXZoomWindow",
+        "AXShowMenu"
+      ],
+      "bounds": {
+        "h": 16,
+        "w": 16,
+        "x": 210,
+        "y": 41
+      },
+      "children_count": 1,
+      "description": "此按钮也可以执行缩放窗口的操作",
+      "enabled": true,
+      "focused": false,
+      "ref": "e3",
+      "role": "AXButton",
+      "role_description": "全屏幕按钮",
+      "subrole": "AXFullScreenButton"
+    },
+    {
+      "actions": [
+        "AXPress"
+      ],
+      "bounds": {
+        "h": 16,
+        "w": 16,
+        "x": 187,
+        "y": 41
+      },
+      "children_count": 0,
+      "enabled": true,
+      "focused": false,
+      "ref": "e4",
+      "role": "AXButton",
+      "role_description": "最小化按钮",
+      "subrole": "AXMinimizeButton"
+    }
+  ],
+  "elements_are_diff": true,
+  "menu_shortcuts": [
+    {
+      "combo": "cmd+opt+⎋",
+      "path": [
+        "Apple",
+        "强制退出…"
+      ]
+    },
+    {
+      "combo": "cmd+opt+shift+⎋",
+      "path": [
+        "Apple",
+        "强制退出“Electron”"
+      ]
+    },
+    {
+      "combo": "cmd+ctrl+q",
+      "path": [
+        "Apple",
+        "锁定屏幕"
+      ]
+    },
+    {
+      "combo": "cmd+shift+q",
+      "path": [
+        "Apple",
+        "退出登录“lu”…"
+      ]
+    },
+    {
+      "combo": "cmd+opt+shift+q",
+      "path": [
+        "Apple",
+        "退出登录“lu”"
+      ]
+    },
+    {
+      "combo": "cmd+,",
+      "path": [
+        "Electron",
+        "Preferences…"
+      ]
+    },
+    {
+      "combo": "cmd+h",
+      "path": [
+        "Electron",
+        "Hide WiseStudio"
+      ]
+    },
+    {
+      "combo": "cmd+opt+h",
+      "path": [
+        "Electron",
+        "Hide Others"
+      ]
+    },
+    {
+      "combo": "cmd+q",
+      "path": [
+        "Electron",
+        "Quit WiseStudio"
+      ]
+    },
+    {
+      "combo": "cmd+opt+q",
+      "path": [
+        "Electron",
+        "退出并保留窗口"
+      ]
+    },
+    {
+      "combo": "cmd+n",
+      "path": [
+        "File",
+        "New Document"
+      ]
+    },
+    {
+      "combo": "cmd+o",
+      "path": [
+        "File",
+        "Open…"
+      ]
+    },
+    {
+      "combo": "cmd+s",
+      "path": [
+        "File",
+        "Save"
+      ]
+    },
+    {
+      "combo": "cmd+shift+s",
+      "path": [
+        "File",
+        "Save As…"
+      ]
+    },
+    {
+      "combo": "cmd+w",
+      "path": [
+        "File",
+        "Close Window"
+      ]
+    },
+    {
+      "combo": "cmd+opt+w",
+      "path": [
+        "File",
+        "全部关闭"
+      ]
+    },
+    {
+      "combo": "cmd+z",
+      "path": [
+        "Edit",
+        "Undo"
+      ]
+    },
+    {
+      "combo": "cmd+shift+z",
+      "path": [
+        "Edit",
+        "Redo"
+      ]
+    },
+    {
+      "combo": "cmd+x",
+      "path": [
+        "Edit",
+        "Cut"
+      ]
+    },
+    {
+      "combo": "cmd+c",
+      "path": [
+        "Edit",
+        "Copy"
+      ]
+    },
+    {
+      "combo": "cmd+v",
+      "path": [
+        "Edit",
+        "Paste"
+      ]
+    },
+    {
+      "combo": "cmd+opt+shift+v",
+      "path": [
+        "Edit",
+        "Paste and Match Style"
+      ]
+    },
+    {
+      "combo": "cmd+a",
+      "path": [
+        "Edit",
+        "Select All"
+      ]
+    },
+    {
+      "combo": "🎤",
+      "path": [
+        "Edit",
+        "开始听写…"
+      ]
+    },
+    {
+      "combo": "🌐",
+      "path": [
+        "Edit",
+        "表情与符号"
+      ]
+    },
+    {
+      "combo": "cmd+r",
+      "path": [
+        "View",
+        "Reload"
+      ]
+    },
+    {
+      "combo": "cmd+shift+r",
+      "path": [
+        "View",
+        "Force Reload"
+      ]
+    },
+    {
+      "combo": "cmd+opt+i",
+      "path": [
+        "View",
+        "Toggle Developer Tools"
+      ]
+    },
+    {
+      "combo": "cmd+0",
+      "path": [
+        "View",
+        "Actual Size"
+      ]
+    },
+    {
+      "combo": "cmd++",
+      "path": [
+        "View",
+        "Zoom In"
+      ]
+    },
+    {
+      "combo": "cmd+-",
+      "path": [
+        "View",
+        "Zoom Out"
+      ]
+    },
+    {
+      "combo": "f",
+      "path": [
+        "View",
+        "Toggle Full Screen"
+      ]
+    },
+    {
+      "combo": "cmd+m",
+      "path": [
+        "Window",
+        "Minimize"
+      ]
+    }
+  ],
+  "removed_refs": [
+    "e14"
+  ],
+  "snapshot_id": "s_2026-10-09T125602Z",
+  "unchanged_element_count": 0,
+  "wakeup_attempts": 1,
+  "wakeup_duration_ms": 0,
+  "window": {
+    "bounds": {
+      "h": 874,
+      "w": 1309,
+      "x": 156,
+      "y": 33
+    },
+    "id": 234415,
+    "title": "WiseStudio"
+  }
+}

@@ -6,7 +6,7 @@ description: 通过已获授权的 daemon socket 操作 macOS PiP，验证多应
 
 ## 前置条件
 
-- **入口是 daemon socket，不是 MCP。** 当前 minami_computer_use 的23个 MCP 工具没有 `pip_*`，这与 Alma 的入口限制一致。CX17 已获用户明确授权使用 socket；其他 GUI 编辑、最小化、关闭文稿仍走 MCP。
+- **首选 MCP 的 5 个 `pip_*` 工具**（pip_open/pip_close/pip_status/pip_arm/pip_disarm，Minami 产品层新增）；需要 socket-only 命令或精细参数时再直连 daemon socket。CX17 已获用户明确授权使用 socket；其他 GUI 编辑、最小化、关闭文稿仍走 MCP。
 - 本机被测 socket：`/Users/lu/Library/Application Support/Alma/computer-use-72097929.sock`；Alma 对照：同目录 `computer-use-9bd08bc1.sock`。后续环境应使用当时实际地址。
 - 只使用本轮测试源窗口，内容/自定义 PiP title 加 `CX17_` 等唯一前缀。原有 Calculator 可读用，但保留窗口、模式和原值。
 - 每个场景前后读取前台和光标。不要 activate app 来解决菜单或截图问题：

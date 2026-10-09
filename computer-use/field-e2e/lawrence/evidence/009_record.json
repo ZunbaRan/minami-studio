@@ -1,0 +1,25 @@
+{
+  "number": 9,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/009_add-dingtalk.mov",
+  "capture_pid": 42016,
+  "start": 1791549544.752238,
+  "seconds": 8,
+  "status": "success",
+  "element": "添加账户/钉钉",
+  "method": "click screen ← screenshot(798,211)",
+  "effect": "显示 Stream 模式 App Key、App Secret、Robot Code",
+  "media": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2754,
+        "height": 1884
+      }
+    ],
+    "format": {
+      "duration": "8.240000"
+    }
+  }
+}

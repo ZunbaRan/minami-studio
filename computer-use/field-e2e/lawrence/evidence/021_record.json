@@ -1,0 +1,11 @@
+{
+  "number": 21,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/021_background-tab-focus.mov",
+  "capture_pid": 46402,
+  "start": 1791549888.132448,
+  "seconds": 8,
+  "status": "fail",
+  "element": "后台键盘焦点探针",
+  "method": "type_text physical TAB",
+  "effect": "无效果：未出现可辨认的焦点，不继续盲按 Return"
+}

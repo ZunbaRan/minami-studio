@@ -1,0 +1,25 @@
+{
+  "number": 24,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/024_avatar-upload-picker.mov",
+  "capture_pid": 47782,
+  "start": 1791550003.2750878,
+  "seconds": 8,
+  "status": "success",
+  "element": "数字形象/上传自定义头像",
+  "method": "click screen ← screenshot(905,711)",
+  "effect": "打开原生文件选择弹窗；未选择、未上传文件",
+  "media": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2754,
+        "height": 1884
+      }
+    ],
+    "format": {
+      "duration": "8.216667"
+    }
+  }
+}

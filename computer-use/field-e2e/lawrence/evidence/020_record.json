@@ -1,0 +1,11 @@
+{
+  "number": 20,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/020_sidebar-context-menu.mov",
+  "capture_pid": 45915,
+  "start": 1791549857.27348,
+  "seconds": 8,
+  "status": "fail",
+  "element": "主侧栏/收件箱上下文菜单",
+  "method": "perform_secondary_action screen ← screenshot(38,189)",
+  "effect": "无效果：未出现上下文菜单"
+}

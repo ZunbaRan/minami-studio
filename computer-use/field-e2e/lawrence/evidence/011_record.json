@@ -1,0 +1,25 @@
+{
+  "number": 11,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/011_cancel-add-account.mov",
+  "capture_pid": 42223,
+  "start": 1791549586.189754,
+  "seconds": 8,
+  "status": "success",
+  "element": "添加账户/取消",
+  "method": "click screen ← screenshot(780,778)",
+  "effect": "弹窗取消：返回渠道页；未创建、未保存，现有2个连接保持",
+  "media": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2754,
+        "height": 1884
+      }
+    ],
+    "format": {
+      "duration": "8.196667"
+    }
+  }
+}

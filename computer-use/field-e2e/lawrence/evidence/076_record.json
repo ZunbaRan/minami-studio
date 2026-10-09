@@ -1,0 +1,11 @@
+{
+  "number": 76,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/076_analytics-cost.mov",
+  "capture_pid": 67664,
+  "start": 1791551761.882006,
+  "seconds": 8,
+  "status": "fail",
+  "element": "运行总览/成本",
+  "method": "click ref=e3034 strategy=ax",
+  "effect": "无效果：8秒录像结束验收仍为总览；后续成本页出现且WiseStudio成前台、鼠标改变，归因不明"
+}

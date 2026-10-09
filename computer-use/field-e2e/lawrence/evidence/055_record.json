@@ -1,0 +1,25 @@
+{
+  "number": 55,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/055_conversation-mcp-menu.mov",
+  "capture_pid": 62471,
+  "start": 1791551000.819712,
+  "seconds": 8,
+  "status": "success",
+  "element": "会话/MCP状态下拉",
+  "method": "click ref=e1430 strategy=ax",
+  "effect": "展开MCP Servers，3/3已连接；未刷新或修改工具配置",
+  "media": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2754,
+        "height": 1884
+      }
+    ],
+    "format": {
+      "duration": "8.071667"
+    }
+  }
+}

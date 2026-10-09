@@ -1,0 +1,25 @@
+{
+  "number": 23,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/023_avatar-name-editor.mov",
+  "capture_pid": 47433,
+  "start": 1791549975.551664,
+  "seconds": 8,
+  "status": "success",
+  "element": "数字形象/名称编辑",
+  "method": "click screen ← screenshot(938,669)",
+  "effect": "名称进入带下划线的编辑状态；保留原名称，未输入",
+  "media": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2754,
+        "height": 1884
+      }
+    ],
+    "format": {
+      "duration": "8.225000"
+    }
+  }
+}

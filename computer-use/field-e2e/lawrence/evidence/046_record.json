@@ -1,0 +1,25 @@
+{
+  "number": 46,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/046_system-settings.mov",
+  "capture_pid": 59303,
+  "start": 1791550714.189007,
+  "seconds": 8,
+  "status": "success",
+  "element": "设置/系统",
+  "method": "click ref=e237 strategy=ax",
+  "effect": "显示守护进程、6个Docker服务、9个主机服务、数据与连接、日志；停止/重启未触发",
+  "media": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2754,
+        "height": 1884
+      }
+    ],
+    "format": {
+      "duration": "8.166667"
+    }
+  }
+}

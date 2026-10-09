@@ -1,0 +1,25 @@
+{
+  "number": 54,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/054_inbox-ax.mov",
+  "capture_pid": 62052,
+  "start": 1791550954.050046,
+  "seconds": 8,
+  "status": "success",
+  "element": "主侧栏/工作区会话（AX恢复）",
+  "method": "click ref=e175 strategy=ax",
+  "effect": "进入工作区会话页，显示项目列表、历史会话、MCP、文件及输入框；未发送消息",
+  "media": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2754,
+        "height": 1884
+      }
+    ],
+    "format": {
+      "duration": "8.111667"
+    }
+  }
+}

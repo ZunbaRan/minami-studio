@@ -1,0 +1,25 @@
+{
+  "number": 50,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/050_expand-data-connections.mov",
+  "capture_pid": 60321,
+  "start": 1791550838.318561,
+  "seconds": 8,
+  "status": "success",
+  "element": "系统/数据与连接",
+  "method": "click ref=e1202 strategy=ax",
+  "effect": "显示数据库已初始化、管理端心跳待审批及连接信息",
+  "media": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2754,
+        "height": 1884
+      }
+    ],
+    "format": {
+      "duration": "8.190000"
+    }
+  }
+}

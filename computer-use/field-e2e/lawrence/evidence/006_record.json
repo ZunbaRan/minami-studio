@@ -1,0 +1,25 @@
+{
+  "number": 6,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/006_account-enable-toggle.mov",
+  "capture_pid": 40999,
+  "start": 1791549446.0968251,
+  "seconds": 8,
+  "status": "success",
+  "element": "添加账户/启用此账户",
+  "method": "click screen(577.34,467.87)",
+  "effect": "未提交表单复选框由勾选变为空；未创建账户",
+  "media": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2754,
+        "height": 1884
+      }
+    ],
+    "format": {
+      "duration": "8.000000"
+    }
+  }
+}

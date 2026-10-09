@@ -1,0 +1,25 @@
+{
+  "number": 27,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/027_close-avatar.mov",
+  "capture_pid": 50011,
+  "start": 1791550122.997498,
+  "seconds": 8,
+  "status": "success",
+  "element": "数字形象/关闭",
+  "method": "click screen ← screenshot(1239,40)",
+  "effect": "返回网关渠道页，头像与名称保持原值",
+  "media": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2754,
+        "height": 1884
+      }
+    ],
+    "format": {
+      "duration": "8.200000"
+    }
+  }
+}

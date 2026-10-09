@@ -1,0 +1,25 @@
+{
+  "number": 52,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/052_system-logs.mov",
+  "capture_pid": 60660,
+  "start": 1791550894.005068,
+  "seconds": 8,
+  "status": "success",
+  "element": "系统/日志展开",
+  "method": "click ref=e1203 strategy=ax",
+  "effect": "显示日志面板、All/仅错误、刷新与打开目录入口；未打开外部目录",
+  "media": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2754,
+        "height": 1884
+      }
+    ],
+    "format": {
+      "duration": "8.203333"
+    }
+  }
+}

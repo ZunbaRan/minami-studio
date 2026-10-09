@@ -1,0 +1,25 @@
+{
+  "number": 40,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/040_provider-api-key-dialog.mov",
+  "capture_pid": 56149,
+  "start": 1791550521.983026,
+  "seconds": 8,
+  "status": "success",
+  "element": "OpenCode/OpenAI API密钥配置",
+  "method": "click ref=e851 strategy=ax",
+  "effect": "打开空白API密钥与Base URL表单，保存禁用；未输入凭据",
+  "media": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2754,
+        "height": 1884
+      }
+    ],
+    "format": {
+      "duration": "8.128333"
+    }
+  }
+}

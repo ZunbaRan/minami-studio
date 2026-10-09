@@ -1,0 +1,25 @@
+{
+  "number": 42,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/042_channel-agent-settings.mov",
+  "capture_pid": 57234,
+  "start": 1791550589.223946,
+  "seconds": 8,
+  "status": "success",
+  "element": "设置/频道智能体",
+  "method": "click ref=e228 strategy=ax",
+  "effect": "导航与选中项变化；等待复查仍停在加载动画，配置内容未加载（覆盖受限）",
+  "media": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2754,
+        "height": 1884
+      }
+    ],
+    "format": {
+      "duration": "8.143333"
+    }
+  }
+}

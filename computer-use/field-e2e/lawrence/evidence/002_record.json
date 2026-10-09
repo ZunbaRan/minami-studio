@@ -1,0 +1,11 @@
+{
+  "number": 2,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/002_chatwoot-tab.mov",
+  "capture_pid": 38276,
+  "start": 1791549275.82059,
+  "seconds": 8,
+  "status": "fail",
+  "element": "网关/Chatwoot tab",
+  "method": "click screenshot(688,559)",
+  "effect": "无效果：目标 tab 未出现；实际显示添加账户/WhatsApp弹窗，归因不明"
+}

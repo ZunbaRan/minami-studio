@@ -1,0 +1,25 @@
+{
+  "number": 60,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/060_new-task-dialog.mov",
+  "capture_pid": 63572,
+  "start": 1791551201.5185761,
+  "seconds": 8,
+  "status": "success",
+  "element": "任务/新建任务",
+  "method": "click ref=e1986 strategy=ax",
+  "effect": "打开工作区、标题、Markdown描述、优先级、来源会话表单；创建禁用",
+  "media": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2754,
+        "height": 1884
+      }
+    ],
+    "format": {
+      "duration": "8.146667"
+    }
+  }
+}

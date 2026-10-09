@@ -1,0 +1,25 @@
+{
+  "number": 48,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/048_expand-host-services.mov",
+  "capture_pid": 60022,
+  "start": 1791550783.372341,
+  "seconds": 8,
+  "status": "success",
+  "element": "系统/主机服务展开",
+  "method": "click ref=e1197 strategy=ax",
+  "effect": "显示gateway、web、docs、lawrence-api、webhook、memory、qmd-mcp、suit-host、opencode共9个服务",
+  "media": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2754,
+        "height": 1884
+      }
+    ],
+    "format": {
+      "duration": "8.056667"
+    }
+  }
+}

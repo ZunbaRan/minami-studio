@@ -1,0 +1,25 @@
+{
+  "number": 45,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/045_web-settings.mov",
+  "capture_pid": 59188,
+  "start": 1791550686.068481,
+  "seconds": 8,
+  "status": "success",
+  "element": "设置/Web配置",
+  "method": "click ref=e235 strategy=ax",
+  "effect": "关闭语言下拉，显示登录配置、飞书SSO回调、去渠道配置/复制和高级连接信息",
+  "media": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2754,
+        "height": 1884
+      }
+    ],
+    "format": {
+      "duration": "8.056667"
+    }
+  }
+}

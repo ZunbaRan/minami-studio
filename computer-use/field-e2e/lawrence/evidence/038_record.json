@@ -1,0 +1,25 @@
+{
+  "number": 38,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/038_provider-codex.mov",
+  "capture_pid": 55430,
+  "start": 1791550463.250719,
+  "seconds": 8,
+  "status": "success",
+  "element": "服务商/Codex",
+  "method": "click ref=e812 strategy=ax",
+  "effect": "显示已登录 ChatGPT、刷新状态、退出登录、文档；退出登录未执行",
+  "media": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2754,
+        "height": 1884
+      }
+    ],
+    "format": {
+      "duration": "8.148333"
+    }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "number": 44,
+  "clip": "/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/clips/044_voice-language-options.mov",
+  "capture_pid": 58999,
+  "start": 1791550660.388315,
+  "seconds": 8,
+  "status": "success",
+  "element": "语音/语言下拉",
+  "method": "click ref=e1007 strategy=ax",
+  "effect": "展开自动/简繁中文/英日韩法德西俄10项；保留Auto-detect",
+  "media": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2754,
+        "height": 1884
+      }
+    ],
+    "format": {
+      "duration": "8.163333"
+    }
+  }
+}
