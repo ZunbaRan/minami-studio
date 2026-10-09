@@ -13,6 +13,69 @@ Agent (Codex CLI / any MCP client)
               └── Accessibility API / CGEvent / CGWindowList / TCC
 ```
 
+
+## 安装
+
+### A. 预编译包（推荐，macOS arm64）
+
+```sh
+# 下载 release 里的 minami-computer-use-<ver>-macos-arm64.tar.gz
+tar xzf minami-computer-use-*.tar.gz && cd minami-computer-use-*
+xattr -dr com.apple.quarantine .   # 去掉 Gatekeeper 隔离位
+```
+
+得到 `bin/minami-computer-use`(Swift daemon)+ `bin/minami-computer-use-mcp`
+(MCP 入口)+ `mcp/` + `skills/`(操作手册，Skill 工具/resources 即时读)。
+
+### B. 源码构建
+
+```sh
+git clone <this repo> && cd minami-computer-use
+./scripts/build.sh release     # 需要 Xcode CLT / Swift toolchain
+```
+
+### 权限（TCC，两步必做）
+
+daemon 需要 **辅助功能(Accessibility)** 和 **屏幕录制(Screen Recording)**。
+权限挂"责任进程"：谁拉起它就授给谁——终端手动跑授给终端 app，
+MCP harness 自动拉起授给 harness(pi/Codex 等)。首次截图/PiP 会弹授权框。
+
+### 接入 MCP harness
+
+入口文件 = `bin/minami-computer-use-mcp`(stdio,node≥18):
+
+```sh
+# Codex
+codex mcp add minami_computer_use -- /abs/path/bin/minami-computer-use-mcp
+
+# pi —— 写进 ~/.pi/agent/mcp.json 的 mcpServers:
+#   "minami_computer_use": { "command": "/abs/path/bin/minami-computer-use-mcp" }
+
+# Claude Code
+claude mcp add minami-computer-use -- /abs/path/bin/minami-computer-use-mcp
+```
+
+wrapper 首次收到请求会自动 spawn daemon
+（socket `~/Library/Application Support/minami-computer-use/computer-use-<sha1tag8>.sock`)。
+手动拉起：
+
+```sh
+bin/minami-computer-use daemon \
+  --socket "$HOME/Library/Application Support/minami-computer-use/computer-use-<tag>.sock" \
+  --idle-seconds 3600 [--lens] [--pip-hide-hw-cursor]
+```
+
+| flag | 语义 |
+|---|---|
+| `--lens` | agent 虚拟光标（蓝点+点击脉冲+type/scroll 徽标）渲染进 PiP 面板；Alma 默认 off |
+| `--pip-hide-hw-cursor` | **Minami 自有 opt-in**：镜像流里去掉用户硬件光标（Alma 默认 showsCursor=true，不加此 flag 保持逐字 parity） |
+
+### 冒烟验证
+
+```sh
+./scripts/smoke.sh    # initialize → tools/list(24) → permissions → list_apps
+```
+
 ## Build & install
 
 ```sh
