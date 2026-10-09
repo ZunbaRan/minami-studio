@@ -10,7 +10,7 @@
 
 import { spawn } from "node:child_process";
 import { createConnection } from "node:net";
-import { existsSync, mkdirSync, readFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, readdirSync } from "node:fs";
 import { randomBytes, createHash } from "node:crypto";
 import * as path from "node:path";
 import * as os from "node:os";
@@ -1686,10 +1686,77 @@ const INSTRUCTIONS = [
   "back to pixel coordinates when elements is empty (Qt/custom apps).",
   "HARD RULE: never take the user's foreground app, key window, or cursor — not even momentarily,",
   "and never by bringing a window forward and putting it back. Every verb works on a background app; nothing here needs the foreground.",
-  "Never activate, raise, or otherwise front an app on your own initiative. If an action reports it could not be delivered, tell the user — do not reach for the foreground to force it through."
+  "Never activate, raise, or otherwise front an app on your own initiative. If an action reports it could not be delivered, tell the user — do not reach for the foreground to force it through.",
+  "Field-tested playbooks: call the Skill tool with a computer-use doc name, or read skill://computer-use resources."
 ].join(" ");
 
 const toolsByName = new Map(tools.map((t) => [t.name, t]));
+
+/* ------------------- skills via MCP (minami-browser mcp-skill-pattern) ---
+ * tools give capability; this channel gives progressive operation knowledge:
+ *   - resources/list+read  → skill://computer-use[/<doc>] (canonical browse)
+ *   - Skill tool           → for harnesses that only surface tools; the name
+ *     mirrors Alma's agent-side Skill tool (invoke by name, get full doc).
+ * skills/<name>/SKILL.md lives in this repo and is read from disk per call —
+ * doc updates land without restarting the wrapper or the daemon. */
+const SKILLS_DIR = path.join(__dirname, "..", "skills");
+const SKILL_NS = "computer-use";
+
+function skillDocs() {
+  try {
+    return readdirSync(SKILLS_DIR, { withFileTypes: true })
+      .filter((d) => d.isDirectory() && existsSync(path.join(SKILLS_DIR, d.name, "SKILL.md")))
+      .map((d) => d.name)
+      .sort();
+  } catch { return []; }
+}
+
+function skillIndex() {
+  const lines = skillDocs().map((name) => {
+    let desc = "";
+    try {
+      const fm = readFileSync(path.join(SKILLS_DIR, name, "SKILL.md"), "utf8")
+        .match(/^description:\s*(.+)$/m);
+      if (fm) desc = ` — ${fm[1].trim()}`;
+    } catch {}
+    return `- ${SKILL_NS}/${name}${desc}`;
+  });
+  return [
+    `# ${SKILL_NS} playbooks`,
+    `Field-tested operation procedures (evidence: CX/R3/R5 desktop runs).`,
+    `Load a doc by name via the Skill tool or read skill://${SKILL_NS}/<name>.`,
+    "",
+    ...lines,
+    ""
+  ].join("\n");
+}
+
+function readSkillDoc(doc) {
+  let rel = (doc === SKILL_NS || doc === "" || doc == null)
+    ? null
+    : doc.startsWith(`${SKILL_NS}/`) ? doc.slice(SKILL_NS.length + 1) : doc;
+  if (rel == null) return skillIndex();
+  if (rel.endsWith(".md")) rel = rel.slice(0, -3);
+  if (rel.endsWith("/SKILL")) rel = rel.slice(0, -6);
+  if (!/^[A-Za-z0-9_-]+$/.test(rel)) return null;   // no traversal
+  try { return readFileSync(path.join(SKILLS_DIR, rel, "SKILL.md"), "utf8"); }
+  catch { return null; }
+}
+
+const SKILL_TOOL = {
+  name: "Skill",
+  description:
+    "Load a computer-use playbook doc (field-tested procedures per app/scenario). Call without a name to list available docs. Docs also ship as MCP resources under skill://computer-use/.",
+  inputSchema: {
+    type: "object",
+    properties: {
+      name: {
+        type: "string",
+        description: 'Doc name, e.g. "computer-use" (index) or "computer-use/textedit-editing". Omit to list docs.'
+      }
+    }
+  }
+};
 
 let outFraming = "jsonl"; // detect from first inbound frame
 function writeMessage(msg) {
@@ -1859,7 +1926,7 @@ async function handleMessage(msg) {
           ? params.protocolVersion : SUPPORTED[SUPPORTED.length - 1];
         rpcResult(id, {
           protocolVersion: pv,
-          capabilities: { tools: { listChanged: true } },
+          capabilities: { tools: { listChanged: true }, resources: {} },
           serverInfo: SERVER_INFO,
           instructions: INSTRUCTIONS
         });
@@ -1870,13 +1937,39 @@ async function handleMessage(msg) {
         return;
       case "tools/list": {
         rpcResult(id, {
-          tools: tools.map((t) => ({
-            name: t.name,
-            description: t.description,
-            execution: { taskSupport: "forbidden" },
-            inputSchema: REAL_SCHEMAS[t.name] ?? t.inputSchema
-          }))
+          tools: [
+            ...tools.map((t) => ({
+              name: t.name,
+              description: t.description,
+              execution: { taskSupport: "forbidden" },
+              inputSchema: REAL_SCHEMAS[t.name] ?? t.inputSchema
+            })),
+            { ...SKILL_TOOL, execution: { taskSupport: "forbidden" } }
+          ]
         });
+        return;
+      }
+      case "resources/list": {
+        rpcResult(id, {
+          resources: [
+            { uri: `skill://${SKILL_NS}`, name: `${SKILL_NS} skill index`, mimeType: "text/markdown" },
+            ...skillDocs().map((n) => ({
+              uri: `skill://${SKILL_NS}/${n}`,
+              name: `${SKILL_NS}: ${n}`,
+              mimeType: "text/markdown"
+            }))
+          ]
+        });
+        return;
+      }
+      case "resources/read": {
+        const uri = params?.uri;
+        const m = typeof uri === "string"
+          ? uri.match(/^skill:\/\/computer-use(?:\/(.*))?$/)
+          : null;
+        const text = m ? readSkillDoc(m[1] ?? SKILL_NS) : null;
+        if (text == null) { rpcError(id, -32002, `Unknown resource: ${uri}`); return; }
+        rpcResult(id, { contents: [{ uri, mimeType: "text/markdown", text }] });
         return;
       }
       case "tools/call": {
@@ -1891,6 +1984,16 @@ async function handleMessage(msg) {
           rpcError(id, -32603, JSON.stringify([{ expected: "string",
             code: "invalid_type", path: ["params", "name"],
             message: `Invalid input: expected string, received ${zodType(name)}` }], null, 2));
+          return;
+        }
+        if (name === "Skill") {
+          const requested = params.arguments?.name;
+          const text = readSkillDoc(requested ?? "");
+          if (text == null) {
+            rpcResult(id, { content: [textBlock(`Unknown skill doc: ${requested}`)], isError: true });
+          } else {
+            rpcResult(id, { content: [textBlock(text)] });
+          }
           return;
         }
         const tool = toolsByName.get(name);
