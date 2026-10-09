@@ -44,7 +44,9 @@ enum LensBus {
     /// the key is `screenPoint` [native-cursor-contract §4]; slideMs
     /// defaults to 180 (disasm literal). Posts are gated by `enabled`
     /// (daemon --lens flag) — Lens visual work only happens when enabled.
-    static var enabled = true
+    /// [native-cursor-contract §1] LensOverlay +0x25 enabled byte inits
+    /// FALSE; --lens sets it before serving.
+    static var enabled = false
     static func postMove(_ p: CGPoint, slideMs: Int = 180) {
         guard enabled else { return }
         NotificationCenter.default.post(name: move, object: nil,

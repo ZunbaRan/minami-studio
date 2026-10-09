@@ -1049,6 +1049,7 @@ extension Daemon {
             try axInsert(element: entry.element, ref: ref, text: text,
                          replace: a.bool("replace") ?? false)
         }
+        LensBus.postType()
         settlePostlude(pid: entry.pid, baseline: baseline, a: a)
         return ["typed": ref, "length": text.count]
     }
@@ -1090,6 +1091,7 @@ extension Daemon {
                 try axInsert(element: refEntry!.element, ref: ref!,
                              text: text, replace: false)
             }
+            LensBus.postType()
             settlePostlude(pid: pid, baseline: baseline, a: a)
             return ["typed": true, "method": "ax_ref",
                     "length": text.count]
@@ -1103,6 +1105,7 @@ extension Daemon {
                    try axInsert(element: e.element, ref: ref!,
                                 text: text, replace: false)
                }) != nil) {
+                LensBus.postType()
                 settlePostlude(pid: pid, baseline: baseline, a: a)
                 return ["typed": true, "method": "ax_ref",
                         "length": text.count]
@@ -1158,6 +1161,7 @@ extension Daemon {
         -> JSONDict {
         let tb = TypeVerification.baseline(pid: pid)
         try deliver()
+        LensBus.postType()
         settlePostlude(pid: pid, baseline: baseline, a: a)
         let outcome = TypeVerification.check(baseline: tb, typed: text,
                                              pid: pid)

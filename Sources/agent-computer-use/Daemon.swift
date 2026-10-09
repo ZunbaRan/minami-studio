@@ -65,6 +65,7 @@ final class Daemon {
         self.socketPath = socketPath
         self.idleSeconds = idleSeconds
         self.lensEnabled = lensEnabled
+        LensBus.enabled = lensEnabled
     }
 
     // Identity wrapper so Set<ConnectionContext> keys by object identity
