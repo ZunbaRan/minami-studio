@@ -54,6 +54,7 @@ case "daemon":
     var socketPath = defaultSocketPath()
     var idleSeconds = DEFAULT_IDLE_SECONDS
     var lens = false
+    var hideHWCursor = false
     var i = 2
     while i < argv.count {
         let flag = argv[i]
@@ -66,6 +67,8 @@ case "daemon":
             lens = true
         case "--no-lens":
             lens = false
+        case "--pip-hide-hw-cursor":
+            hideHWCursor = true
         case "--help", "-h":
             printUsage()
             exit(0)
@@ -74,7 +77,8 @@ case "daemon":
         }
         i += 1
     }
-    Daemon(socketPath: socketPath, idleSeconds: idleSeconds, lensEnabled: lens).run()
+    Daemon(socketPath: socketPath, idleSeconds: idleSeconds, lensEnabled: lens,
+           pipHideHWCursor: hideHWCursor).run()
 default:
     FileHandle.standardError.write(
         "unknown subcommand: \(sub)\n".data(using: .utf8)!)

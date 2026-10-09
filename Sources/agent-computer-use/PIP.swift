@@ -240,6 +240,9 @@ final class PIPFloaterWindow: NSPanel {
 // MARK: - PIPSession — one live SCStream per mirrored window.
 
 final class PIPSession: NSObject, SCStreamOutput, SCStreamDelegate {
+    /// Opt-in divergence (--pip-hide-hw-cursor): Alma parity is showsCursor
+    /// =true; when set, the stream omits the hardware cursor entirely.
+    static var hideHardwareCursor = false
     let windowId: CGWindowID
     let pid: pid_t?
     let title: String
@@ -289,7 +292,11 @@ final class PIPSession: NSObject, SCStreamOutput, SCStreamDelegate {
         cfg.width = Int(scWindow.frame.width * scale)
         cfg.height = Int(scWindow.frame.height * scale)
         cfg.minimumFrameInterval = CMTime(value: 1, timescale: 30)
-        cfg.showsCursor = true
+        // [native-cursor-contract §3] Alma sets showsCursor=true on the
+        // native PiP stream — the hardware cursor is composited whenever it
+        // overlaps the source window's screen rect. --pip-hide-hw-cursor is
+        // an opt-in product divergence: agent lens stays, user cursor out.
+        cfg.showsCursor = !PIPSession.hideHardwareCursor
         cfg.capturesAudio = false
         cfg.pixelFormat = kCVPixelFormatType_32BGRA
         cfg.queueDepth = 3

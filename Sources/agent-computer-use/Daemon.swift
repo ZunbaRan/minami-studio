@@ -61,11 +61,13 @@ final class Daemon {
     let elementStore = ElementStore()
     let appState = AppStateStore()
 
-    init(socketPath: String, idleSeconds: Double, lensEnabled: Bool) {
+    init(socketPath: String, idleSeconds: Double, lensEnabled: Bool,
+         pipHideHWCursor: Bool = false) {
         self.socketPath = socketPath
         self.idleSeconds = idleSeconds
         self.lensEnabled = lensEnabled
         LensBus.enabled = lensEnabled
+        PIPSession.hideHardwareCursor = pipHideHWCursor
     }
 
     // Identity wrapper so Set<ConnectionContext> keys by object identity
