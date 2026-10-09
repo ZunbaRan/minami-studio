@@ -181,7 +181,7 @@ R3 屏幕可见区由 AppKit 实读：`x=0,y=60,w=1512,h=889`，maxY=949，单�
 - 完整哨兵：`/tmp/cu-field-r3-20261009-134241/sentinel.jsonl`
 - 响应差异：`/tmp/cu-field-r3-20261009-134241/comparisons.jsonl` 与 `phase2-results.jsonl`
 - 回归定位/销毁：`r3-initial-frames.json`、`r3-aligned-frames.json`、`r4-destroy.json`
-- 崩溃报告：`agent-computer-use-2026-10-09-134734.ips`、`agent-computer-use-2026-10-09-135043.ips`
+- 崩溃报告：`minami-studio-2026-10-09-134734.ips`、`minami-studio-2026-10-09-135043.ips`
 - 所有临时脚本/输出与散列：同目录 `r3*.py`、`r3*.out`、`manifest.json`。生产仓库不新增可执行测试代码。
 
 ## 产出核验

@@ -1,6 +1,6 @@
 # LAWRENCE-TOUR — WiseStudio 全功能遍历 + 成功录像 + 手册沉淀
 
-你是 Codex CLI，拥有 `minami_computer_use` MCP（23 工具 + Skill 手册通道）和 bash。
+你是 Codex CLI，拥有 `minami_studio` MCP（23 工具 + Skill 手册通道）和 bash。
 
 ## 目标对象（固定，别换 pid）
 
@@ -16,7 +16,7 @@
 
 ## 工作目录（已建好）
 
-`/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/computer-use/field-e2e/lawrence/`
+`/Users/lu/Documents/data/project/alma-reverse/minami-studio/computer-use/field-e2e/lawrence/`
 - `clips/` 每次成功操作的录像片段
 - `out/` 最终合并视频
 - `LOG.md` 逐操作日志
@@ -46,7 +46,7 @@
 2. `out/lawrence-tour.mov`：ffmpeg 合并所有保留片段为单一视频
    `ffmpeg -f concat -safe 0 -i clips.txt -c copy out/lawrence-tour.mov`（若 concat copy 失败，重编码 `-c:v libx264 -pix_fmt yuv420p`）
 3. `LOG.md`：每操作一行（含失败原因分类：suppressed/无效果/报错/弹窗取消）
-4. **`/Users/lu/Documents/data/project/alma-reverse/minami-computer-use/skills/lawrence-exploration/SKILL.md`**（repo 内新建）：给低等级模型的 Lawrence 操作手册——YAML frontmatter(name/description)，正文含：app 概况与 AX 特点（Chromium 空树→截图坐标流）、可点击元素清单与坐标锚点、菜单 chord 表、每条踩坑记录（什么操作失败/为什么/绕法）、顺利操作配方（什么方法稳定）、探索时的注意事项
+4. **`/Users/lu/Documents/data/project/alma-reverse/minami-studio/skills/lawrence-exploration/SKILL.md`**（repo 内新建）：给低等级模型的 Lawrence 操作手册——YAML frontmatter(name/description)，正文含：app 概况与 AX 特点（Chromium 空树→截图坐标流）、可点击元素清单与坐标锚点、菜单 chord 表、每条踩坑记录（什么操作失败/为什么/绕法）、顺利操作配方（什么方法稳定）、探索时的注意事项
 
 ## 清理
 

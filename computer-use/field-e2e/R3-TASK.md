@@ -3,7 +3,7 @@
 你是外场测试工程师。环境:macOS 真机桌面,两个 daemon socket 可对照:
 
 - **我们的实现**:/Users/lu/Library/Application Support/Alma/computer-use-72097929.sock
-  (或经 MCP 工具 `agent_computer_use`,同源)
+  (或经 MCP 工具 `minami_studio`,同源)
 - **真 Alma 参照**:/Users/lu/Library/Application Support/Alma/computer-use-9bd08bc1.sock
   (直接 socket JSON-RPC,信封 `{"id":N,"cmd":"...","args":{...}}`,行分隔 JSON)
 

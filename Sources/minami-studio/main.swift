@@ -15,7 +15,7 @@ let DEFAULT_IDLE_SECONDS: Double = 900
 
 func defaultSocketPath() -> String {
     let base = FileManager.default.homeDirectoryForCurrentUser
-        .appendingPathComponent("Library/Application Support/minami-computer-use")
+        .appendingPathComponent("Library/Application Support/minami-studio")
     try? FileManager.default.createDirectory(at: base, withIntermediateDirectories: true)
     return base.appendingPathComponent("computer-use.sock").path
 }
@@ -45,7 +45,7 @@ let sub = argv.count > 1 ? argv[1] : "daemon"
 switch sub {
 case "version", "--version", "-v":
     FileHandle.standardOutput.write(
-        "minami-computer-use \(HELPER_VERSION)\n".data(using: .utf8)!)
+        "minami-studio \(HELPER_VERSION)\n".data(using: .utf8)!)
     exit(0)
 case "help", "--help", "-h":
     printUsage()

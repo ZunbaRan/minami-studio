@@ -1,11 +1,11 @@
 #!/usr/bin/env node
-// minami-computer-use MCP stdio server.
+// minami-studio MCP stdio server.
 // Verbatim port of Alma's Resources/cli/alma-computer-use-mcp.mjs tool surface
 // (23 registerTool sites, byte-identical across .153/.164), with the Alma host
 // HTTP side-calls kept best-effort fail-open and a hand-rolled stdio transport
 // (Alma bundles the SDK; behavior identical either way).
 //
-// Chain: MCP client ──stdio──> this ──unix socket──> agent-computer-use daemon
+// Chain: MCP client ──stdio──> this ──unix socket──> minami-studio daemon
 // Side calls (ALMA_API-equivalent, fail-open): CU_HOST_URL env (default off).
 
 import { spawn } from "node:child_process";
@@ -108,10 +108,10 @@ function resolveHelperBinary() {
     candidates.push(path.join(dir, "..", "..", "computer-use", almaRel));
     candidates.push(path.join(dir, "..", "..", "..", "computer-use", almaRel));
     // our own repo layout
-    candidates.push(path.join(dir, "..", "bin", "minami-computer-use"));
-    candidates.push(path.join(dir, "..", ".build", "release", "minami-computer-use"));
-    candidates.push(path.join(dir, "..", ".build", "debug", "minami-computer-use"));
-    candidates.push(path.join(dir, "..", "..", "bin", "minami-computer-use"));
+    candidates.push(path.join(dir, "..", "bin", "minami-studio"));
+    candidates.push(path.join(dir, "..", ".build", "release", "minami-studio"));
+    candidates.push(path.join(dir, "..", ".build", "debug", "minami-studio"));
+    candidates.push(path.join(dir, "..", "..", "bin", "minami-studio"));
   }
   for (const p of candidates) {
     if (existsSync(p)) return p;
@@ -120,7 +120,7 @@ function resolveHelperBinary() {
 }
 
 function defaultSocketPath() {
-  const base = path.join(os.homedir(), "Library", "Application Support", "minami-computer-use");
+  const base = path.join(os.homedir(), "Library", "Application Support", "minami-studio");
   mkdirSync(base, { recursive: true });
   const helper = resolveHelperBinary();
   if (!helper) return path.join(base, "computer-use.sock");
@@ -1759,7 +1759,7 @@ defTool(
 // Content-Length headers and bare newline-delimited JSON (what codex sends),
 // and replies in the framing the client used.
 
-const SERVER_INFO = { name: "minami-computer-use", version: "1.0.0" };
+const SERVER_INFO = { name: "minami-studio", version: "1.0.0" };
 const INSTRUCTIONS = [
   "Drive native macOS apps via the Accessibility API and CGEvent.",
   "Start every turn with `get_app_state <bundle|pid>` — it returns a",

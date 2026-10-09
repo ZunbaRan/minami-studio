@@ -1,6 +1,6 @@
 ---
 name: lawrence-exploration
-description: 在 macOS 后台探索 WiseStudio（Lawrence），使用 minami_computer_use 截图、深层 AX 引用和坐标操作，记录成功录像、恢复原页面并诊断无效果操作。用于 WiseStudio 功能巡检和操作手册，不替代应用配置或数据变更授权。
+description: 在 macOS 后台探索 WiseStudio（Lawrence），使用 minami_studio 截图、深层 AX 引用和坐标操作，记录成功录像、恢复原页面并诊断无效果操作。用于 WiseStudio 功能巡检和操作手册，不替代应用配置或数据变更授权。
 ---
 
 # WiseStudio / Lawrence 后台操作手册
@@ -20,7 +20,7 @@ description: 在 macOS 后台探索 WiseStudio（Lawrence），使用 minami_com
 
 ## 先读手册，再看当前状态
 
-开始前通过 `minami_computer_use.Skill` 读取：
+开始前通过 `minami_studio.Skill` 读取：
 
 1. `computer-use/screenshot-coordinate-clicks`
 2. `computer-use/error-recovery`
@@ -53,7 +53,7 @@ get_app_state({
 
 不要对没有 AXPress 的容器盲试 ref 点击。`strategy:"ax"` 不是通用动作接口。`type_text` 回 `typed ...` 也不是落字证据：005 Unicode 输入和 030 ref+AX 输入均未改变字段；031 的 `set_value` 才成功。
 
-像素点击有一个本轮可解释但未完全证明的限制：`Sources/minami-computer-use/Input.swift` 的后台 click 会设置 Command 标志，而部分 SPA 链接对修饰键点击不导航。这与本轮“只出现悬停样式”的现象相符；不要把它升级成已证明的 WiseStudio bug，也不要改 daemon 或取消后台保护来绕过。使用当前 AXLink 的 AXPress 是已验证的办法。
+像素点击有一个本轮可解释但未完全证明的限制：`Sources/minami-studio/Input.swift` 的后台 click 会设置 Command 标志，而部分 SPA 链接对修饰键点击不导航。这与本轮“只出现悬停样式”的现象相符；不要把它升级成已证明的 WiseStudio bug，也不要改 daemon 或取消后台保护来绕过。使用当前 AXLink 的 AXPress 是已验证的办法。
 
 ## 截图坐标与锚点
 

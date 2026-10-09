@@ -8,7 +8,7 @@ if [ -z "$NODE" ]; then
   done
 fi
 if [ -z "$NODE" ]; then
-  echo "minami-computer-use-mcp: node not found on PATH" >&2
+  echo "minami-studio-mcp: node not found on PATH" >&2
   exit 1
 fi
-exec "$NODE" "$(dirname "$0")/../mcp/minami-computer-use-mcp.mjs" "$@"
+exec "$NODE" "$(dirname "$0")/../mcp/minami-studio-mcp.mjs" "$@"

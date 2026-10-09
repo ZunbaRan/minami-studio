@@ -14,7 +14,7 @@ agent ──stdio──> MCP wrapper (29 tools) ──unix socket NDJSON──> 
 ```
 
 - **MCP 工具面 = 29 个**：Alma 的 23 个 action 工具 + `Skill` + Minami 自己的 5 个 `pip_*`（pip_open/pip_close/pip_status/pip_arm/pip_disarm）。
-- **daemon socket = 完整协议面**：含 MCP 未暴露的命令。路径 `~/Library/Application Support/minami-computer-use/computer-use-<tag>.sock`，UTF-8 JSON-lines，一行请求一行响应。socket 直连见 `pip-preview` 手册。
+- **daemon socket = 完整协议面**：含 MCP 未暴露的命令。路径 `~/Library/Application Support/minami-studio/computer-use-<tag>.sock`，UTF-8 JSON-lines，一行请求一行响应。socket 直连见 `pip-preview` 手册。
 
 ## PiP 画中画
 

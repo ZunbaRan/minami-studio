@@ -1,10 +1,10 @@
 {
-  "name": "minami-computer-use",
-  "version": "1.0.0-beta.3",
-  "description": "Minami Computer Use — MCP-native macOS desktop automation (AX/CGEvent/SCK daemon + stdio MCP wrapper)",
+  "name": "minami-studio",
+  "version": "0.1.0",
+  "description": "Minami Studio — MCP-native macOS desktop automation daemon with self-recording + auto-zoom export (fork of minami-computer-use)",
   "type": "module",
   "bin": {
-    "minami-computer-use-mcp": "mcp/minami-computer-use-mcp.mjs"
+    "minami-studio-mcp": "mcp/minami-studio-mcp.mjs"
   },
   "scripts": {
     "postinstall": "node scripts/install.mjs"
@@ -23,7 +23,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/ZunbaRan/minami-computer-use.git"
+    "url": "git+ssh://git@github.com/ZunbaRan/minami-studio.git"
   },
   "private": true
 }

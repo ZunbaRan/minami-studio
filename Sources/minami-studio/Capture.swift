@@ -55,7 +55,7 @@ enum Capture {
             throw inFlightError
                 ?? DaemonError("sc_not_granted",
                     "Screen Recording permission not granted to "
-                    + "agent-computer-use.")
+                    + "minami-studio.")
         }
         inFlight = true
         let mySem = DispatchSemaphore(value: 0)
@@ -81,7 +81,7 @@ enum Capture {
             // creator failure normalizes to sc_not_granted
             inFlightError = DaemonError("sc_not_granted",
                 "Screen Recording permission not granted to "
-                + "agent-computer-use.")
+                + "minami-studio.")
         }
         inFlight = false
         let r = inFlightResult, e = inFlightError
@@ -91,7 +91,7 @@ enum Capture {
         if let r { return r }
         throw e ?? DaemonError("sc_not_granted",
             "Screen Recording permission not granted to "
-            + "agent-computer-use.")
+            + "minami-studio.")
     }
 
     /// cache window(id): fresh(2s) → search → miss → invalidate →

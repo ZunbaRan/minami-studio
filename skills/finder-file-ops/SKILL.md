@@ -1,6 +1,6 @@
 ---
 name: finder-file-ops
-description: 使用 minami_computer_use 在后台做 Finder 自有文件的定位、重命名、简介和清理。
+description: 使用 minami_studio 在后台做 Finder 自有文件的定位、重命名、简介和清理。
 ---
 # Finder 文件操作
 ## 前置条件

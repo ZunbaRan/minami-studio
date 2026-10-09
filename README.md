@@ -1,15 +1,20 @@
-# minami-computer-use
+# minami-studio
 
-Independent, MCP-native reproduction of Alma's macOS Computer Use surface.
-Behavior is benchmarked against Alma .153 (disassembly + live probes) and the
-.164 contract package — same three-layer chain, same wire formats, same error
-text. No added features.
+**Alma-parity macOS Computer Use daemon + self-recording & auto-zoom export.**
+
+Fork of [minami-computer-use](https://github.com/ZunbaRan/minami-computer-use)
+(@ v1.0.0-beta.3). The existing 23-tool wire surface keeps verbatim parity
+with Alma (.153 disassembly / .164 contract); on top of it this project adds
+the ability for the daemon to **record its own sessions** — cursor tracked
+separately, then re-composited with Recordly-style auto-zoom camera motion
+at export. Recording helpers derive from [Recordly](https://github.com/webadderallorg/Recordly)
+(AGPL-3.0); this project is AGPL-3.0 accordingly.
 
 ```
 Agent (Codex CLI / any MCP client)
-  └── stdio MCP ── bin/minami-computer-use-mcp (node, zero-dep)
+  └── stdio MCP ── bin/minami-studio-mcp (node, zero-dep)
         ├── optional host calls → MINAMI_CU_HOST_URL (fail-open)
-        └── unix socket NDJSON ── bin/minami-computer-use (Swift daemon)
+        └── unix socket NDJSON ── bin/minami-studio (Swift daemon)
               └── Accessibility API / CGEvent / CGWindowList / TCC
 ```
 
@@ -22,30 +27,30 @@ harness 配置里直接写（无需 clone；postinstall 会自动从 Release 拉
 的 universal 守护进程，私有 repo 需要本机 git/gh 对该 repo 有访问权）：
 
 ```json
-"minami_computer_use": {
+"minami_studio": {
   "command": "npx",
-  "args": ["-y", "github:ZunbaRan/minami-computer-use"]
+  "args": ["-y", "github:ZunbaRan/minami-studio"]
 }
 ```
 
 ### B. 预编译 tarball
 
 ```sh
-# 下载 release 里的 minami-computer-use-<ver>-macos-universal.tar.gz
+# 下载 release 里的 minami-studio-<ver>-macos-universal.tar.gz
 # (Apple Silicon + Intel 双架构；私有 repo 需 gh 登录或 token)
-gh release download v1.0.0-beta.2 -R ZunbaRan/minami-computer-use \
-  -p 'minami-computer-use-*-macos-universal.tar.gz'
-tar xzf minami-computer-use-*.tar.gz && cd minami-computer-use
+gh release download v1.0.0-beta.2 -R ZunbaRan/minami-studio \
+  -p 'minami-studio-*-macos-universal.tar.gz'
+tar xzf minami-studio-*.tar.gz && cd minami-studio
 xattr -dr com.apple.quarantine .   # 去掉 Gatekeeper 隔离位
 ```
 
-得到 `bin/minami-computer-use`(Swift daemon)+ `bin/minami-computer-use-mcp`
+得到 `bin/minami-studio`(Swift daemon)+ `bin/minami-studio-mcp`
 (MCP 入口)+ `mcp/` + `skills/`(操作手册，Skill 工具/resources 即时读)。
 
 ### C. 源码构建
 
 ```sh
-git clone <this repo> && cd minami-computer-use
+git clone <this repo> && cd minami-studio
 ./scripts/build.sh release     # 需要 Xcode CLT / Swift toolchain
 ```
 
@@ -57,26 +62,26 @@ MCP harness 自动拉起授给 harness(pi/Codex 等)。首次截图/PiP 会弹�
 
 ### 接入 MCP harness
 
-入口文件 = `bin/minami-computer-use-mcp`(stdio,node≥18):
+入口文件 = `bin/minami-studio-mcp`(stdio,node≥18):
 
 ```sh
 # Codex
-codex mcp add minami_computer_use -- /abs/path/bin/minami-computer-use-mcp
+codex mcp add minami_studio -- /abs/path/bin/minami-studio-mcp
 
 # pi —— 写进 ~/.pi/agent/mcp.json 的 mcpServers:
-#   "minami_computer_use": { "command": "/abs/path/bin/minami-computer-use-mcp" }
+#   "minami_studio": { "command": "/abs/path/bin/minami-studio-mcp" }
 
 # Claude Code
-claude mcp add minami-computer-use -- /abs/path/bin/minami-computer-use-mcp
+claude mcp add minami-studio -- /abs/path/bin/minami-studio-mcp
 ```
 
 wrapper 首次收到请求会自动 spawn daemon
-（socket `~/Library/Application Support/minami-computer-use/computer-use-<sha1tag8>.sock`)。
+（socket `~/Library/Application Support/minami-studio/computer-use-<sha1tag8>.sock`)。
 手动拉起：
 
 ```sh
-bin/minami-computer-use daemon \
-  --socket "$HOME/Library/Application Support/minami-computer-use/computer-use-<tag>.sock" \
+bin/minami-studio daemon \
+  --socket "$HOME/Library/Application Support/minami-studio/computer-use-<tag>.sock" \
   --idle-seconds 3600 [--lens] [--pip-hide-hw-cursor]
 ```
 
@@ -94,16 +99,16 @@ bin/minami-computer-use daemon \
 ## Build & install
 
 ```sh
-./scripts/build.sh            # swift build + stage bin/minami-computer-use
-./scripts/install-codex.sh    # codex mcp add agent_computer_use
+./scripts/build.sh            # swift build + stage bin/minami-studio
+./scripts/install-codex.sh    # codex mcp add minami_studio
 ./scripts/smoke.sh            # initialize → tools/list(23) → permissions → list_apps
 ```
 
 The MCP wrapper auto-spawns the daemon (`daemon --socket <path> --idle-seconds 900`)
 on first call; socket lives at
-`~/Library/Application Support/agent-computer-use/computer-use-<hash>.sock`.
+`~/Library/Application Support/minami-studio/computer-use-<hash>.sock`.
 
-For non-Codex harnesses: stdio command = `<repo>/bin/minami-computer-use-mcp`
+For non-Codex harnesses: stdio command = `<repo>/bin/minami-studio-mcp`
 (accepts both Content-Length headers and bare-JSONL framing, replies in kind).
 
 ## Tool surface (23 — verbatim parity)
@@ -153,8 +158,8 @@ rejected with Alma's verbatim message.
 - Error paths verbatim: `element_not_found` (stale ref), `forbidden_target`
   (blocklist), `no screenshot mapping for pid …`, `missing "direction"`,
   `unknown cmd: …`, `missing "out"` (shot).
-- Codex CLI e2e: registered as `agent_computer_use`, tools load as
-  `mcp__agent_computer_use__*`; requires `codex exec --approve-for-me`
+- Codex CLI e2e: registered as `minami_studio`, tools load as
+  `mcp__minami_studio__*`; requires `codex exec --approve-for-me`
   (default `never` policy auto-denies MCP calls).
 
 ## Platform realities observed
@@ -184,12 +189,12 @@ rejected with Alma's verbatim message.
 
 ```
 Package.swift
-Sources/agent-computer-use/   main, Support, Daemon, Daemon+Actions,
+Sources/minami-studio/   main, Support, Daemon, Daemon+Actions,
                               AX, Capture, Focus, Input, MCPServer, PIP,
                               Appshot+VisualIndex
-mcp/agent-computer-use-mcp.mjs   23-tool stdio server (Alma wrapper port)
+mcp/minami-studio-mcp.mjs   23-tool stdio server (Alma wrapper port)
 mcp/playbooks/*.md               7 verbatim app playbooks
-bin/minami-computer-use{,-mcp}    staged artifacts
+bin/minami-studio{,-mcp}    staged artifacts
 scripts/{build,install-codex,smoke}.sh
 docs/                            provenance notes
 ```

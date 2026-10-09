@@ -13,15 +13,15 @@ import { fileURLToPath } from "node:url";
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const require = createRequire(import.meta.url);
 const pkg = require("../package.json");
-const repo = process.env.MINAMI_CU_REPO || "ZunbaRan/minami-computer-use";
+const repo = process.env.MINAMI_CU_REPO || "ZunbaRan/minami-studio";
 const tag = `v${pkg.version}`;
-const asset = `minami-computer-use-${tag}-macos-universal.tar.gz`;
-const dest = path.join(root, "bin", "minami-computer-use");
+const asset = `minami-studio-${tag}-macos-universal.tar.gz`;
+const dest = path.join(root, "bin", "minami-studio");
 
 function log(m) { process.stderr.write(`[minami-cu install] ${m}\n`); }
 
 if (process.platform !== "darwin") {
-  log("non-macOS platform — minami-computer-use is macOS-only, skipping daemon download.");
+  log("non-macOS platform — minami-studio is macOS-only, skipping daemon download.");
   process.exit(0);
 }
 if (existsSync(dest)) { log(`daemon already present: ${dest}`); process.exit(0); }
@@ -51,12 +51,12 @@ try {
   ], { maxBuffer: 64 << 20 }));
   mkdirSync(path.dirname(dest), { recursive: true });
   execFileSync("tar", ["-xzf", tgz, "-C", path.dirname(tgz),
-    `minami-computer-use/bin/minami-computer-use`]);
-  const unpacked = path.join(path.dirname(tgz), "minami-computer-use/bin/minami-computer-use");
+    `minami-studio/bin/minami-studio`]);
+  const unpacked = path.join(path.dirname(tgz), "minami-studio/bin/minami-studio");
   execFileSync("cp", [unpacked, dest]);
   chmodSync(dest, 0o755);
   rmSync(tgz, { force: true });
-  rmSync(path.join(path.dirname(tgz), "minami-computer-use"), { recursive: true, force: true });
+  rmSync(path.join(path.dirname(tgz), "minami-studio"), { recursive: true, force: true });
   log(`daemon installed → ${dest} (${tag})`);
 } catch (e) {
   log(`daemon download failed: ${String(e).slice(0, 300)}`);

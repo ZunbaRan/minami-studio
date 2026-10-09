@@ -1,6 +1,6 @@
 import Foundation
 
-// Wire types + helpers for the agent-computer-use daemon protocol.
+// Wire types + helpers for the minami-studio daemon protocol.
 // Spec: computer-use/chapters/12 (45-cmd dispatch), 03-daemon-protocol (envelope),
 // code-evidence/* and alma-computer-use-archive for .153 branch semantics.
 

@@ -1,4 +1,26 @@
-# AGENTS.md — minami-computer-use
+# AGENTS.md — minami-studio
+
+**minami-studio = minami-computer-use 的分叉项目**（fork @ v1.0.0-beta.3,
+commit e181b9a），在完整 Alma parity daemon 之上增加**自带录屏 +
+自动变焦（scale 效果）导出**能力。原版项目继续在
+`../minami-computer-use` 维护，两边代码各自演进。
+
+## 与原版的分工
+
+- **存量面（23 工具 wire/错误语义/daemon 命令注册表）**：仍按下方 Alma
+  parity 纪律执行——不动 wire 格式、不加错误字段、不改已钉死语义。
+- **新增面（`record_*` / zoom 导出 / 光标遥测）**：Alma 没有等价物，
+  属于自由设计区，但 wire 风格照 daemon 既有 NDJSON 惯例。
+  设计证据基准：`docs/RECORDLY-ZOOM-PIPELINE.md`（Recordly 逆向分析）。
+- **许可证**：本项目 AGPL-3.0（`LICENSE`），允许 vendored 使用
+  Recordly 的 AGPL Swift helper（录制器/光标监视器）；自主实现的
+  zoom 数学层不受其版权约束。
+- `.153` 反汇编证据目录未随 fork 复制；需要时看
+  `../minami-computer-use/alma-computer-use-archive/`。
+
+以下为原版 AGENTS.md 内容（parity 纪律与硬坑记录全部继承）：
+
+---
 
 Independent MCP-native reproduction of Alma's macOS Computer Use surface.
 **唯一准绳：严格对标 Alma。** 不加 Alma 没有的能力、不改 Alma 的 wire/错误语义，
@@ -8,11 +30,11 @@ Independent MCP-native reproduction of Alma's macOS Computer Use surface.
 ## 结构与入口
 
 ```
-Sources/minami-computer-use/  Swift daemon（main / Support / Daemon /
+Sources/minami-studio/  Swift daemon（main / Support / Daemon /
                               Daemon+Actions / AX / Capture / Focus /
                               Input / PIP）
-mcp/minami-computer-use-mcp.mjs 23-tool stdio MCP wrapper（Alma wrapper 移植）
-bin/minami-computer-use-mcp     稳定入口（任何 harness 指这里）
+mcp/minami-studio-mcp.mjs 23-tool stdio MCP wrapper（Alma wrapper 移植）
+bin/minami-studio-mcp     稳定入口（任何 harness 指这里）
 scripts/{build,install-codex,smoke}.sh
 ```
 
@@ -23,13 +45,13 @@ daemon 自带 45 命令注册表；未实现项返回 Alma 的 `not_implemented`
 ## 构建/验证
 
 ```sh
-./scripts/build.sh            # swift build → bin/minami-computer-use
+./scripts/build.sh            # swift build → bin/minami-studio
 ./scripts/smoke.sh            # initialize→tools/list(23)→permissions→list_apps
-./scripts/install-codex.sh    # codex mcp add minami_computer_use
+./scripts/install-codex.sh    # codex mcp add minami_studio
 ```
 
 Devin 侧已配置：项目根 `.devin/mcp_config.local.json` 的
-`mcpServers.minami_computer_use` 指到 `bin/minami-computer-use-mcp`。
+`mcpServers.minami_studio` 指到 `bin/minami-studio-mcp`。
 
 ## 本机踩出的硬坑（再改别再踩）
 
@@ -54,7 +76,7 @@ Devin 侧已配置：项目根 `.devin/mcp_config.local.json` 的
 6. **Apple 系 app 的 AXWindows 自环**：snapshot walker 必须 CFEqual 祖先
    防环 + `maxSerializedElements=4000` 硬顶。
 7. **Codex 用裸 JSONL 帧**（无 Content-Length）；wrapper 双帧自适应——
-   请求什么帧就回什么帧。codex 工具名要下划线（`agent_computer_use`）。
+   请求什么帧就回什么帧。codex 工具名要下划线（`minami_studio`）。
 8. **`codex exec` 默认 `approval=never` 拒掉所有 MCP 调用**——用
    `--approve-for-me` 或交互式审批。
 9. **TCC 归因**：裸二进制无独立条目，权限挂责任进程（本机 = Ghostty）。
@@ -211,7 +233,7 @@ minimize→自动开 PiP 会话全链路实测；gas AX-only 不还原最小化�
 - **menu_shortcuts 序列化规则**(walk @0x100030608 逐指令）:mods 位 3 置位=无 cmd;cmd/ctrl/opt/shift 固定序；key=`AXMenuItemCmdChar.lowercased()` 原样（glyph ⎋/\x1b/? 不映射）;char 空→vk 跳表命名（Return/Tab/Space/Backspace/Escape/F1-F12/Home/End/PageUp/PageDown/Delete/Left/Right/Down/Up，首字母大写）；表外→`vk%02X` 大写 hex。char 与 vk 皆无→跳过该项。
 - **PiP 浮窗定位**(`nextCascadeOrigin` @0x10004f36c)：全局单调 counter（锁保护、关闭不重置、**读旧值再自增**);`x=max(vf.maxX-w-24-28n,minX+12)`,`y=max(vf.maxY-h-24-28n,minY+12)`;**Cocoa 顶右锚定**（视觉上是屏幕右上、菜单栏下方），非右下。本机验证 (1248,725)/(1220,471) 逐字节命中。
 - **PiP 会话回收**：已销毁 AX 元素的属性（含 wid）不可读；且 **AXUIElementDestroyed 先于 CGWindowList 移除**——两类替代判定都不可靠。真实语义：观察器只注册在解析出的窗口元素上，destroyed 通知即权威、无条件 close;MinimizeArmer 同理用元素身份 CFEqual 定位。
-- daemon 手工拉起约定：`bin/minami-computer-use daemon --socket ~/Library/Application Support/minami-computer-use/computer-use-<sha1tag8>.sock --idle-seconds 3600 [--lens] [--pip-hide-hw-cursor]`(MCP 客户端也会自动 spawn)。
+- daemon 手工拉起约定：`bin/minami-studio daemon --socket ~/Library/Application Support/minami-studio/computer-use-<sha1tag8>.sock --idle-seconds 3600 [--lens] [--pip-hide-hw-cursor]`(MCP 客户端也会自动 spawn)。
 
 ## Round-4 修复（2026-10-09，针对 R3 回归新发现的 6 项）
 

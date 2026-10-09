@@ -5,7 +5,7 @@ set -e
 cd "$(dirname "$0")/.."
 python3 - <<'PYEOF'
 import subprocess, json, time, select, sys, os
-p = subprocess.Popen(["bin/agent-computer-use-mcp"], stdin=subprocess.PIPE,
+p = subprocess.Popen(["bin/minami-studio-mcp"], stdin=subprocess.PIPE,
                      stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 def send(msg):
     body = json.dumps(msg).encode()
@@ -27,13 +27,13 @@ def recv(timeout=45):
 send({"jsonrpc":"2.0","id":1,"method":"initialize",
       "params":{"protocolVersion":"2024-11-05","capabilities":{},
                 "clientInfo":{"name":"smoke","version":"0"}}})
-r = recv(); assert r and r["result"]["serverInfo"]["name"]=="agent-computer-use", r
+r = recv(); assert r and r["result"]["serverInfo"]["name"]=="minami-studio", r
 send({"jsonrpc":"2.0","method":"notifications/initialized"})
 
 send({"jsonrpc":"2.0","id":2,"method":"tools/list","params":{}})
 r = recv(); names = sorted(t["name"] for t in r["result"]["tools"])
-assert len(names)==23, names
-print("tools/list: 23 tools OK")
+assert len(names)==29, names
+print("tools/list: 29 tools OK")
 
 send({"jsonrpc":"2.0","id":3,"method":"tools/call",
       "params":{"name":"permissions","arguments":{}}})

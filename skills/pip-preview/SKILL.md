@@ -106,7 +106,7 @@ CX17 两端在**源窗口仍最小化时新建**的会话，约9秒后仍 `has_f
 
 ## 已踩的坑 / 不要做的事
 
-- 不发明 `minami_computer_use.pip_open` 这样的 MCP 工具名，不用 shell/AppleScript 编辑源文稿。
+- 不发明 `minami_studio.pip_open` 这样的 MCP 工具名，不用 shell/AppleScript 编辑源文稿。
 - 不硬编码默认334×220。本轮宽度240，TextEdit高200、Calculator高426；源尺寸和当前环境会影响大小。
 - **默认位置存在已确认差异**：ours 两窗返回同一 x1248/y84；Alma 分别为 x1248/y725 与 x1220/y471。这里只确认返回位置/布局不同，不猜坐标系根因。像素点击必须重新 MCP get_app_state，不能直接拿 floater_frame 当截图映射。
 - **源窗口关闭后可能残留 PiP**：本轮第二次复现中 ours 在源已关闭43秒后仍有无新帧 session，Alma 已为空。主动按源 ID close 清理，不能只关闭源窗口就结束。

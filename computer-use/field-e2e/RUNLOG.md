@@ -3,7 +3,7 @@
 - 执行环境：2026-10-09，本机macOS；首轮实测11:13–12:22 CST，CX17补测12:28–12:36 CST。**计划20项，实际执行20项（含部分完成和确认差异）；不能宣称全部覆盖通过。**
 - 已确认实现差异：4项minor（opt别名、menu_shortcuts键名、PiP默认位置/布局、源关闭后PiP残留），见[BUGS](BUGS.md)。另按硬约束记录16项哨兵变化观察，因用户/其他操作未排除，不计已确认parity差异。
 - 本轮编写17本类别手册。原有field-preflight是另一权限环境预检留下的历史手册，不计入17本。
-- 只写本目录两份Markdown和skills各SKILL.md；没有修改源码、配置、构建或修复系统。GUI操作走agent_computer_use；CX17按用户新增明确授权使用PiP daemon socket，真Alma socket用于同请求对照。未发送消息、购物、修改真实系统选项或删除用户既有数据。
+- 只写本目录两份Markdown和skills各SKILL.md；没有修改源码、配置、构建或修复系统。GUI操作走minami_studio；CX17按用户新增明确授权使用PiP daemon socket，真Alma socket用于同请求对照。未发送消息、购物、修改真实系统选项或删除用户既有数据。
 - 下表为最终有效统计。附录保留文件原有的CX00预检阻塞记录和逐步流水，包含已更正的临时结论；旧“0项执行”不代表本轮实测。
 
 |任务|覆盖|结果|发现的bug|手册|
@@ -88,7 +88,7 @@ Alma对照socket为computer-use-9bd08bc1.sock，JSON-lines。通过只读脚本�
 
 - 日期：2026-10-09（Asia/Shanghai）；执行者：Codex CX。
 - 状态：预检阻塞，计划 20 项真实任务，完成 0 项；下表明确区分计划与实测。
-- GUI 仅使用 agent_computer_use MCP；真 Alma socket 只用于同请求定性。未执行 socket 调用。
+- GUI 仅使用 minami_studio MCP；真 Alma socket 只用于同请求定性。未执行 socket 调用。
 - 不改源码/配置；不发送消息；不操作既有数据。实际未创建任何测试文件、笔记、窗口或 PiP 会话，也未修改计算器状态，无测试数据待清理。
 - 哨兵前后采样只能检查采样点，不能证明中间没有瞬时变化。本轮连有效首次基线也未取得。
 - 当前 MCP 暴露 23 工具，不含 pip_*、press；get_app_state schema 未暴露 include_screenshot。PiP 是否允许 socket 例外已询问，未获答复前不执行。
@@ -133,7 +133,7 @@ Alma对照socket为computer-use-9bd08bc1.sock，JSON-lines。通过只读脚本�
 
 ## 恢复入口
 
-需要运行环境允许 agent_computer_use MCP 调用，并能取得有效的前台/光标哨兵。当前会话禁止审批升级；不在本次任务中修改源码、MCP配置或系统选项。环境恢复后先重跑CX00，再逐项执行CX01–CX20；不得沿用不存在的截图、ref或窗口id。若PiP仍只有socket入口，需明确获准该例外后才执行CX18。
+需要运行环境允许 minami_studio MCP 调用，并能取得有效的前台/光标哨兵。当前会话禁止审批升级；不在本次任务中修改源码、MCP配置或系统选项。环境恢复后先重跑CX00，再逐项执行CX01–CX20；不得沿用不存在的截图、ref或窗口id。若PiP仍只有socket入口，需明确获准该例外后才执行CX18。
 
 每项执行时先写入前哨兵，再做操作和效果验证，清理后记录后哨兵；有异常时立即记录动作时间与参数。每3–5项落盘已验证手册。真Alma也有的行为写入手册的parity限制，不报实现bug。
 
@@ -226,7 +226,7 @@ CX18定性：Alma Music depth0同样返回visual_refs=[v1 SiQrn,v2 pJ•]，conf
 
 ## CX17 获授权的PiP续测
 
-用户新增授权明确允许 PiP 使用 daemon socket；本项不再受“23个 MCP 工具无 pip_*”阻塞。2026-10-09 12:28:58–12:36:58 CST，GUI 编辑/最小化/文稿关闭全部使用 agent_computer_use MCP；PiP 使用授权的两端 socket，同源、同参数对照。没有改源码、配置或系统选项。
+用户新增授权明确允许 PiP 使用 daemon socket；本项不再受“23个 MCP 工具无 pip_*”阻塞。2026-10-09 12:28:58–12:36:58 CST，GUI 编辑/最小化/文稿关闭全部使用 minami_studio MCP；PiP 使用授权的两端 socket，同源、同参数对照。没有改源码、配置或系统选项。
 
 - 被测 socket：`computer-use-72097929.sock`；Alma：`computer-use-9bd08bc1.sock`；目录均为 `/Users/lu/Library/Application Support/Alma/`。
 - 源应用：TextEdit pid64284；Calculator pid57752。初始 TextEdit 用户原窗 W230637、内容 `é👩‍💻`；Calculator W230248、基础模式0。

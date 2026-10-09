@@ -6,9 +6,9 @@
 
 ## BUG-CX00-MCP授权策略阻断全部探测
 - 严重度: blocker
-- 分类: 测试运行环境阻塞；不是已确认的 agent-computer-use 实现缺陷，不计入 parity bug。
+- 分类: 测试运行环境阻塞；不是已确认的 minami-studio 实现缺陷，不计入 parity bug。
 - 任务: CX00 预检，在开始真实桌面任务前检查权限、应用和 TextEdit 状态。
-- 复现: 依次调用 `agent_computer_use.permissions({})`、`agent_computer_use.list_apps({"days":1})`、`agent_computer_use.get_app_state({"bundle":"com.apple.TextEdit","auto_launch":false,"depth":2,"interactive_only":true})`。
+- 复现: 依次调用 `minami_studio.permissions({})`、`minami_studio.list_apps({"days":1})`、`minami_studio.get_app_state({"bundle":"com.apple.TextEdit","auto_launch":false,"depth":2,"interactive_only":true})`。
 - 实际: 三次均返回 `{"content":[{"type":"text","text":"MCP tool call requires approval, but approval policy is never"}],"isError":true}`。未得到 daemon 响应或应用快照。
 - 期望: 运行环境允许本次已授权的 MCP 测试请求到达被测工具；此期望来自任务执行前提，不是对 Alma wire 的修改建议。
 - 真机对照: 未执行。拒绝发生在工具授权层，未取得可与 Alma daemon 对比的被测响应。不可将该文字当作 Alma 错误语义。
@@ -284,7 +284,7 @@ run_id=`r3`，2026-10-09；原4项修复回归均PASS，Phase2选11项补扫。�
 - 现象：后台测试TextEdit W234393，AX重置为ANCHOR并选中后，`type_text(input_method:physical,text:"A\nB",settle_ms:0)` 导致我们的连接EOF，后续ping拒绝连接。
 - 我们：原PID81258于13:47:34 `EXC_BREAKPOINT/SIGTRAP`；故障线程8栈为 `_dispatch_assert_queue_fail` → `islGetInputSourceListWithAdditions` → `TISCopyCurrentKeyboardLayoutInputSource` → `KeyboardLayoutTranslator.keyPresses(for:)`（Input.swift:135）→ `cmdTypeText`（Daemon+Actions.swift:1094）。这是运行时崩溃证据，不是仅凭源码推测。
 - 真机：相同请求返回 `internal/type_text delivered no text...`，随后ping成功；没有进程退出。
-- 证据命令：下面两个记录的request可用文末的socket客户端重放，text含真实换行（码点65,10,66）；先用本端快照ref重置/选中测试文稿。崩溃日志 `agent-computer-use-2026-10-09-134734.ips` 已留存。
+- 证据命令：下面两个记录的request可用文末的socket客户端重放，text含真实换行（码点65,10,66）；先用本端快照ref重置/选中测试文稿。崩溃日志 `minami-studio-2026-10-09-134734.ips` 已留存。
 - 裁决建议：接受为崩溃级parity差异，检查命中HIToolbox队列约束的键盘布局读取路径；不得把新增参数拒绝或永久禁用physical作为对齐。输入源运行状态可能影响触发，不宣称每次physical调用必崩。
 
 ```json
@@ -339,7 +339,7 @@ run_id=`r3`，2026-10-09；原4项修复回归均PASS，Phase2选11项补扫。�
 - 现象：测试文稿AXScrollArea声明AXScrollDownByPage，但执行返回不支持。对同一逻辑元素分别传pages0/-1。
 - 我们：pages0直接成功 `scrolled:<ref>,pages:0`；pages-1在 `Daemon.cmdScroll` 的range遍历崩溃，PID87947退出。
 - 真机：pages0和-1均尝试动作，返回 `action_unsupported/Element does not support action performing AXScrollDownByPage.`，继续正常服务。正数1/2经恢复后双端同错误。
-- 证据命令：`P05-scroll-down--1`、`P05-scroll-down-0`，复核 `C-scroll-0/1/2`；两边ref来自同W234393的AXScrollArea。崩溃报告 `agent-computer-use-2026-10-09-135043.ips`，栈 `closure #1 in Daemon.cmdScroll(_:)`（Daemon+Actions.swift:1354）→ `_assertionFailure`。
+- 证据命令：`P05-scroll-down--1`、`P05-scroll-down-0`，复核 `C-scroll-0/1/2`；两边ref来自同W234393的AXScrollArea。崩溃报告 `minami-studio-2026-10-09-135043.ips`，栈 `closure #1 in Daemon.cmdScroll(_:)`（Daemon+Actions.swift:1354）→ `_assertionFailure`。
 - 裁决建议：接受；应复刻Alma的非正pages有效步数处理，不能自行增加invalid_arg墙。本次不推断Alma究竟钳制为几步，因为该控件第一步已失败。
 
 ```json

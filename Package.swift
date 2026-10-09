@@ -2,12 +2,12 @@
 import PackageDescription
 
 let package = Package(
-    name: "minami-computer-use",
+    name: "minami-studio",
     platforms: [.macOS(.v13)],
     targets: [
         .executableTarget(
-            name: "minami-computer-use",
-            path: "Sources/minami-computer-use"
+            name: "minami-studio",
+            path: "Sources/minami-studio"
         )
     ]
 )
