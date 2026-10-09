@@ -1,0 +1,29 @@
+{
+  "name": "minami-computer-use",
+  "version": "1.0.0-beta.2",
+  "description": "Minami Computer Use — MCP-native macOS desktop automation (AX/CGEvent/SCK daemon + stdio MCP wrapper)",
+  "type": "module",
+  "bin": {
+    "minami-computer-use-mcp": "mcp/minami-computer-use-mcp.mjs"
+  },
+  "scripts": {
+    "postinstall": "node scripts/install.mjs"
+  },
+  "files": [
+    "bin/",
+    "mcp/",
+    "skills/",
+    "scripts/install.mjs"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "os": [
+    "darwin"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/ZunbaRan/minami-computer-use.git"
+  },
+  "private": true
+}

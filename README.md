@@ -16,18 +16,33 @@ Agent (Codex CLI / any MCP client)
 
 ## 安装
 
-### A. 预编译包（推荐，macOS arm64）
+### A. npx 一行接入（推荐）
+
+harness 配置里直接写（无需 clone；postinstall 会自动从 Release 拉对应版本
+的 universal 守护进程，私有 repo 需要本机 git/gh 对该 repo 有访问权）：
+
+```json
+"minami_computer_use": {
+  "command": "npx",
+  "args": ["-y", "github:ZunbaRan/minami-computer-use"]
+}
+```
+
+### B. 预编译 tarball
 
 ```sh
-# 下载 release 里的 minami-computer-use-<ver>-macos-arm64.tar.gz
-tar xzf minami-computer-use-*.tar.gz && cd minami-computer-use-*
+# 下载 release 里的 minami-computer-use-<ver>-macos-universal.tar.gz
+# (Apple Silicon + Intel 双架构；私有 repo 需 gh 登录或 token)
+gh release download v1.0.0-beta.2 -R ZunbaRan/minami-computer-use \
+  -p 'minami-computer-use-*-macos-universal.tar.gz'
+tar xzf minami-computer-use-*.tar.gz && cd minami-computer-use
 xattr -dr com.apple.quarantine .   # 去掉 Gatekeeper 隔离位
 ```
 
 得到 `bin/minami-computer-use`(Swift daemon)+ `bin/minami-computer-use-mcp`
 (MCP 入口)+ `mcp/` + `skills/`(操作手册，Skill 工具/resources 即时读)。
 
-### B. 源码构建
+### C. 源码构建
 
 ```sh
 git clone <this repo> && cd minami-computer-use
