@@ -535,6 +535,7 @@ final class ZoomExporter {
         var autoZoom: Bool = true
         var showCursor: Bool = true
         var cursorStyle: String = "dot"   // "dot" (agent blue) | "arrow" (system)
+        var cursorSize: Double?           // px height override; nil = style default
         var clickRings: Bool = true
         var motionBlur: Bool = true
         var audio: Bool = true
@@ -572,8 +573,10 @@ final class ZoomExporter {
         }.filter { $0.endMs > $0.startMs }
         var camera = ZoomCamera(regions: regions ?? [], samples: samples)
 
-        // Artwork: cursor at ~2.5% of frame height, ring ~7%.
-        let cursorSize = max(28.0, Double(H) * 0.025)
+        // Artwork: dot at ~2.5% of frame height, arrow ~4% (arrows read
+        // small next to a filled dot), ring ~7%. cursor_size overrides.
+        let cursorSize = opt.cursorSize
+            ?? max(28.0, Double(H) * (opt.cursorStyle == "arrow" ? 0.04 : 0.025))
         let ringSize = max(48.0, Double(H) * 0.07)
         var cursorCG: CGImage?, hotspot = CGPoint(x: 0.5, y: 0.5)
         if opt.cursorStyle == "arrow" {
@@ -819,6 +822,7 @@ extension Daemon {
         opt.autoZoom = a.bool("auto_zoom") ?? true
         opt.showCursor = a.bool("show_cursor") ?? true
         if let cs = a["cursor_style"] as? String { opt.cursorStyle = cs }
+        opt.cursorSize = a.int("cursor_size").map { Double($0) }
         opt.clickRings = a.bool("click_rings") ?? true
         opt.motionBlur = a.bool("motion_blur") ?? true
         opt.audio = a.bool("audio") ?? true
