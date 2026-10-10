@@ -1843,6 +1843,7 @@ defTool(
     show_cursor: { type: "boolean", description: "Draw the cursor overlay (default true)." },
     click_rings: { type: "boolean", description: "Draw expanding rings at clicks (default true)." },
     motion_blur: { type: "boolean", description: "Directional/radial blur during camera moves (default true)." },
+    cursor_style: { type: "string", enum: ["dot", "arrow"], description: "Cursor overlay style: 'dot' = agent blue dot matching the PiP lens (default), 'arrow' = system arrow." },
     audio: { type: "boolean", description: "Pass the source's audio track through untouched (default true)." }
   },
   ["in", "out"],
@@ -1851,7 +1852,8 @@ defTool(
       in: args.in, out: args.out, cursor: args.cursor, depth: args.depth,
       auto_zoom: args.auto_zoom, regions: args.regions,
       show_cursor: args.show_cursor, click_rings: args.click_rings,
-      motion_blur: args.motion_blur, audio: args.audio
+      motion_blur: args.motion_blur, audio: args.audio,
+      cursor_style: args.cursor_style
     });
     return { content: [textBlock(JSON.stringify(res, null, 2))] };
   }
