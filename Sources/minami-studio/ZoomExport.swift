@@ -664,17 +664,17 @@ final class ZoomExporter {
                 if havePrev {
                     let panPx = hypot(tx - prevTx, ty - prevTy)
                     let ds = s - prevS
-                    if panPx > 4 {
+                    if panPx > 6 {
                         composited = composited.applyingFilter("CIMotionBlur",
                             parameters: [
-                                "inputRadius": min(9, panPx * 0.3),
+                                "inputRadius": min(5, panPx * 0.25),
                                 "inputAngle": atan2(ty - prevTy, tx - prevTx),
                             ]).cropped(to: outRect)
                     }
-                    if abs(ds) > 0.01 {
+                    if abs(ds) > 0.02 {
                         composited = composited.applyingFilter("CIZoomBlur",
                             parameters: [
-                                "inputAmount": min(12, abs(ds) * 30),
+                                "inputAmount": min(7, abs(ds) * 20),
                                 "inputCenter": CIVector(x: CGFloat(W) / 2,
                                                         y: CGFloat(H) / 2),
                             ]).cropped(to: outRect)
