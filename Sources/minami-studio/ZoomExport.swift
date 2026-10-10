@@ -469,6 +469,28 @@ func loadCursorTelemetry(path: String) -> [CursorSample] {
     }
 }
 
+/// Resolves the asset duration in ms. The deprecated synchronous
+/// `asset.duration` returns 0 for files whose moov atom sits at the end
+/// (metadata not yet loaded), which silently empties every generated
+/// region. Load it properly via load(.duration), then fall back to the
+/// longest track timeRange, then to caller-provided telemetry bounds.
+private func assetDurationMs(_ asset: AVAsset, fallbackMs: Double = 0) -> Double {
+    var loaded = 0.0
+    let sema = DispatchSemaphore(value: 0)
+    Task {
+        if let d = try? await asset.load(.duration) {
+            loaded = CMTimeGetSeconds(d) * 1000
+        }
+        sema.signal()
+    }
+    _ = sema.wait(timeout: .now() + 5)
+    if loaded > 0 { return loaded }
+    let trackMs = asset.tracks.map {
+        CMTimeGetSeconds($0.timeRange.duration) * 1000
+    }.max() ?? 0
+    return max(trackMs, fallbackMs)
+}
+
 // MARK: - Exporter
 
 final class ZoomExporter {
@@ -502,11 +524,11 @@ final class ZoomExporter {
         guard W > 1, H > 1 else {
             throw DaemonError("invalid_arg", "bad video dimensions \(W)x\(H)")
         }
-        let totalMs = CMTimeGetSeconds(asset.duration) * 1000
-
         let cursorPath = opt.cursorPath ?? (opt.input + ".cursor.json")
         let samples = FileManager.default.fileExists(atPath: cursorPath)
             ? loadCursorTelemetry(path: cursorPath) : []
+        let totalMs = assetDurationMs(asset,
+                                      fallbackMs: samples.map(\.timeMs).max() ?? 0)
 
         var regions = opt.regions
         if regions == nil, opt.autoZoom {
@@ -791,8 +813,9 @@ extension Daemon {
         } else {
             let input = try requireStr(a, "in")
             let asset = AVAsset(url: URL(fileURLWithPath: input))
-            totalMs = CMTimeGetSeconds(asset.duration) * 1000
             samples = loadCursorTelemetry(path: input + ".cursor.json")
+            totalMs = assetDurationMs(asset,
+                                      fallbackMs: samples.map(\.timeMs).max() ?? 0)
         }
         let depth = a.int("depth") ?? ZM.defaultDepth
         let regions = ZoomSuggest.regions(samples: samples, totalMs: totalMs,
