@@ -249,7 +249,10 @@ class DaemonClient {
         binary,
         // Same contract as Alma: whichever process starts the daemon sets
         // its lifetime for both.
-        ["daemon", "--socket", this.socketPath, "--idle-seconds", "900"],
+        ["daemon", "--socket", this.socketPath, "--idle-seconds", "900",
+         // Studio defaults: PiP floaters show the agent's virtual cursor
+         // (LensBus) and never mirror the user's hardware cursor.
+         "--lens", "--pip-hide-hw-cursor"],
         { stdio: ["ignore", "pipe", "pipe"], detached: false }
       );
       child.stderr?.on("data", (buf) => process.stderr.write(buf));
