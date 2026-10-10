@@ -1766,13 +1766,14 @@ defTool(
     window_id: { type: "integer", description: "Record only this CGWindowID's on-screen rect (display-relative crop; occluded pixels show whatever is on top). Omit for full display." },
     display_id: { type: "integer", description: "CGDirectDisplayID to record. Default: main display." },
     fps: { type: "integer", description: "Capture rate, 1–120. Default 60." },
-    audio: { type: "boolean", description: "Also record system audio inline. Default false." }
+    audio: { type: "boolean", description: "Also record system audio inline. Default false." },
+    os_cursor: { type: "boolean", description: "Track the real OS cursor in telemetry (moves + clicks). Default true. Set false for agent-only telemetry — the exported cursor overlay then follows only the agent's actions, never the user's mouse." }
   },
   ["out"],
   async (args) => {
     const res = await daemon.call("record_start", {
       out: args.out, window_id: args.window_id, display_id: args.display_id,
-      fps: args.fps, audio: args.audio
+      fps: args.fps, audio: args.audio, os_cursor: args.os_cursor
     });
     return { content: [textBlock(JSON.stringify(res, null, 2))] };
   }

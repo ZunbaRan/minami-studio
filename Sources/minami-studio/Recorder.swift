@@ -648,7 +648,7 @@ final class CursorTelemetryRecorder {
         return max(0, Int(elapsed * 1000))
     }
 
-    func start(normRect: CGRect) {
+    func start(normRect: CGRect, trackOS: Bool = true) {
         queue.sync {
             samples.removeAll()
             self.normRect = normRect
@@ -657,6 +657,11 @@ final class CursorTelemetryRecorder {
             pauseStart = nil
             isCapturing = true
         }
+        // trackOS=false → agent-only telemetry: no OS cursor polling, no
+        // event tap. The exported video's cursor overlay then follows only
+        // the agent's virtual pointer (Input noteAction injections), so the
+        // user's own mouse never appears as the cursor in the final render.
+        guard trackOS else { return }
         installTap()
         let t = DispatchSource.makeTimerSource(queue: queue)
         t.schedule(deadline: .now() + 0.033, repeating: 0.033)
@@ -841,6 +846,7 @@ final class RecordManager {
         let displayId = args.int("display_id").map { CGDirectDisplayID($0) }
         let fps = args.int("fps") ?? recordCaptureFPS
         let audio = args.bool("audio") ?? false
+        let osCursor = args.bool("os_cursor") ?? true
         let excluded = (args.array("exclude_pids") ?? []).compactMap {
             ($0 as? NSNumber)?.int32Value
         }
@@ -884,7 +890,7 @@ final class RecordManager {
 
         let tel = CursorTelemetryRecorder()
         telemetry = tel
-        tel.start(normRect: rec.normRect)
+        tel.start(normRect: rec.normRect, trackOS: osCursor)
         outPath = out
         startWall = Date()
 
@@ -898,6 +904,7 @@ final class RecordManager {
             "window_id": windowId.map { Int($0) } ?? NSNull(),
             "display_id": displayId.map { Int($0) } ?? NSNull(),
             "cursor_tap": tel.tapInstalled,
+            "os_cursor": osCursor,
         ]
     }
 
