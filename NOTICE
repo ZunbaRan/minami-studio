@@ -1,0 +1,25 @@
+minami-studio
+=============
+
+Copyright (c) 2026 minami-studio contributors
+Licensed under the GNU Affero General Public License v3.0 (see LICENSE).
+
+This project contains code adapted from:
+
+  Recordly — https://github.com/webadderallorg/Recordly
+  Copyright (c) Recordly contributors
+  Licensed under the GNU Affero General Public License v3.0
+
+  - Sources/minami-studio/Recorder.swift: the ScreenCaptureKit capture core
+    (60fps stream configuration, window-mode display-filter + CIContext crop,
+    pause/resume timestamp rebasing, guarded tail-frame finalization) is
+    adapted from electron/native/ScreenCaptureKitRecorder.swift.
+  - Sources/minami-studio/ZoomExport.swift: the auto-zoom camera model
+    (click clustering, region strengths, easing curves, focus-anchored
+    transform, safe-zone cursor-follow, chained pan) is a reimplementation
+    of the algorithms and constants in src/components/video-editor/ — see
+    docs/RECORDLY-ZOOM-PIPELINE.md for the full mapping.
+
+minami-studio is a fork of minami-computer-use
+(https://github.com/ZunbaRan/minami-computer-use), an independent clean-room
+reproduction of Alma's macOS Computer Use wire surface.
