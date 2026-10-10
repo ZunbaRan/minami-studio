@@ -417,22 +417,34 @@ struct ZoomCamera {
 
 // MARK: - Cursor artwork
 
-/// Arrow cursor CGImage + hotspot (in points of the cursor image).
-private func systemArrowCursor() -> (CGImage, CGPoint)? {
-    var result: (CGImage, CGPoint)?
+/// Agent cursor dot matching the PiP lens (PIPLens cursorDot: accent-blue
+/// fill, white ring). Rendered at 2x so downscaling in the frame stays
+/// smooth. Hotspot is the center.
+private func makeCursorDotImage(diameter: CGFloat) -> CGImage? {
+    var out: CGImage?
     let grab = {
-        let img = NSCursor.arrow.image
-        var rect = CGRect(origin: .zero, size: img.size)
-        if let cg = img.cgImage(forProposedRect: &rect, context: nil, hints: nil) {
-            let hs = NSCursor.arrow.hotSpot
-            result = (cg, CGPoint(x: hs.x / max(1, img.size.width),
-                                  y: hs.y / max(1, img.size.height)))
-        }
+        let s = max(16, diameter) * 2
+        let space = CGColorSpaceCreateDeviceRGB()
+        guard let ctx = CGContext(data: nil, width: Int(s), height: Int(s),
+                                  bitsPerComponent: 8, bytesPerRow: 0,
+                                  space: space,
+                                  bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)
+        else { return }
+        ctx.scaleBy(x: 2, y: 2)
+        let d = s / 2
+        let lw = max(2, d * 0.125)
+        let rect = CGRect(x: lw, y: lw, width: d - 2 * lw, height: d - 2 * lw)
+        ctx.setFillColor(NSColor.controlAccentColor.cgColor)
+        ctx.fillEllipse(in: rect)
+        ctx.setStrokeColor(NSColor.white.cgColor)
+        ctx.setLineWidth(lw)
+        ctx.strokeEllipse(in: rect)
+        out = ctx.makeImage()
     }
     if Thread.isMainThread { grab() } else {
         DispatchQueue.main.sync { grab() }
     }
-    return result
+    return out
 }
 
 /// Pre-rendered click ring (white stroke) drawn expanding+fading over clicks.
@@ -542,9 +554,10 @@ final class ZoomExporter {
         var camera = ZoomCamera(regions: regions ?? [], samples: samples)
 
         // Artwork: cursor at ~2% of frame height, ring ~7%.
-        let cursorSize = max(24.0, Double(H) * 0.02)
+        let cursorSize = max(28.0, Double(H) * 0.025)
         let ringSize = max(48.0, Double(H) * 0.07)
-        let (cursorCG, hotspot) = systemArrowCursor() ?? (nil, CGPoint(x: 0.15, y: 0.08))
+        let cursorCG = makeCursorDotImage(diameter: CGFloat(cursorSize))
+        let hotspot = CGPoint(x: 0.5, y: 0.5)
         let cursorCI = cursorCG.map { CIImage(cgImage: $0) }
         let cursorScale = cursorCG.map { cursorSize / Double($0.height) } ?? 0
         let ringCI = makeRingImage(diameter: CGFloat(ringSize)).map { CIImage(cgImage: $0) }
