@@ -119,6 +119,9 @@ final class ScreenRecorder: NSObject, SCStreamOutput, SCStreamDelegate {
         var outH: Int
 
         if let windowId {
+            // desktopIndependentWindow captures the window's own backing
+            // store — content survives occlusion AND off-space windows,
+            // strictly stronger than Recordly's display-crop semantics.
             guard let window = content.windows.first(where: { $0.windowID == windowId }) else {
                 throw DaemonError("invalid_arg", "window_id \(windowId) not capturable")
             }
@@ -128,22 +131,17 @@ final class ScreenRecorder: NSObject, SCStreamOutput, SCStreamDelegate {
                 throw DaemonError("invalid_arg", "no display contains window_id \(windowId)")
             }
             let scaleFactor = Self.scaleFactor(for: display.displayID)
-            let captureRect = visibleFrame.intersection(display.frame)
-            filter = SCContentFilter(display: display, excludingApplications: excludedApps,
-                                     exceptingWindows: [])
-            cropRectNorm = CGRect(
-                x: (captureRect.minX - display.frame.minX) / display.frame.width,
-                y: (captureRect.minY - display.frame.minY) / display.frame.height,
-                width: captureRect.width / display.frame.width,
-                height: captureRect.height / display.frame.height)
-            cropDisplayId = display.displayID
+            filter = SCContentFilter(desktopIndependentWindow: window)
+            cropRectNorm = nil
+            cropDisplayId = nil
             trackedWindowId = windowId
-            normRect = captureRect
-            outW = max(2, Int(captureRect.width) * scaleFactor) & ~1
-            outH = max(2, Int(captureRect.height) * scaleFactor) & ~1
-            cfg.width = max(2, Int(display.frame.width) * scaleFactor)
-            cfg.height = max(2, Int(display.frame.height) * scaleFactor)
-            cfg.pixelFormat = kCVPixelFormatType_32BGRA
+            normRect = visibleFrame
+            outW = max(2, Int(visibleFrame.width) * scaleFactor) & ~1
+            outH = max(2, Int(visibleFrame.height) * scaleFactor) & ~1
+            cfg.width = outW
+            cfg.height = outH
+            cfg.scalesToFit = true
+            if #available(macOS 14.0, *) { cfg.ignoreShadowsSingleWindow = true }
         } else {
             let targetDisplay = displayId ?? CGMainDisplayID()
             guard let display = content.displays.first(where: { $0.displayID == targetDisplay }) else {
@@ -165,6 +163,7 @@ final class ScreenRecorder: NSObject, SCStreamOutput, SCStreamDelegate {
 
         let url = URL(fileURLWithPath: out)
         outputURL = url
+        try? FileManager.default.removeItem(at: url) // overwrite existing target
         let fileType: AVFileType = url.pathExtension.lowercased() == "mp4" ? .mp4 : .mov
         let writer = try AVAssetWriter(url: url, fileType: fileType)
 
@@ -558,7 +557,10 @@ final class ScreenRecorder: NSObject, SCStreamOutput, SCStreamDelegate {
             y: (captureRect.minY - display.frame.minY) / display.frame.height,
             width: captureRect.width / display.frame.width,
             height: captureRect.height / display.frame.height)
-        if cropDisplayId != display.displayID {
+        // display-crop mode only: follow the window across displays.
+        // desktopIndependentWindow mode (cropRectNorm nil at start) needs no
+        // filter updates — SCK tracks the window itself.
+        if let cropDisplayId, cropDisplayId != display.displayID {
             let excludedApps = content.applications.filter {
                 excludedPids.contains($0.processID)
             }
@@ -571,8 +573,8 @@ final class ScreenRecorder: NSObject, SCStreamOutput, SCStreamDelegate {
         }
         queue.async {
             guard self.isRecording else { return }
-            self.cropRectNorm = newCrop
-            self.cropDisplayId = display.displayID
+            if self.cropRectNorm != nil { self.cropRectNorm = newCrop }
+            if self.cropDisplayId != nil { self.cropDisplayId = display.displayID }
             self.normRect = captureRect
         }
     }
