@@ -32,7 +32,7 @@ Independent MCP-native reproduction of Alma's macOS Computer Use surface.
 ```
 Sources/minami-studio/  Swift daemon（main / Support / Daemon /
                               Daemon+Actions / AX / Capture / Focus /
-                              Input / PIP）
+                              Input / PIP / Recorder / ZoomExport）
 mcp/minami-studio-mcp.mjs 36-tool stdio MCP wrapper（Alma wrapper 移植
                               + 5 record_* + 2 zoom_* 新面工具）
 bin/minami-studio-mcp     稳定入口（任何 harness 指这里）

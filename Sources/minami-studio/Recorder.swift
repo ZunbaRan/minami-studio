@@ -728,7 +728,16 @@ final class CursorTelemetryRecorder {
         }
     }
 
-    // MARK: CGEvent tap (passive, session scope — sees user AND daemon-injected clicks)
+    /// Agent-driven interactions arrive here: daemon clicks/drags are
+    /// CGEventPostToPid'd and never enter the session event tap, so Input
+    /// reports them directly. A "move" entry at the action point also makes
+    /// the export-time cursor overlay track the agent's virtual pointer.
+    func noteAction(_ type: String, at p: CGPoint) {
+        pushInteraction(type, at: p)
+    }
+
+    // MARK: CGEvent tap (passive, session scope — sees REAL user clicks only;
+    // daemon clicks are CGEventPostToPid'd and arrive via noteAction instead)
 
     private func installTap() {
         let types: [CGEventType] = [
@@ -938,6 +947,15 @@ final class RecordManager {
         let ok = rec.resume()
         if ok { tel?.resume() }
         return ["recording": true, "paused": rec.paused]
+    }
+
+    /// Feed an agent-driven interaction (click/drag phase) into the active
+    /// telemetry recorder. No-op when not recording.
+    func noteAction(_ type: String, at p: CGPoint) {
+        lock.lock()
+        let tel = telemetry
+        lock.unlock()
+        tel?.noteAction(type, at: p)
     }
 
     func status() -> JSONDict {

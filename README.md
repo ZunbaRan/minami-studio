@@ -144,6 +144,36 @@ Verified live: `pip_open` on a Notes CGWindowID → panel appears bottom-right
 fields match the Alma probe shape exactly; partial `width`/`height` is
 rejected with Alma's verbatim message.
 
+## Session recording + auto-zoom (minami-studio 新面)
+
+The agent can record its own session and produce a polished auto-zoomed
+video — Screen Studio / Recordly style — in one pass:
+
+```
+record_start{out, window_id?|display_id?, fps?, audio?}   # SCK→mp4, cursor NOT baked
+   …agent operates the computer (click/drag/type_text/…)…
+record_stop          # mp4 + <out>.cursor.json telemetry sidecar
+zoom_suggest{in}     # optional: preview/edit auto-generated zoom regions
+zoom_export{in,out,depth?,regions?,motion_blur?,audio?}   # final composited mp4
+```
+
+- **录制**（`Recorder.swift`）：SCStream 60fps + AVAssetWriter H.264；
+  `showsCursor=false`——OS 光标不进像素；window 模式 = display filter +
+  逐帧 CI crop（遮挡录上层）；pause/resume 时间轴重基线。
+- **遥测**（同文件 `CursorTelemetryRecorder`）：33ms 轮询物理光标 +
+  CGEvent session tap 记真实用户点击；**agent 的 `click`/`drag` 经
+  `RecordManager.noteAction` 直接注入**（CGEventPostToPid 不经事件流，
+  tap 看不见）——export 时渲染的光标因此跟随 agent 的虚拟指针。
+- **变焦合成**（`ZoomExport.swift`）：AVAssetReader 逐帧 → 点击分类
+  （dropdown/text-selection/text-field/double-click）+ 2.5s 聚簇生成
+  region → easeOutZoom(0.16,1,0.3,1) 缓动 + focus 锚定仿射
+  `s=1+(S−1)·p` → safe-zone 跟焦相机（25% 内缩）+ 缩出冻结 +
+  gap≤1350ms chained pan（1000ms easeInOutCubic 混合）→ CIMotionBlur/
+  CIZoomBlur 运动模糊 → 光标重绘 + 点击涟漪 → AVAssetWriter。
+  `depth` 1–6 → 1.25×/1.5×/1.8×/2.2×/3.5×/5×，默认 3。音轨压缩样本透传。
+- 数学与常数移植自 Recordly（AGPL-3.0），详见
+  `docs/RECORDLY-ZOOM-PIPELINE.md`；本项目 AGPL-3.0。
+
 ## Verified end-to-end (live, this machine)
 
 - `launch_app` background launch (Calculator/TextEdit) without focus theft.

@@ -483,6 +483,8 @@ final class ZoomExporter {
         var autoZoom: Bool = true
         var showCursor: Bool = true
         var clickRings: Bool = true
+        var motionBlur: Bool = true
+        var audio: Bool = true
     }
 
     /// Synchronous export — call off the main thread. Returns output stats.
@@ -536,6 +538,20 @@ final class ZoomExporter {
         }
         reader.add(rdOut)
 
+        // Audio passthrough: when the source carries a track, copy the
+        // compressed samples through untouched (no re-encode).
+        var rdAudioOut: AVAssetReaderTrackOutput?
+        var audioTrack: AVAssetTrack?
+        if opt.audio, let at = asset.tracks(withMediaType: .audio).first {
+            let o = AVAssetReaderTrackOutput(track: at, outputSettings: nil)
+            o.alwaysCopiesSampleData = false
+            if reader.canAdd(o) {
+                reader.add(o)
+                rdAudioOut = o
+                audioTrack = at
+            }
+        }
+
         // Writer — same assistant settings path as the recorder.
         let dstURL = URL(fileURLWithPath: opt.output)
         try? FileManager.default.removeItem(at: dstURL)
@@ -566,6 +582,18 @@ final class ZoomExporter {
             throw DaemonError("internal", "unable to add video writer input")
         }
         writer.add(vIn)
+        var aIn: AVAssetWriterInput?
+        if let audioTrack, opt.audio,
+           let hint = audioTrack.formatDescriptions.first as! CMFormatDescription? {
+            let input = AVAssetWriterInput(mediaType: .audio,
+                                           outputSettings: nil,
+                                           sourceFormatHint: hint)
+            input.expectsMediaDataInRealTime = false
+            if writer.canAdd(input) {
+                writer.add(input)
+                aIn = input
+            }
+        }
         let adaptor = AVAssetWriterInputPixelBufferAdaptor(
             assetWriterInput: vIn,
             sourcePixelBufferAttributes: [
@@ -588,6 +616,7 @@ final class ZoomExporter {
             explicitClickTypes.contains($0.interactionType)
         }
         var frames = 0
+        var prevTx = 0.0, prevTy = 0.0, prevS = 1.0, havePrev = false
 
         while let sb = rdOut.copyNextSampleBuffer() {
             guard let srcPB = CMSampleBufferGetImageBuffer(sb) else { continue }
@@ -600,12 +629,37 @@ final class ZoomExporter {
             let fx = focus.cx * Double(W)
             let fyCI = (1 - focus.cy) * Double(H)     // CI y is bottom-up
             let s = 1 + (targetScale - 1) * progress
+            let tx = (Double(W) / 2 - fx * targetScale) * progress
+            let ty = (Double(H) / 2 - fyCI * targetScale) * progress
             var composited = CIImage(cvPixelBuffer: srcPB)
-                .transformed(by: CGAffineTransform(
-                    a: s, b: 0, c: 0, d: s,
-                    tx: (Double(W) / 2 - fx * targetScale) * progress,
-                    ty: (Double(H) / 2 - fyCI * targetScale) * progress))
+                .transformed(by: CGAffineTransform(a: s, b: 0, c: 0, d: s,
+                                                 tx: tx, ty: ty))
                 .composited(over: black)
+
+            // Motion blur from camera delta (scene only — cursor stays crisp):
+            // pan → directional CIMotionBlur, scale delta → radial CIZoomBlur.
+            if opt.motionBlur {
+                if havePrev {
+                    let panPx = hypot(tx - prevTx, ty - prevTy)
+                    let ds = s - prevS
+                    if panPx > 1.25 {
+                        composited = composited.applyingFilter("CIMotionBlur",
+                            parameters: [
+                                "inputRadius": min(20, panPx * 0.5),
+                                "inputAngle": atan2(ty - prevTy, tx - prevTx),
+                            ]).cropped(to: outRect)
+                    }
+                    if abs(ds) > 0.002 {
+                        composited = composited.applyingFilter("CIZoomBlur",
+                            parameters: [
+                                "inputAmount": min(30, abs(ds) * 60),
+                                "inputCenter": CIVector(x: CGFloat(W) / 2,
+                                                        y: CGFloat(H) / 2),
+                            ]).cropped(to: outRect)
+                    }
+                }
+                prevTx = tx; prevTy = ty; prevS = s; havePrev = true
+            }
 
             // Click rings (viewport space, centered at click pos).
             if opt.clickRings, let ringCI {
@@ -651,6 +705,18 @@ final class ZoomExporter {
             if adaptor.append(dest, withPresentationTime: pts) { frames += 1 }
         }
 
+        // Drain the audio track (compressed passthrough; writer muxes by PTS).
+        if let rdAudioOut, let aIn {
+            while let asb = rdAudioOut.copyNextSampleBuffer() {
+                var spins = 0
+                while !aIn.isReadyForMoreMediaData, spins < 2000 {
+                    usleep(1000); spins += 1
+                }
+                aIn.append(asb)
+            }
+            aIn.markAsFinished()
+        }
+
         vIn.markAsFinished()
         try awaitSync { done in writer.finishWriting { done() } }
         guard writer.status == .completed else {
@@ -693,6 +759,8 @@ extension Daemon {
         opt.autoZoom = a.bool("auto_zoom") ?? true
         opt.showCursor = a.bool("show_cursor") ?? true
         opt.clickRings = a.bool("click_rings") ?? true
+        opt.motionBlur = a.bool("motion_blur") ?? true
+        opt.audio = a.bool("audio") ?? true
         if let rawRegions = a.array("regions") {
             opt.regions = rawRegions.compactMap { item in
                 guard let r = item as? [String: Any],

@@ -1837,14 +1837,17 @@ defTool(
       items: { type: "object" }
     },
     show_cursor: { type: "boolean", description: "Draw the cursor overlay (default true)." },
-    click_rings: { type: "boolean", description: "Draw expanding rings at clicks (default true)." }
+    click_rings: { type: "boolean", description: "Draw expanding rings at clicks (default true)." },
+    motion_blur: { type: "boolean", description: "Directional/radial blur during camera moves (default true)." },
+    audio: { type: "boolean", description: "Pass the source's audio track through untouched (default true)." }
   },
   ["in", "out"],
   async (args) => {
     const res = await daemon.call("zoom_export", {
       in: args.in, out: args.out, cursor: args.cursor, depth: args.depth,
       auto_zoom: args.auto_zoom, regions: args.regions,
-      show_cursor: args.show_cursor, click_rings: args.click_rings
+      show_cursor: args.show_cursor, click_rings: args.click_rings,
+      motion_blur: args.motion_blur, audio: args.audio
     });
     return { content: [textBlock(JSON.stringify(res, null, 2))] };
   }

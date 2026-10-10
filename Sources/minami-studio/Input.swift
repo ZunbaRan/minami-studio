@@ -607,6 +607,12 @@ extension EventDispatch {
                 SynthPost.post(pid: pid, up)
                 if i < clickCount - 1 { usleep(40_000) }
             }
+            let kind = button == .right ? "right-click"
+                : button == .middle ? "middle-click"
+                : clickCount > 1 ? "double-click" : "click"
+            RecordManager.shared.noteAction("move", at: p)
+            RecordManager.shared.noteAction(kind, at: p)
+            RecordManager.shared.noteAction("mouseup", at: p)
             if showCursor {
                 LensBus.postMove(p)
                 LensBus.postClick()
@@ -630,6 +636,8 @@ extension EventDispatch {
                 button: button, clickCount: 1, pressure: 1.0,
                 pid: pid, winID: winID, winBounds: wb, forceCommandFlag: bg)
             SynthPost.post(pid: pid, down)
+            RecordManager.shared.noteAction("move", at: s)
+            RecordManager.shared.noteAction("click", at: s)
             for i in 1..<steps {
                 let t = Double(i) / Double(steps)
                 let pt = CGPoint(x: s.x + (e.x - s.x) * t,
@@ -639,6 +647,7 @@ extension EventDispatch {
                         pid: pid, winID: winID, winBounds: wb,
                         forceCommandFlag: bg) {
                     SynthPost.post(pid: pid, mv)
+                    RecordManager.shared.noteAction("move", at: pt)
                 }
                 usleep(8_000)
             }
@@ -646,6 +655,7 @@ extension EventDispatch {
                 button: button, clickCount: 1, pressure: 0,
                 pid: pid, winID: winID, winBounds: wb, forceCommandFlag: bg)
             SynthPost.post(pid: pid, up)
+            RecordManager.shared.noteAction("mouseup", at: e)
             if showCursor {
                 LensBus.postMove(e)
                 LensBus.postClick()
